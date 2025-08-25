@@ -1,0 +1,20 @@
+# Dependencias
+node_modules
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Git
+.git
+.gitignore
+
+# Archivos de desarrollo
+.env
+.env.*
+dist
+coverage
+.vscode
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
