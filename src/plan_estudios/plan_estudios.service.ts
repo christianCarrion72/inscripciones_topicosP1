@@ -18,17 +18,21 @@ export class PlanEstudiosService {
   ) {}
 
   async create(createPlanEstudioDto: CreatePlanEstudioDto) {
-    const carrera = await this.carreraRepository.findOneBy({
-      id: createPlanEstudioDto.idCarrera}
-    );
-    if(!carrera) {
-      throw new BadRequestException('La carrera no existe');
+    const planData: Partial<PlanEstudio> = {
+      nombre: createPlanEstudioDto.nombre
+    };
+    
+    if (createPlanEstudioDto.idCarrera) {
+      const carrera = await this.carreraRepository.findOneBy({
+        id: createPlanEstudioDto.idCarrera
+      });
+      if(!carrera) {
+        throw new BadRequestException('La carrera no existe');
+      }
+      planData.idCarrera = carrera;
     }
 
-    return await this.planEstudioRepository.save({
-      ...createPlanEstudioDto,
-      idCarrera: carrera,
-    })
+    return await this.planEstudioRepository.save(planData);
   }
 
   async findAll() {

@@ -17,7 +17,24 @@ export class NivelsService {
     private readonly planEstudioRepository: Repository<PlanEstudio>,
   ){}
 
-  async create(createNivelDto: CreateNivelDto) {
+    async create(createNivelDto: CreateNivelDto) {
+      const nivelData: Partial<Nivel> = {
+        nombre: createNivelDto.nombre
+      };
+      
+      if (createNivelDto.idPlan) {
+        const plan_estudio = await this.planEstudioRepository.findOneBy({
+          id: createNivelDto.idPlan
+        });
+        if(!plan_estudio) {
+          throw new BadRequestException('El plan de estudio no existe');
+        }
+        nivelData.idPlan = plan_estudio;
+      }
+  
+      return await this.nivelRepository.save(nivelData);
+    }
+  /*async create(createNivelDto: CreateNivelDto) {
     const plan_estudio = await this.planEstudioRepository.findOneBy({
       id: createNivelDto.idPlan
     });
@@ -30,7 +47,7 @@ export class NivelsService {
       ...createNivelDto,
       idPlan: plan_estudio,
     });
-  }
+  }*/
 
   async findAll() {
     return await this.nivelRepository.find();

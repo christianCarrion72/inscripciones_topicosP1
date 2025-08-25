@@ -1,4 +1,5 @@
-import { Column, DeleteDateColumn, Entity } from "typeorm";
+import { Nivel } from "src/nivels/entities/nivel.entity";
+import { Column, DeleteDateColumn, Entity, ManyToOne } from "typeorm";
 
 @Entity()
 export class Materia {
@@ -12,8 +13,10 @@ export class Materia {
     @Column()
     codigo: string;
 
-    @Column()
-    idNivel: number;
+    @ManyToOne(() => Nivel, (nivel) => nivel.id,{
+        eager: true,
+    })
+    idNivel: Nivel;
 
     @DeleteDateColumn()
     deletedAt: Date;

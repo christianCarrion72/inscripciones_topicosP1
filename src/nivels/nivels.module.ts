@@ -13,5 +13,6 @@ import { CarrerasModule } from 'src/carreras/carreras.module';
   ],
   controllers: [NivelsController],
   providers: [NivelsService, PlanEstudiosService],
+  exports: [TypeOrmModule]
 })
 export class NivelsModule {}

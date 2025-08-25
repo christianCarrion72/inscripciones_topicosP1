@@ -1,26 +1,62 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateMateriaDto } from './dto/create-materia.dto';
 import { UpdateMateriaDto } from './dto/update-materia.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Materia } from './entities/materia.entity';
+import { Repository } from 'typeorm';
+import { Nivel } from 'src/nivels/entities/nivel.entity';
 
 @Injectable()
 export class MateriasService {
-  create(createMateriaDto: CreateMateriaDto) {
-    return 'This action adds a new materia';
+
+  constructor(
+    @InjectRepository(Materia)
+    private readonly materiasRepository: Repository<Materia>,
+
+    @InjectRepository(Nivel)
+    private readonly nivelsRepository: Repository<Nivel>,
+  ) {}
+  async create(createMateriaDto: CreateMateriaDto) {
+    const nivel = await this.nivelsRepository.findOneBy({ id: createMateriaDto.idNivel});
+    if (!nivel) {
+      throw new BadRequestException('El nivel no existe');
+    }
+    return await this.materiasRepository.save({
+      ...createMateriaDto,
+      idNivel: nivel
+    });
   }
 
-  findAll() {
-    return `This action returns all materias`;
+  async findAll() {
+    return await this.materiasRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} materia`;
+  async findOne(id: number) {
+    return await this.materiasRepository.findOneBy({id});
   }
 
-  update(id: number, updateMateriaDto: UpdateMateriaDto) {
-    return `This action updates a #${id} materia`;
+  async update(id: number, updateMateriaDto: UpdateMateriaDto) {
+    const materia = await this.materiasRepository.findOneBy({id});
+
+    if(!materia){
+      throw new BadRequestException('La materia no existe');
+    }
+
+    let nivel;
+    if(updateMateriaDto.idNivel){
+      nivel = await this.nivelsRepository.findOneBy({id : updateMateriaDto.idNivel});
+      if(!nivel){
+        throw new BadRequestException('El nivel no encontrado');
+      }
+    }
+    return await this.materiasRepository.save({
+      ...materia,
+      ...updateMateriaDto,
+      idNivel: nivel,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} materia`;
+  async remove(id: number) {
+    return await this.materiasRepository.softDelete(id);
   }
 }

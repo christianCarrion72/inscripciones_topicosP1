@@ -13,6 +13,7 @@ export class PlanEstudio {
     
     @ManyToOne(() => Carrera ,(carrera)=> carrera.id, {
         eager: true,
+        nullable: true
     })
     idCarrera: Carrera;
 
