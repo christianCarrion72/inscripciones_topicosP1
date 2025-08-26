@@ -26,7 +26,7 @@ export class GrupoMateria {
     @OneToMany(() => Periodo, (periodo) => periodo.idGrupoMateria)
     periodos: Periodo[];
 
-    @OneToMany(() => BoletaHorario, (boleta_horario) =>boleta_horario.idHorario)
+    @OneToMany(() => BoletaHorario, (boleta_horario) =>boleta_horario.idGrupoMateria)
     boletaHorarios: BoletaHorario[];
 
     @DeleteDateColumn()
