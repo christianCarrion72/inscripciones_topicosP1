@@ -39,6 +39,9 @@ import { AuthModule } from './auth/auth.module';
       database: process.env.POSTGRES_DB,
       autoLoadEntities: true,
       synchronize: true,
+      ssl: process.env.DATABASE_SSL === 'true' ? {
+        rejectUnauthorized: false // Necesario para Render y otros servicios en la nube
+      } : false,
     }),
     CarrerasModule,
     PlanEstudiosModule,
