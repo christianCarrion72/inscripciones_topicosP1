@@ -1,26 +1,34 @@
 import { Injectable } from '@nestjs/common';
 import { CreateGestionDto } from './dto/create-gestion.dto';
 import { UpdateGestionDto } from './dto/update-gestion.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Gestion } from './entities/gestion.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class GestionsService {
-  create(createGestionDto: CreateGestionDto) {
-    return 'This action adds a new gestion';
+  constructor(
+    @InjectRepository(Gestion)
+    private readonly gestionRepository: Repository<Gestion>,
+  ) {}
+
+  async create(createGestionDto: CreateGestionDto) {
+    return await this.gestionRepository.save(createGestionDto);
   }
 
-  findAll() {
-    return `This action returns all gestions`;
+  async findAll() {
+    return await this.gestionRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} gestion`;
+  async findOne(id: number) {
+    return await this.gestionRepository.findOneBy({id});
   }
 
-  update(id: number, updateGestionDto: UpdateGestionDto) {
-    return `This action updates a #${id} gestion`;
+  async update(id: number, updateGestionDto: UpdateGestionDto) {
+    return await this.gestionRepository.update(id, updateGestionDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} gestion`;
+  async remove(id: number) {
+    return await this.gestionRepository.softDelete(id);
   }
 }

@@ -8,5 +8,6 @@ import { Gestion } from './entities/gestion.entity';
   imports: [TypeOrmModule.forFeature([Gestion])],
   controllers: [GestionsController],
   providers: [GestionsService],
+  exports: [TypeOrmModule]
 })
 export class GestionsModule {}

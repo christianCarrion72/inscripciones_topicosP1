@@ -1,3 +1,4 @@
+import { GrupoMateria } from "src/grupo_materias/entities/grupo_materia.entity";
 import { Nivel } from "src/nivels/entities/nivel.entity";
 import { Prerequisito } from "src/prerequisitos/entities/prerequisito.entity";
 import { Column, DeleteDateColumn, Entity, ManyToOne, OneToMany } from "typeorm";
@@ -25,6 +26,9 @@ export class Materia {
 
     @OneToMany(() => Prerequisito, (prerequisito) => prerequisito.idPrerequisito )
     prerequisitos: Prerequisito[];
+
+    @OneToMany(() => GrupoMateria, (grupo_materia) => grupo_materia.idMateria )
+    grupo_materias: GrupoMateria[];
 
     @DeleteDateColumn()
     deletedAt: Date;

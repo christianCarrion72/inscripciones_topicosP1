@@ -1,4 +1,8 @@
-import { Column, DeleteDateColumn, Entity } from "typeorm";
+import { Docente } from "src/docentes/entities/docente.entity";
+import { Grupo } from "src/grupos/entities/grupo.entity";
+import { Materia } from "src/materias/entities/materia.entity";
+import { Periodo } from "src/periodos/entities/periodo.entity";
+import { Column, DeleteDateColumn, Entity, ManyToOne, OneToMany } from "typeorm";
 
 @Entity()
 export class GrupoMateria {
@@ -9,14 +13,17 @@ export class GrupoMateria {
     @Column()
     cupos: number;
 
-    @Column()
-    idMateria: number;
+    @ManyToOne(() =>Materia, (materia) => materia.id,{ eager: true, nullable: true })
+    idMateria: Materia;
 
-    @Column()
-    idDocente: number;
+    @ManyToOne(() =>Docente, (docente) => docente.id,{ eager: true, nullable: true })
+    idDocente: Docente;
 
-    @Column()
-    idGrupo: number;
+    @ManyToOne(() => Grupo, (grupo) => grupo.id, { eager: true, nullable: true })
+    idGrupo: Grupo;
+
+    @OneToMany(() => Periodo, (periodo) => periodo.idGrupoMateria)
+    periodos: Periodo[];
 
     @DeleteDateColumn()
     deletedAt: Date;
