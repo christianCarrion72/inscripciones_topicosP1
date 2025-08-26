@@ -16,6 +16,14 @@ import { seedDiaHorarios } from './seeders/dia_horario.seeder';
 import { seedMaterias } from './seeders/materia.seeder';
 import { seedPrerequisitos } from './seeders/prerequisito.seeder';
 import { seedInscripcions } from './seeders/inscripcion.seeder';
+import { seedGestions } from './seeders/gestion.seeder';
+import { seedGrupos } from './seeders/grupo.seeder';
+import { seedDocentes } from './seeders/docente.seeder';
+import { seedPeriodos } from './seeders/periodo.seeder';
+import { seedGrupoMaterias } from './seeders/grupo_materia.seeder';
+import { seedBoletaHorarios } from './seeders/boleta_horario.seeder';
+import { seedDetalles } from './seeders/detalle.seeder';
+import { seedNotas } from './seeders/nota.seeder';
 
 async function runSeeders(): Promise<void> {
   const app = await NestFactory.createApplicationContext(AppModule, { logger: false });
@@ -34,6 +42,14 @@ async function runSeeders(): Promise<void> {
     await seedMaterias(dataSource);
     await seedPrerequisitos(dataSource);
     await seedInscripcions(dataSource);
+    await seedGestions(dataSource);
+    await seedGrupos(dataSource);
+    await seedDocentes(dataSource);
+    await seedPeriodos(dataSource);
+    await seedGrupoMaterias(dataSource);
+    await seedBoletaHorarios(dataSource);
+    await seedDetalles(dataSource);
+    await seedNotas(dataSource);
 
     // eslint-disable-next-line no-console
     console.log('Seeding completed.');

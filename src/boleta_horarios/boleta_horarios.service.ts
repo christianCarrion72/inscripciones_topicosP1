@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateBoletaHorarioDto } from './dto/create-boleta_horario.dto';
 import { UpdateBoletaHorarioDto } from './dto/update-boleta_horario.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -20,7 +20,29 @@ export class BoletaHorariosService {
     private readonly horarioRepository: Repository<Horario>
   ){}
   async create(createBoletaHorarioDto: CreateBoletaHorarioDto) {
-    return 'This action adds a new boletaHorario';
+    const boletaData: Partial<BoletaHorario> = {};
+    
+    if (createBoletaHorarioDto.idHorario) {
+      const horario = await this.horarioRepository.findOneBy({
+        id: createBoletaHorarioDto.idHorario
+      });
+      if(!horario) {
+        throw new BadRequestException('El horario no existe');
+      }
+      boletaData.idHorario = horario;
+    }
+
+    if (createBoletaHorarioDto.idGrupoMateria) {
+      const grupoMateria = await this.grupoMateriaRepository.findOneBy({
+        id: createBoletaHorarioDto.idGrupoMateria
+      });
+      if(!grupoMateria) {
+        throw new BadRequestException('El grupo de materia no existe');
+      }
+      boletaData.idGrupoMateria = grupoMateria;
+    }
+
+    return await this.boletaHorarioRepository.save(boletaData);
   }
 
   async findAll() {
@@ -32,7 +54,41 @@ export class BoletaHorariosService {
   }
 
   async update(id: number, updateBoletaHorarioDto: UpdateBoletaHorarioDto) {
-    return `This action updates a #${id} boletaHorario`;
+    
+    const boletaHorario = await this.boletaHorarioRepository.findOneBy({id});
+
+    if(!boletaHorario){
+      throw new BadRequestException('La boleta horario no existe');
+    }
+
+    let horario;
+    if(updateBoletaHorarioDto.idHorario){
+      horario = await this.horarioRepository.findOneBy({
+        id: updateBoletaHorarioDto.idHorario,
+      });
+
+      if (!horario) {
+        throw new BadRequestException('Horario no encontrado');
+      }
+    }
+
+    let grupoMateria;
+    if(updateBoletaHorarioDto.idGrupoMateria){
+      grupoMateria = await this.grupoMateriaRepository.findOneBy({
+        id: updateBoletaHorarioDto.idGrupoMateria,
+      });
+
+      if (!grupoMateria) {
+        throw new BadRequestException('Grupo de materia no encontrado');
+      }
+    }
+    
+    return await this.boletaHorarioRepository.save({
+      ...boletaHorario,
+      ...updateBoletaHorarioDto,
+      idHorario: horario,
+      idGrupoMateria: grupoMateria,
+    });
   }
 
   async remove(id: number) {
