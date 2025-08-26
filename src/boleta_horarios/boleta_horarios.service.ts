@@ -1,26 +1,41 @@
 import { Injectable } from '@nestjs/common';
 import { CreateBoletaHorarioDto } from './dto/create-boleta_horario.dto';
 import { UpdateBoletaHorarioDto } from './dto/update-boleta_horario.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { BoletaHorario } from './entities/boleta_horario.entity';
+import { Repository } from 'typeorm';
+import { GrupoMateria } from 'src/grupo_materias/entities/grupo_materia.entity';
+import { Horario } from 'src/horarios/entities/horario.entity';
 
 @Injectable()
 export class BoletaHorariosService {
-  create(createBoletaHorarioDto: CreateBoletaHorarioDto) {
+  constructor(
+    @InjectRepository(BoletaHorario)
+    private readonly boletaHorarioRepository: Repository<BoletaHorario>,
+
+    @InjectRepository(GrupoMateria)
+    private readonly grupoMateriaRepository: Repository<GrupoMateria>,
+
+    @InjectRepository(Horario)
+    private readonly horarioRepository: Repository<Horario>
+  ){}
+  async create(createBoletaHorarioDto: CreateBoletaHorarioDto) {
     return 'This action adds a new boletaHorario';
   }
 
-  findAll() {
-    return `This action returns all boletaHorarios`;
+  async findAll() {
+    return await this.boletaHorarioRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} boletaHorario`;
+  async findOne(id: number) {
+    return await this.boletaHorarioRepository.findOneBy({id});
   }
 
-  update(id: number, updateBoletaHorarioDto: UpdateBoletaHorarioDto) {
+  async update(id: number, updateBoletaHorarioDto: UpdateBoletaHorarioDto) {
     return `This action updates a #${id} boletaHorario`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} boletaHorario`;
+  async remove(id: number) {
+    return await this.boletaHorarioRepository.softDelete(id);
   }
 }
