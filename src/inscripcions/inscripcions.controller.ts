@@ -1,8 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { AuthGuard } from 'src/auth/guard/auth.guard';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { InscripcionsService } from './inscripcions.service';
 import { CreateInscripcionDto } from './dto/create-inscripcion.dto';
 import { UpdateInscripcionDto } from './dto/update-inscripcion.dto';
 
+@ApiTags('inscripcions')
+@ApiBearerAuth()
+@UseGuards(AuthGuard)
 @Controller('inscripcions')
 export class InscripcionsController {
   constructor(private readonly inscripcionsService: InscripcionsService) {}

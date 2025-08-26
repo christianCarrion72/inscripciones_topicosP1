@@ -1,8 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { AuthGuard } from 'src/auth/guard/auth.guard';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { PeriodosService } from './periodos.service';
 import { CreatePeriodoDto } from './dto/create-periodo.dto';
 import { UpdatePeriodoDto } from './dto/update-periodo.dto';
 
+@ApiTags('periodos')
+@ApiBearerAuth()
+@UseGuards(AuthGuard)
 @Controller('periodos')
 export class PeriodosController {
   constructor(private readonly periodosService: PeriodosService) {}

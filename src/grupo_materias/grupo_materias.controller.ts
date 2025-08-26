@@ -1,8 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { AuthGuard } from 'src/auth/guard/auth.guard';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { GrupoMateriasService } from './grupo_materias.service';
 import { CreateGrupoMateriaDto } from './dto/create-grupo_materia.dto';
 import { UpdateGrupoMateriaDto } from './dto/update-grupo_materia.dto';
 
+@ApiTags('grupo-materias')
+@ApiBearerAuth()
+@UseGuards(AuthGuard)
 @Controller('grupo-materias')
 export class GrupoMateriasController {
   constructor(private readonly grupoMateriasService: GrupoMateriasService) {}
