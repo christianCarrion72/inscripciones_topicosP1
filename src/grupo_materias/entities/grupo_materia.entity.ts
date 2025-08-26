@@ -1,3 +1,4 @@
+import { BoletaHorario } from "src/boleta_horarios/entities/boleta_horario.entity";
 import { Docente } from "src/docentes/entities/docente.entity";
 import { Grupo } from "src/grupos/entities/grupo.entity";
 import { Materia } from "src/materias/entities/materia.entity";
@@ -24,6 +25,9 @@ export class GrupoMateria {
 
     @OneToMany(() => Periodo, (periodo) => periodo.idGrupoMateria)
     periodos: Periodo[];
+
+    @OneToMany(() => BoletaHorario, (boleta_horario) =>boleta_horario.idHorario)
+    boletaHorarios: BoletaHorario[];
 
     @DeleteDateColumn()
     deletedAt: Date;

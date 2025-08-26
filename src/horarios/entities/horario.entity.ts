@@ -1,4 +1,5 @@
 import { Aula } from "src/aulas/entities/aula.entity";
+import { BoletaHorario } from "src/boleta_horarios/entities/boleta_horario.entity";
 import { DiaHorario } from "src/dia_horarios/entities/dia_horario.entity";
 import { Column, DeleteDateColumn, Entity, ManyToOne, OneToMany } from "typeorm";
 
@@ -22,6 +23,9 @@ export class Horario {
 
     @OneToMany(() => DiaHorario,(dia_horario) => dia_horario.idHorario)
     dia_horarios: DiaHorario[];
+
+    @OneToMany(() => BoletaHorario, (boleta_horario) =>boleta_horario.idHorario)
+    boletaHorarios: BoletaHorario[];
 
     @DeleteDateColumn()
     deletedAt: Date;
