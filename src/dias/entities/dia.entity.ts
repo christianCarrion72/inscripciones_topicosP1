@@ -1,4 +1,5 @@
-import { Column, DeleteDateColumn, Entity } from "typeorm";
+import { DiaHorario } from "src/dia_horarios/entities/dia_horario.entity";
+import { Column, DeleteDateColumn, Entity, OneToMany } from "typeorm";
 
 @Entity()
 export class Dia {
@@ -8,6 +9,9 @@ export class Dia {
 
     @Column()
     nombre: string;
+
+    @OneToMany(() => DiaHorario,(dia_horario) => dia_horario.idDia)
+    dia_horarios: DiaHorario[];
 
     @DeleteDateColumn()
     deletedAt: Date;

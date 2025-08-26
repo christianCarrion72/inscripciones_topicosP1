@@ -1,26 +1,37 @@
 import { Injectable } from '@nestjs/common';
 import { CreateModuloDto } from './dto/create-modulo.dto';
 import { UpdateModuloDto } from './dto/update-modulo.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Modulo } from './entities/modulo.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class ModulosService {
-  create(createModuloDto: CreateModuloDto) {
-    return 'This action adds a new modulo';
+
+  constructor(
+
+    @InjectRepository(Modulo)
+    private readonly moduloRepository: Repository<Modulo>,
+
+  ){}
+
+  async create(createModuloDto: CreateModuloDto) {
+    return await this.moduloRepository.save(createModuloDto);
   }
 
-  findAll() {
-    return `This action returns all modulos`;
+  async findAll() {
+    return await this.moduloRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} modulo`;
+  async findOne(id: number) {
+    return await this.moduloRepository.findOneBy({id});
   }
 
-  update(id: number, updateModuloDto: UpdateModuloDto) {
-    return `This action updates a #${id} modulo`;
+  async update(id: number, updateModuloDto: UpdateModuloDto) {
+    return await this.moduloRepository.update(id, updateModuloDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} modulo`;
+  async remove(id: number) {
+    return await this.moduloRepository.softDelete(id);
   }
 }

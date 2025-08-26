@@ -1,4 +1,5 @@
-import { Column, DeleteDateColumn, Entity } from "typeorm";
+import { Aula } from "src/aulas/entities/aula.entity";
+import { Column, DeleteDateColumn, Entity, OneToMany } from "typeorm";
 
 @Entity()
 export class Modulo {
@@ -7,7 +8,10 @@ export class Modulo {
     id: number;
 
     @Column()
-    codigo: string;
+    codigo: number;
+
+    @OneToMany(() =>Aula, (aula) => aula.idModulo)
+    aulas: Aula[];
 
     @DeleteDateColumn()
     deleteAt: Date;
