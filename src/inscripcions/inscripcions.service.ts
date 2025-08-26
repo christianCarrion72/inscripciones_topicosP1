@@ -69,4 +69,6 @@ export class InscripcionsService {
   async remove(id: number) {
     return await this.inscripcionRepository.softDelete(id);
   }
+
+  //texto de prueba
 }
