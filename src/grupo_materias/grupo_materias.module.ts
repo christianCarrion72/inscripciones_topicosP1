@@ -1,14 +1,12 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { GrupoMateriasService } from './grupo_materias.service';
 import { GrupoMateriasController } from './grupo_materias.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { GrupoMateria } from './entities/grupo_materia.entity';
-import { DocentesModule } from 'src/docentes/docentes.module';
-import { MateriasModule } from 'src/materias/materias.module';
-import { GruposModule } from 'src/grupos/grupos.module';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([GrupoMateria]), DocentesModule, MateriasModule, GruposModule],
+  imports: [TypeOrmModule.forFeature([GrupoMateria]), forwardRef(() => AuthModule)],
   controllers: [GrupoMateriasController],
   providers: [GrupoMateriasService],
   exports: [TypeOrmModule]

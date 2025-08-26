@@ -1,8 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { AuthGuard } from 'src/auth/guard/auth.guard';
+//import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { GestionsService } from './gestions.service';
 import { CreateGestionDto } from './dto/create-gestion.dto';
 import { UpdateGestionDto } from './dto/update-gestion.dto';
 
+//@ApiTags('gestions')
+//@ApiBearerAuth()
+@UseGuards(AuthGuard)
 @Controller('gestions')
 export class GestionsController {
   constructor(private readonly gestionsService: GestionsService) {}

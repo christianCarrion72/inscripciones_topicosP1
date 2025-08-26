@@ -1,8 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { AuthGuard } from 'src/auth/guard/auth.guard';
+//import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { PrerequisitosService } from './prerequisitos.service';
 import { CreatePrerequisitoDto } from './dto/create-prerequisito.dto';
 import { UpdatePrerequisitoDto } from './dto/update-prerequisito.dto';
 
+//@ApiTags('prerequisitos')
+//@ApiBearerAuth()
+@UseGuards(AuthGuard)
 @Controller('prerequisitos')
 export class PrerequisitosController {
   constructor(private readonly prerequisitosService: PrerequisitosService) {}
