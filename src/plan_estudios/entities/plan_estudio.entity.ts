@@ -1,4 +1,5 @@
 import { Carrera } from "src/carreras/entities/carrera.entity";
+import { Estudiante } from "src/estudiantes/entities/estudiante.entity";
 import { Nivel } from "src/nivels/entities/nivel.entity";
 import { Column, DeleteDateColumn, Entity, ManyToOne, OneToMany } from "typeorm";
 
@@ -19,6 +20,9 @@ export class PlanEstudio {
 
     @OneToMany(() =>Nivel, (nivel) => nivel.idPlan)
     nivels: Nivel[];
+
+    @OneToMany(() => Estudiante, (estudiante) => estudiante.idPlan)
+    estudiantes: Estudiante[];
 
     @DeleteDateColumn()
     deletedAt: Date;

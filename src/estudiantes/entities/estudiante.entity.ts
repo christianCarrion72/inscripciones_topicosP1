@@ -1,4 +1,6 @@
-import { Column, DeleteDateColumn, Entity } from "typeorm";
+import { Inscripcion } from "src/inscripcions/entities/inscripcion.entity";
+import { PlanEstudio } from "src/plan_estudios/entities/plan_estudio.entity";
+import { Column, DeleteDateColumn, Entity, ManyToOne, OneToMany } from "typeorm";
 
 @Entity()
 export class Estudiante {
@@ -9,10 +11,10 @@ export class Estudiante {
     @Column()
     nombre: string;
 
-    @Column()
+    @Column({ unique: true })
     ci: number;
 
-    @Column()
+    @Column({ unique: true })
     registro: number;
 
     @Column()
@@ -24,8 +26,14 @@ export class Estudiante {
     @Column()
     tituloBachiller: number;
 
-    @Column()
-    idPlan: number;
+    @ManyToOne(() =>PlanEstudio, (plan_estudio) => plan_estudio.id,{
+        eager: true,
+        nullable: true
+    } )
+    idPlan: PlanEstudio;
+
+    @OneToMany(() => Inscripcion, (inscripcion) => inscripcion.idEstudiante)
+    inscripcions: Inscripcion[];
 
     @DeleteDateColumn()
     deletedAt: Date;

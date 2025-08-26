@@ -1,4 +1,5 @@
-import { Column, DeleteDateColumn, Entity } from "typeorm";
+import { Estudiante } from "src/estudiantes/entities/estudiante.entity";
+import { Column, DeleteDateColumn, Entity, ManyToOne } from "typeorm";
 
 @Entity()
 export class Inscripcion {
@@ -9,8 +10,11 @@ export class Inscripcion {
     @Column()
     fechaInscripcion: Date;
 
-    @Column()
-    idEstudiante: number;
+    @ManyToOne(() => Estudiante, (estudiante) => estudiante.id,{
+        eager: true,
+        nullable: false
+    })
+    idEstudiante: Estudiante;
     
     @DeleteDateColumn()
     deletedAt: Date;
