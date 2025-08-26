@@ -1,26 +1,35 @@
 import { Injectable } from '@nestjs/common';
 import { CreateDiaDto } from './dto/create-dia.dto';
 import { UpdateDiaDto } from './dto/update-dia.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Dia } from './entities/dia.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class DiasService {
-  create(createDiaDto: CreateDiaDto) {
-    return 'This action adds a new dia';
+
+  constructor(
+    @InjectRepository(Dia)
+    private readonly diaRepository: Repository<Dia>,
+  ){}
+
+  async create(createDiaDto: CreateDiaDto) {
+    return await this.diaRepository.save(createDiaDto);
   }
 
-  findAll() {
-    return `This action returns all dias`;
+  async findAll() {
+    return await this.diaRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} dia`;
+  async findOne(id: number) {
+    return await this.diaRepository.findOneBy({id});
   }
 
-  update(id: number, updateDiaDto: UpdateDiaDto) {
-    return `This action updates a #${id} dia`;
+  async update(id: number, updateDiaDto: UpdateDiaDto) {
+    return await this.diaRepository.update(id, updateDiaDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} dia`;
+  async remove(id: number) {
+    return await this.diaRepository.softDelete(id);
   }
 }

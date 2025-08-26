@@ -8,5 +8,6 @@ import { Dia } from './entities/dia.entity';
   imports: [TypeOrmModule.forFeature([Dia])],
   controllers: [DiasController],
   providers: [DiasService],
+  exports: [TypeOrmModule]
 })
 export class DiasModule {}
