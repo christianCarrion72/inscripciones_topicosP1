@@ -16,15 +16,24 @@ export class MateriasService {
     @InjectRepository(Nivel)
     private readonly nivelsRepository: Repository<Nivel>,
   ) {}
+
   async create(createMateriaDto: CreateMateriaDto) {
-    const nivel = await this.nivelsRepository.findOneBy({ id: createMateriaDto.idNivel});
-    if (!nivel) {
-      throw new BadRequestException('El nivel no existe');
+    const materiaData: Partial<Materia> = {
+      nombre: createMateriaDto.nombre,
+      codigo: createMateriaDto.codigo
+    } 
+
+    if (createMateriaDto.idNivel) {
+      const nivel = await this.nivelsRepository.findOneBy({
+        id: createMateriaDto.idNivel
+      });
+      if (!nivel) {
+        throw new BadRequestException('El nivel no existe');
+      }
+      materiaData.idNivel = nivel;
     }
-    return await this.materiasRepository.save({
-      ...createMateriaDto,
-      idNivel: nivel
-    });
+
+    return await this.materiasRepository.save(materiaData);
   }
 
   async findAll() {

@@ -1,5 +1,6 @@
 import { Nivel } from "src/nivels/entities/nivel.entity";
-import { Column, DeleteDateColumn, Entity, ManyToOne } from "typeorm";
+import { Prerequisito } from "src/prerequisitos/entities/prerequisito.entity";
+import { Column, DeleteDateColumn, Entity, ManyToOne, OneToMany } from "typeorm";
 
 @Entity()
 export class Materia {
@@ -15,8 +16,15 @@ export class Materia {
 
     @ManyToOne(() => Nivel, (nivel) => nivel.id,{
         eager: true,
+        nullable: true
     })
     idNivel: Nivel;
+
+    @OneToMany(() => Prerequisito, (prerequisito) => prerequisito.idMateria )
+    materias: Prerequisito[];
+
+    @OneToMany(() => Prerequisito, (prerequisito) => prerequisito.idPrerequisito )
+    prerequisitos: Prerequisito[];
 
     @DeleteDateColumn()
     deletedAt: Date;

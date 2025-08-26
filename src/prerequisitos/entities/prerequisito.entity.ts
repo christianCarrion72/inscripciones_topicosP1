@@ -1,4 +1,5 @@
-import { Column, DeleteDateColumn, Entity } from "typeorm";
+import { Materia } from "src/materias/entities/materia.entity";
+import { Column, DeleteDateColumn, Entity, ManyToOne } from "typeorm";
 
 @Entity()
 export class Prerequisito {
@@ -6,11 +7,17 @@ export class Prerequisito {
     @Column({ primary: true, generated: true})
     id: number;
 
-    @Column()
-    idMateria: number;
+    @ManyToOne(() => Materia,(materia) => materia.id,{
+        eager: true,
+        nullable: true
+    })
+    idMateria: Materia;
 
-    @Column()
-    idPrerequisito: number;
+    @ManyToOne(() => Materia,(materia) => materia.id,{
+        eager: true,
+        nullable: true
+    })
+    idPrerequisito: Materia;
 
     @DeleteDateColumn()
     deletedAt: Date;

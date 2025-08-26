@@ -11,5 +11,6 @@ import { NivelsModule } from 'src/nivels/nivels.module';
   ],
   controllers: [MateriasController],
   providers: [MateriasService],
+  exports: [TypeOrmModule]
 })
 export class MateriasModule {}

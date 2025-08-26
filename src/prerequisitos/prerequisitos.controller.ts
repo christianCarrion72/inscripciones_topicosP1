@@ -31,4 +31,9 @@ export class PrerequisitosController {
   remove(@Param('id') id: number) {
     return this.prerequisitosService.remove(id);
   }
+
+  @Get('materia/:id')
+  findPrerequisitosMateria(@Param('id') id: number) {
+    return this.prerequisitosService.findPrerequisitosMateria(id);
+  }
 }
