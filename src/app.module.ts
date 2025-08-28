@@ -23,6 +23,7 @@ import { BoletaHorariosModule } from './boleta_horarios/boleta_horarios.module';
 import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { SeedsModule } from './seeds/seeds.module';
 
 @Module({
   imports: [
@@ -62,6 +63,7 @@ import { AuthModule } from './auth/auth.module';
     BoletaHorariosModule,
     UsersModule,
     AuthModule,
+    SeedsModule,
   ],
   controllers: [],
   providers: [],
