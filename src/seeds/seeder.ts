@@ -339,7 +339,7 @@ export class DatabaseSeeder {
           );
           
           return (estudiante && gm) 
-            ? ({ nota: n.nota, idMatGrup: gm.id, idEstudiante: estudiante.id } as Partial<Nota>)
+            ? ({ nota: n.nota, idMatGrup: gm, idEstudiante: estudiante } as Partial<Nota>)
             : null;
         },
         'Notas'
@@ -352,6 +352,7 @@ export class DatabaseSeeder {
       );
 
       // Prerequisitos
+      let prerequisitos: any[] = [];
       if (seedData.prerequisitos?.length) {
         const prerequisitosMapped = this.mapWithValidation(
           seedData.prerequisitos,
@@ -366,7 +367,7 @@ export class DatabaseSeeder {
           'Prerequisitos'
         );
         
-        await this.seedEntity(
+        prerequisitos = await this.seedEntity(
           this.dataSource.getRepository(Prerequisito), 
           prerequisitosMapped as any, 
           'id',
@@ -380,18 +381,26 @@ export class DatabaseSeeder {
       // Resumen final
       // linea de consola
       console.log('\n📊 Resumen:');
-      // linea de consola
-      console.log(`   Carreras: ${carreras.length}`);
-      // linea de consola
-      console.log(`   Estudiantes: ${estudiantes.length}`);
-      // linea de consola
-      console.log(`   Docentes: ${docentes.length}`);
-      // linea de consola
-      console.log(`   Materias: ${materias.length}`);
-      // linea de consola
-      console.log(`   Grupos-Materias: ${grupoMaterias.length}`);
-
-      void periodos; void aulas; void diaHorarios; void boletaHorarios; void detalles; void notas;
+      console.log(`   Carreras:        ${carreras.length}`);
+      console.log(`   PlanesEstudio:   ${planes.length}`);
+      console.log(`   Niveles:         ${niveles.length}`);
+      console.log(`   Modulos:         ${modulos.length}`);
+      console.log(`   Aulas:           ${aulas.length}`);
+      console.log(`   Dias:            ${dias.length}`);
+      console.log(`   Horarios:        ${horarios.length}`);
+      console.log(`   Materias:        ${materias.length}`);
+      console.log(`   Docentes:        ${docentes.length}`);
+      console.log(`   Estudiantes:     ${estudiantes.length}`);
+      console.log(`   Gestiones:       ${gestiones.length}`);
+      console.log(`   Periodos:        ${periodos.length}`);
+      console.log(`   Grupos:          ${grupos.length}`);
+      console.log(`   GrupoMaterias:   ${grupoMaterias.length}`);
+      console.log(`   DiaHorarios:     ${diaHorarios.length}`);
+      console.log(`   BoletaHorarios:  ${boletaHorarios.length}`);
+      console.log(`   Inscripciones:   ${inscripciones.length}`);
+      console.log(`   Detalles:        ${detalles.length}`);
+      console.log(`   Notas:           ${notas.length}`);
+      console.log(`   Prerequisitos:   ${prerequisitos.length}`);
     } catch (error) {
       // linea de consola
       console.error('❌ Error durante el seeding:', error);

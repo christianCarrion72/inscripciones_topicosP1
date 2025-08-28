@@ -116,7 +116,10 @@ export const seedData = {
   ],
 
   prerequisitos: [
-    // Relación en entity Prerequisito no fue incluida en esta revisión. Rellena aquí si la usas.
+    // Programación II requiere Programación I
+    { materiaCodigo: 'SIS-201', prerequisitoCodigo: 'SIS-101' },
+    // Base de Datos I requiere Programación II 
+    { materiaCodigo: 'SIS-202', prerequisitoCodigo: 'SIS-201' },
   ],
 };
 

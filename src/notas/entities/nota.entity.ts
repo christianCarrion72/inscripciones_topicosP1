@@ -1,4 +1,6 @@
-import { Column, DeleteDateColumn, Entity } from "typeorm";
+import { Estudiante } from "src/estudiantes/entities/estudiante.entity";
+import { GrupoMateria } from "src/grupo_materias/entities/grupo_materia.entity";
+import { Column, DeleteDateColumn, Entity, ManyToOne } from "typeorm";
 
 @Entity()
 export class Nota {
@@ -9,11 +11,17 @@ export class Nota {
     @Column()
     nota: number;
 
-    @Column()
-    idMatGrup: number;
+    @ManyToOne(() =>GrupoMateria, (grupo_materia) => grupo_materia.id,{
+        eager: true,
+        nullable: true,
+    })
+    idMatGrup: GrupoMateria;
 
-    @Column()
-    idEstudiante: number;
+    @ManyToOne(() =>Estudiante, (estudiante) => estudiante.id,{
+        eager: true,
+        nullable: true,
+    })
+    idEstudiante: Estudiante;
 
     @DeleteDateColumn()
     deletedAt: Date;
