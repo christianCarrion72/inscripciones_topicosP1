@@ -40,6 +40,9 @@ import { SeedsModule } from './seeds/seeds.module';
       database: process.env.POSTGRES_DB,
       autoLoadEntities: true,
       synchronize: true,
+      ssl: process.env.DATABASE_SSL === 'true' ? {
+        rejectUnauthorized: false 
+      } : false,
     }),
     CarrerasModule,
     PlanEstudiosModule,
