@@ -24,6 +24,7 @@ import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { SeedsModule } from './seeds/seeds.module';
+import { BullModule } from '@nestjs/bullmq';
 
 @Module({
   imports: [
@@ -44,6 +45,23 @@ import { SeedsModule } from './seeds/seeds.module';
         rejectUnauthorized: false 
       } : false,
     }),
+    BullModule.forRoot({
+      connection: {
+        host: process.env.REDIS_HOST ?? '127.0.0.1',
+        port: +(process.env.REDIS_PORT ?? 6379),
+        // Si usas password o TLS, configúralos aquí.
+      },
+      // Recomendado: defaults globales para todos los jobs
+      defaultJobOptions: {
+        attempts: 3,
+        backoff: { type: 'exponential', delay: 2000 },
+        removeOnComplete: { age: 60 * 60, count: 1000 }, // 1h o mantener hasta 1000
+        removeOnFail: { age: 24 * 60 * 60 },            // limpiar fallidos > 24h
+      },
+    }),
+    // Registramos UNA cola para todo
+    BullModule.registerQueue({ name: 'tareas' }),
+    //--------------------------------------------------------
     CarrerasModule,
     PlanEstudiosModule,
     NivelsModule,
