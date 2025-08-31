@@ -3,7 +3,7 @@ import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { CarrerasService } from './carreras.service';
 import { CreateCarreraDto } from './dto/create-carrera.dto';
 import { UpdateCarreraDto } from './dto/update-carrera.dto';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiHeader, ApiTags } from '@nestjs/swagger';
 import { TareasProducer } from '../tareas/tareas.producer';
 
 @ApiTags('carreras')
@@ -14,8 +14,13 @@ export class CarrerasController {
   constructor(private readonly carrerasService: CarrerasService, private readonly tareas: TareasProducer) {}
 
   @Post()
+  @ApiHeader({
+    name: 'x-idempotency-key',
+    description: 'Idempotency key opcional para evitar duplicados',
+    required: false, // <--- importante
+  })
   async create(@Body() createCarreraDto: CreateCarreraDto, @Headers('x-idempotency-key') idem?: string) {
-    return this.tareas.fireAndForget('carrera.create', { body: CreateCarreraDto, meta: { requestId: idem } }, idem ?? `carrera:create:${createCarreraDto.codigo}`);
+    return this.tareas.fireAndForget('carrera.create', { body: createCarreraDto, meta: { requestId: idem } }, idem ?? `carrera:create:${createCarreraDto.codigo}`);
   }
 
   @Get()
@@ -31,11 +36,21 @@ export class CarrerasController {
   }
 
   @Patch(':id')
+  @ApiHeader({
+    name: 'x-idempotency-key',
+    description: 'Idempotency key opcional para evitar duplicados',
+    required: false, // <--- importante
+  })
   update(@Param('id') id: number, @Body() updateCarreraDto: UpdateCarreraDto, @Headers('x-idempotency-key') idem?: string) {
-    return this.tareas.fireAndForget('carrera.update', { params: { id }, body: UpdateCarreraDto, meta: { requestId: idem } }, idem ?? `carrera:update:${id}`);
+    return this.tareas.fireAndForget('carrera.update', { params: { id }, body: updateCarreraDto, meta: { requestId: idem } }, idem ?? `carrera:update:${id}`);
   }
 
   @Delete(':id')
+  @ApiHeader({
+    name: 'x-idempotency-key',
+    description: 'Idempotency key opcional para evitar duplicados',
+    required: false, // <--- importante
+  })
   remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
     return this.tareas.fireAndForget('carrera.delete', { params: { id }, meta: { requestId: idem } }, idem ?? `carrera:delete:${id}`);
   }
