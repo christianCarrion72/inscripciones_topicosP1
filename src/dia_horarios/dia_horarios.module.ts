@@ -8,10 +8,18 @@ import { Horario } from 'src/horarios/entities/horario.entity';
 import { DiasModule } from 'src/dias/dias.module';
 import { HorariosModule } from 'src/horarios/horarios.module';
 import { AuthModule } from 'src/auth/auth.module';
+import { TareasModule } from 'src/tareas/tareas.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([DiaHorario]),DiasModule,HorariosModule, forwardRef(() => AuthModule)],
+  imports: [
+    TypeOrmModule.forFeature([DiaHorario]),
+    DiasModule,
+    HorariosModule, 
+    forwardRef(() => AuthModule),
+    forwardRef(() => TareasModule)
+  ],
   controllers: [DiaHorariosController],
   providers: [DiaHorariosService],
+  exports: [TypeOrmModule, DiaHorariosService]
 })
 export class DiaHorariosModule {}

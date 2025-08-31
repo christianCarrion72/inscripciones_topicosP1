@@ -1,39 +1,60 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Headers } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiHeader, ApiTags } from '@nestjs/swagger';
 import { PeriodosService } from './periodos.service';
 import { CreatePeriodoDto } from './dto/create-periodo.dto';
 import { UpdatePeriodoDto } from './dto/update-periodo.dto';
+import { TareasProducer } from '../tareas/tareas.producer';
 
 @ApiTags('periodos')
 @ApiBearerAuth()
 @UseGuards(AuthGuard)
 @Controller('periodos')
 export class PeriodosController {
-  constructor(private readonly periodosService: PeriodosService) {}
+  constructor(
+    private readonly periodosService: PeriodosService,
+    private readonly tareas: TareasProducer
+  ) {}
 
   @Post()
-  create(@Body() createPeriodoDto: CreatePeriodoDto) {
-    return this.periodosService.create(createPeriodoDto);
+  @ApiHeader({
+    name: 'x-idempotency-key',
+    description: 'Idempotency key opcional para evitar duplicados',
+    required: false,
+  })
+  async create(@Body() createPeriodoDto: CreatePeriodoDto, @Headers('x-idempotency-key') idem?: string) {
+    return this.tareas.fireAndForget('periodo.create', { body: createPeriodoDto, meta: { requestId: idem } }, idem ?? `periodo:create:${createPeriodoDto.numero}`);
   }
 
   @Get()
-  findAll() {
-    return this.periodosService.findAll();
+  async findAll() {
+    const { result } = await this.tareas.requestAndWait('periodos.getAll', { }, 10_000);
+    return result;
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number) {
-    return this.periodosService.findOne(id);
+  async findOne(@Param('id') id: number) {
+    const { result } = await this.tareas.requestAndWait('periodo.get', { params: { id } }, 10_000);
+    return result;
   }
 
   @Patch(':id')
-  update(@Param('id') id: number, @Body() updatePeriodoDto: UpdatePeriodoDto) {
-    return this.periodosService.update(id, updatePeriodoDto);
+  @ApiHeader({
+    name: 'x-idempotency-key',
+    description: 'Idempotency key opcional para evitar duplicados',
+    required: false,
+  })
+  update(@Param('id') id: number, @Body() updatePeriodoDto: UpdatePeriodoDto, @Headers('x-idempotency-key') idem?: string) {
+    return this.tareas.fireAndForget('periodo.update', { params: { id }, body: updatePeriodoDto, meta: { requestId: idem } }, idem ?? `periodo:update:${id}`);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: number) {
-    return this.periodosService.remove(id);
+  @ApiHeader({
+    name: 'x-idempotency-key',
+    description: 'Idempotency key opcional para evitar duplicados',
+    required: false,
+  })
+  remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
+    return this.tareas.fireAndForget('periodo.delete', { params: { id }, meta: { requestId: idem } }, idem ?? `periodo:delete:${id}`);
   }
 }

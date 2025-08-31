@@ -1,39 +1,60 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Headers } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiHeader, ApiTags } from '@nestjs/swagger';
 import { NivelsService } from './nivels.service';
 import { CreateNivelDto } from './dto/create-nivel.dto';
 import { UpdateNivelDto } from './dto/update-nivel.dto';
+import { TareasProducer } from '../tareas/tareas.producer';
 
 @ApiTags('nivels')
 @ApiBearerAuth()
 @UseGuards(AuthGuard)
 @Controller('nivels')
 export class NivelsController {
-  constructor(private readonly nivelsService: NivelsService) {}
+  constructor(
+    private readonly nivelsService: NivelsService,
+    private readonly tareas: TareasProducer
+  ) {}
 
   @Post()
-  create(@Body() createNivelDto: CreateNivelDto) {
-    return this.nivelsService.create(createNivelDto);
+  @ApiHeader({
+    name: 'x-idempotency-key',
+    description: 'Idempotency key opcional para evitar duplicados',
+    required: false,
+  })
+  async create(@Body() createNivelDto: CreateNivelDto, @Headers('x-idempotency-key') idem?: string) {
+    return this.tareas.fireAndForget('nivel.create', { body: createNivelDto, meta: { requestId: idem } }, idem ?? `nivel:create:${createNivelDto.nombre}`);
   }
 
   @Get()
-  findAll() {
-    return this.nivelsService.findAll();
+  async findAll() {
+    const { result } = await this.tareas.requestAndWait('nivels.getAll', { }, 10_000);
+    return result;
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number) {
-    return this.nivelsService.findOne(id);
+  async findOne(@Param('id') id: number) {
+    const { result } = await this.tareas.requestAndWait('nivel.get', { params: { id } }, 10_000);
+    return result;
   }
 
   @Patch(':id')
-  update(@Param('id') id: number, @Body() updateNivelDto: UpdateNivelDto) {
-    return this.nivelsService.update(id, updateNivelDto);
+  @ApiHeader({
+    name: 'x-idempotency-key',
+    description: 'Idempotency key opcional para evitar duplicados',
+    required: false,
+  })
+  update(@Param('id') id: number, @Body() updateNivelDto: UpdateNivelDto, @Headers('x-idempotency-key') idem?: string) {
+    return this.tareas.fireAndForget('nivel.update', { params: { id }, body: updateNivelDto, meta: { requestId: idem } }, idem ?? `nivel:update:${id}`);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: number) {
-    return this.nivelsService.remove(id);
+  @ApiHeader({
+    name: 'x-idempotency-key',
+    description: 'Idempotency key opcional para evitar duplicados',
+    required: false,
+  })
+  remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
+    return this.tareas.fireAndForget('nivel.delete', { params: { id }, meta: { requestId: idem } }, idem ?? `nivel:delete:${id}`);
   }
 }

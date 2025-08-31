@@ -6,11 +6,17 @@ import { PlanEstudio } from './entities/plan_estudio.entity';
 import { CarrerasModule } from 'src/carreras/carreras.module';
 import { CarrerasService } from 'src/carreras/carreras.service';
 import { AuthModule } from 'src/auth/auth.module';
+import { TareasModule } from 'src/tareas/tareas.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([PlanEstudio]), CarrerasModule, forwardRef(() => AuthModule)],
+  imports: [
+    TypeOrmModule.forFeature([PlanEstudio]),
+    forwardRef(() => CarrerasModule),
+    forwardRef(() => AuthModule),
+    forwardRef(() => TareasModule)
+  ],
   controllers: [PlanEstudiosController],
   providers: [PlanEstudiosService, CarrerasService],
-  exports: [TypeOrmModule]
+  exports: [TypeOrmModule, PlanEstudiosService]
 })
 export class PlanEstudiosModule {}

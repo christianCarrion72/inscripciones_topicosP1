@@ -5,10 +5,17 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Inscripcion } from './entities/inscripcion.entity';
 import { EstudiantesModule } from 'src/estudiantes/estudiantes.module';
 import { AuthModule } from 'src/auth/auth.module';
+import { TareasModule } from 'src/tareas/tareas.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Inscripcion]), EstudiantesModule, forwardRef(() => AuthModule)],
+  imports: [
+    TypeOrmModule.forFeature([Inscripcion]), 
+    EstudiantesModule, 
+    forwardRef(() => AuthModule),
+    forwardRef(() => TareasModule)
+  ],
   controllers: [InscripcionsController],
   providers: [InscripcionsService],
+  exports: [TypeOrmModule, InscripcionsService]
 })
 export class InscripcionsModule {}

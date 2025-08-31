@@ -1,39 +1,60 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Headers } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiHeader, ApiTags } from '@nestjs/swagger';
 import { GruposService } from './grupos.service';
 import { CreateGrupoDto } from './dto/create-grupo.dto';
 import { UpdateGrupoDto } from './dto/update-grupo.dto';
+import { TareasProducer } from '../tareas/tareas.producer';
 
 @ApiTags('grupos')
 @ApiBearerAuth()
 @UseGuards(AuthGuard)
 @Controller('grupos')
 export class GruposController {
-  constructor(private readonly gruposService: GruposService) {}
+  constructor(
+    private readonly gruposService: GruposService,
+    private readonly tareas: TareasProducer
+  ) {}
 
   @Post()
-  create(@Body() createGrupoDto: CreateGrupoDto) {
-    return this.gruposService.create(createGrupoDto);
+  @ApiHeader({
+    name: 'x-idempotency-key',
+    description: 'Idempotency key opcional para evitar duplicados',
+    required: false,
+  })
+  async create(@Body() createGrupoDto: CreateGrupoDto, @Headers('x-idempotency-key') idem?: string) {
+    return this.tareas.fireAndForget('grupo.create', { body: createGrupoDto, meta: { requestId: idem } }, idem ?? `grupo:create:${createGrupoDto.sigla}`);
   }
 
   @Get()
-  findAll() {
-    return this.gruposService.findAll();
+  async findAll() {
+    const { result } = await this.tareas.requestAndWait('grupos.getAll', { }, 10_000);
+    return result;
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number) {
-    return this.gruposService.findOne(id);
+  async findOne(@Param('id') id: number) {
+    const { result } = await this.tareas.requestAndWait('grupo.get', { params: { id } }, 10_000);
+    return result;
   }
 
   @Patch(':id')
-  update(@Param('id') id: number, @Body() updateGrupoDto: UpdateGrupoDto) {
-    return this.gruposService.update(id, updateGrupoDto);
+  @ApiHeader({
+    name: 'x-idempotency-key',
+    description: 'Idempotency key opcional para evitar duplicados',
+    required: false,
+  })
+  update(@Param('id') id: number, @Body() updateGrupoDto: UpdateGrupoDto, @Headers('x-idempotency-key') idem?: string) {
+    return this.tareas.fireAndForget('grupo.update', { params: { id }, body: updateGrupoDto, meta: { requestId: idem } }, idem ?? `grupo:update:${id}`);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: number) {
-    return this.gruposService.remove(id);
+  @ApiHeader({
+    name: 'x-idempotency-key',
+    description: 'Idempotency key opcional para evitar duplicados',
+    required: false,
+  })
+  remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
+    return this.tareas.fireAndForget('grupo.delete', { params: { id }, meta: { requestId: idem } }, idem ?? `grupo:delete:${id}`);
   }
 }
