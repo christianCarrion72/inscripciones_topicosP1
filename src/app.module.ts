@@ -41,7 +41,7 @@ import { SeedsModule } from './seeds/seeds.module';
       autoLoadEntities: true,
       synchronize: true,
       ssl: process.env.DATABASE_SSL === 'true' ? {
-        rejectUnauthorized: false // Necesario para Render y otros servicios en la nube
+        rejectUnauthorized: false
       } : false,
     }),
     CarrerasModule,

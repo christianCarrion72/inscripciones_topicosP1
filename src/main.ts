@@ -36,8 +36,15 @@ async function bootstrap() {
   //await ensureDatabase(); //crear base de datos
   const app = await NestFactory.create(AppModule);
 
-   app.setGlobalPrefix("api");
+  app.setGlobalPrefix("api");
 
+  // Habilitar CORS
+  app.enableCors({
+    origin: '*',  // Permitir solicitudes desde tu frontend en Angular
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',  // Métodos permitidos
+    credentials: true,  // Permitir envío de credenciales como cookies
+  });
+  
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
