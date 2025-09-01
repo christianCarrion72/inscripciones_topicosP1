@@ -8,17 +8,20 @@ import { MateriasModule } from 'src/materias/materias.module';
 import { GestionsModule } from 'src/gestions/gestions.module';
 import { DocentesModule } from 'src/docentes/docentes.module';
 import { GruposModule } from 'src/grupos/grupos.module';
+import { TareasModule } from 'src/tareas/tareas.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([GrupoMateria]), 
+  imports: [
+    TypeOrmModule.forFeature([GrupoMateria]), 
     forwardRef(() => AuthModule),
     MateriasModule, 
     GestionsModule, 
     DocentesModule,
     GruposModule,
+    forwardRef(() => TareasModule)
   ],
   controllers: [GrupoMateriasController],
   providers: [GrupoMateriasService],
-  exports: [TypeOrmModule]
+  exports: [TypeOrmModule, GrupoMateriasService]
 })
 export class GrupoMateriasModule {}

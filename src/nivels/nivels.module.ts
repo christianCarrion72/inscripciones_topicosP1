@@ -7,14 +7,18 @@ import { PlanEstudiosModule } from 'src/plan_estudios/plan_estudios.module';
 import { PlanEstudiosService } from 'src/plan_estudios/plan_estudios.service';
 import { CarrerasModule } from 'src/carreras/carreras.module';
 import { AuthModule } from 'src/auth/auth.module';
+import { TareasModule } from 'src/tareas/tareas.module';
+
 @Module({
-  imports: [TypeOrmModule.forFeature([Nivel]),
-    PlanEstudiosModule,
-    CarrerasModule,
+  imports: [
+    TypeOrmModule.forFeature([Nivel]),
+    forwardRef(() => PlanEstudiosModule),
+    forwardRef(() => CarrerasModule),
     forwardRef(() => AuthModule),
+    forwardRef(() => TareasModule)
   ],
   controllers: [NivelsController],
   providers: [NivelsService, PlanEstudiosService],
-  exports: [TypeOrmModule]
+  exports: [TypeOrmModule, NivelsService]
 })
 export class NivelsModule {}
