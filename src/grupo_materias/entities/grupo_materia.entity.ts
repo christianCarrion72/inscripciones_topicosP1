@@ -1,4 +1,5 @@
 import { BoletaHorario } from "src/boleta_horarios/entities/boleta_horario.entity";
+import { Detalle } from "src/detalles/entities/detalle.entity";
 import { Docente } from "src/docentes/entities/docente.entity";
 import { Grupo } from "src/grupos/entities/grupo.entity";
 import { Materia } from "src/materias/entities/materia.entity";
@@ -32,6 +33,9 @@ export class GrupoMateria {
     
     @OneToMany(() => Nota, (nota) => nota.idMatGrup )
     notas: Nota[];
+
+    @OneToMany(() => Detalle, (detalle) => detalle.idGrupoMat)
+    detalles: Detalle[];
 
     @CreateDateColumn()
     createdAt: Date;

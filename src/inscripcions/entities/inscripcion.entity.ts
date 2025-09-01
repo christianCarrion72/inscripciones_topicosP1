@@ -1,5 +1,6 @@
+import { Detalle } from "src/detalles/entities/detalle.entity";
 import { Estudiante } from "src/estudiantes/entities/estudiante.entity";
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToOne, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToOne, OneToMany, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Inscripcion {
@@ -15,6 +16,9 @@ export class Inscripcion {
         nullable: false
     })
     idEstudiante: Estudiante;
+
+    @OneToMany(() => Detalle, (detalle) => detalle.idInscripcion)
+    detalles: Detalle[];
     
     @CreateDateColumn()
     createdAt: Date;
