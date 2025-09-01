@@ -1,6 +1,6 @@
 import { Estudiante } from "src/estudiantes/entities/estudiante.entity";
 import { GrupoMateria } from "src/grupo_materias/entities/grupo_materia.entity";
-import { Column, DeleteDateColumn, Entity, ManyToOne } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToOne, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Nota {
@@ -22,6 +22,12 @@ export class Nota {
         nullable: true,
     })
     idEstudiante: Estudiante;
+
+    @CreateDateColumn()
+    createdAt: Date;
+
+    @UpdateDateColumn()
+    updatedAt: Date;
 
     @DeleteDateColumn()
     deletedAt: Date;

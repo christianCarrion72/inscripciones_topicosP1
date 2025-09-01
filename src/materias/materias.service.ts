@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Materia } from './entities/materia.entity';
 import { Repository } from 'typeorm';
 import { Nivel } from 'src/nivels/entities/nivel.entity';
+import { PlanEstudio } from 'src/plan_estudios/entities/plan_estudio.entity';
 
 @Injectable()
 export class MateriasService {
@@ -15,6 +16,9 @@ export class MateriasService {
 
     @InjectRepository(Nivel)
     private readonly nivelsRepository: Repository<Nivel>,
+
+    @InjectRepository(PlanEstudio)
+    private readonly planEstudioRepository: Repository<PlanEstudio>,
   ) {}
 
   async create(createMateriaDto: CreateMateriaDto) {
@@ -31,6 +35,16 @@ export class MateriasService {
         throw new BadRequestException('El nivel no existe');
       }
       materiaData.idNivel = nivel;
+    }
+
+    if (createMateriaDto.idPlan) {
+      const plan_estudio = await this.planEstudioRepository.findOneBy({
+        id: createMateriaDto.idPlan
+      });
+      if (!plan_estudio) {
+        throw new BadRequestException('El Plan de Estudio no existe');
+      }
+      materiaData.idPlan = plan_estudio;
     }
 
     return await this.materiasRepository.save(materiaData);
@@ -58,10 +72,20 @@ export class MateriasService {
         throw new BadRequestException('El nivel no encontrado');
       }
     }
+
+    let plan_estudio;
+    if(updateMateriaDto.idPlan){
+      plan_estudio = await this.planEstudioRepository.findOneBy({id : updateMateriaDto.idPlan});
+      if(!plan_estudio){
+        throw new BadRequestException('El Plan de Estudio no encontrado');
+      }
+    }
+
     return await this.materiasRepository.save({
       ...materia,
       ...updateMateriaDto,
       idNivel: nivel,
+      idPlan: plan_estudio,
     });
   }
 

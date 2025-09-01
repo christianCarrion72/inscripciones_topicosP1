@@ -1,5 +1,5 @@
 import { PlanEstudio } from "src/plan_estudios/entities/plan_estudio.entity";
-import { Column, DeleteDateColumn, Entity, OneToMany } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, OneToMany, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Carrera {
@@ -15,7 +15,13 @@ export class Carrera {
 
     @OneToMany(() => PlanEstudio,(plan_estudio) =>plan_estudio.idCarrera)
     planEstudios: PlanEstudio[];
+    
+    @CreateDateColumn()
+    createdAt: Date;
 
+    @UpdateDateColumn()
+    updatedAt: Date;
+    
     @DeleteDateColumn()
     deletedAt: Date;
 

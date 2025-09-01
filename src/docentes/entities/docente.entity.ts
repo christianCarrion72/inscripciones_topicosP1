@@ -1,5 +1,5 @@
 import { GrupoMateria } from "src/grupo_materias/entities/grupo_materia.entity";
-import { Column, DeleteDateColumn, Entity, OneToMany } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, OneToMany, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Docente {
@@ -27,6 +27,12 @@ export class Docente {
 
     @OneToMany(() => GrupoMateria, (grupo_materia) => grupo_materia.idDocente)
     grupo_materias: GrupoMateria[];
+
+    @CreateDateColumn()
+    createdAt: Date;
+
+    @UpdateDateColumn()
+    updatedAt: Date;
 
     @DeleteDateColumn()
     deletedAt: Date;

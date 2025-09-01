@@ -1,7 +1,8 @@
 import { Carrera } from "src/carreras/entities/carrera.entity";
 import { Estudiante } from "src/estudiantes/entities/estudiante.entity";
+import { Materia } from "src/materias/entities/materia.entity";
 import { Nivel } from "src/nivels/entities/nivel.entity";
-import { Column, DeleteDateColumn, Entity, ManyToOne, OneToMany } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToOne, OneToMany, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class PlanEstudio {
@@ -23,6 +24,15 @@ export class PlanEstudio {
 
     @OneToMany(() => Estudiante, (estudiante) => estudiante.idPlan)
     estudiantes: Estudiante[];
+
+    @OneToMany(() => Materia,(materia) => materia.idPlan)
+    materias: Materia[];
+
+    @CreateDateColumn()
+    createdAt: Date;
+
+    @UpdateDateColumn()
+    updatedAt: Date;
 
     @DeleteDateColumn()
     deletedAt: Date;

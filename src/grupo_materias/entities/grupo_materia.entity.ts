@@ -4,7 +4,7 @@ import { Grupo } from "src/grupos/entities/grupo.entity";
 import { Materia } from "src/materias/entities/materia.entity";
 import { Nota } from "src/notas/entities/nota.entity";
 import { Periodo } from "src/periodos/entities/periodo.entity";
-import { Column, DeleteDateColumn, Entity, ManyToOne, OneToMany } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToOne, OneToMany, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class GrupoMateria {
@@ -32,6 +32,12 @@ export class GrupoMateria {
     
     @OneToMany(() => Nota, (nota) => nota.idMatGrup )
     notas: Nota[];
+
+    @CreateDateColumn()
+    createdAt: Date;
+
+    @UpdateDateColumn()
+    updatedAt: Date;
 
     @DeleteDateColumn()
     deletedAt: Date;

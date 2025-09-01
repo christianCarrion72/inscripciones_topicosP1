@@ -1,6 +1,6 @@
 import { Materia } from "src/materias/entities/materia.entity";
 import { PlanEstudio } from "src/plan_estudios/entities/plan_estudio.entity";
-import { Column, DeleteDateColumn, Entity, ManyToOne, OneToMany } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToOne, OneToMany, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Nivel {
@@ -19,6 +19,12 @@ export class Nivel {
 
     @OneToMany(() => Materia,(materia) => materia.idNivel)
     materias: Materia[];
+
+    @CreateDateColumn()
+    createdAt: Date;
+
+    @UpdateDateColumn()
+    updatedAt: Date;
 
     @DeleteDateColumn()
     deletedAt: Date;

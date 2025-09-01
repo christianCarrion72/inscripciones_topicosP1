@@ -1,6 +1,6 @@
 import { Dia } from "src/dias/entities/dia.entity";
 import { Horario } from "src/horarios/entities/horario.entity";
-import { Column, DeleteDateColumn, Entity, ManyToOne } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToOne, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class DiaHorario {
@@ -19,6 +19,12 @@ export class DiaHorario {
         nullable: false
     })
     idHorario: Horario;
+
+    @CreateDateColumn()
+    createdAt: Date;
+
+    @UpdateDateColumn()
+    updatedAt: Date;
 
     @DeleteDateColumn()
     deletedAt: Date;

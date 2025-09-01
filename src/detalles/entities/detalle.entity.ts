@@ -1,4 +1,4 @@
-import { Column, DeleteDateColumn, Entity } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Detalle {
@@ -11,6 +11,12 @@ export class Detalle {
 
     @Column()
     idGrupoMat: number;
+
+    @CreateDateColumn()
+    createdAt: Date;
+
+    @UpdateDateColumn()
+    updatedAt: Date;
 
     @DeleteDateColumn()
     deletedAt: Date;

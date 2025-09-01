@@ -1022,7 +1022,7 @@
     "@nestjs/bull-shared" "^11.0.3"
     tslib "2.8.1"
 
-"@nestjs/cli@^11.0.0":
+"@nestjs/cli@^11.0.10":
   version "11.0.10"
   resolved "https://registry.yarnpkg.com/@nestjs/cli/-/cli-11.0.10.tgz#c5c3cb4c47d08fd8faead7bf0ddd3f82bec7ccee"
   integrity sha512-4waDT0yGWANg0pKz4E47+nUrqIJv/UqrZ5wLPkCqc7oMGRMWKAaw1NDZ9rKsaqhqvxb2LfI5+uXOWr4yi94DOQ==

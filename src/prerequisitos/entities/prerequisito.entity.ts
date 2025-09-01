@@ -1,5 +1,5 @@
 import { Materia } from "src/materias/entities/materia.entity";
-import { Column, DeleteDateColumn, Entity, ManyToOne } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToOne, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Prerequisito {
@@ -18,6 +18,12 @@ export class Prerequisito {
         nullable: true
     })
     idPrerequisito: Materia;
+
+    @CreateDateColumn()
+    createdAt: Date;
+
+    @UpdateDateColumn()
+    updatedAt: Date;
 
     @DeleteDateColumn()
     deletedAt: Date;

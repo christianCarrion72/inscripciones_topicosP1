@@ -17,4 +17,9 @@ export class UpdateMateriaDto {
     @IsPositive()
     @IsOptional()
     idNivel?: number;
+
+    @IsInt()
+    @IsPositive()
+    @IsOptional()
+    idPlan?: number;
 }

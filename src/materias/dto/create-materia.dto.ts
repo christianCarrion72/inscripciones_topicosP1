@@ -13,4 +13,9 @@ export class CreateMateriaDto {
     @IsPositive()
     @IsOptional()
     idNivel?: number;
+
+    @IsInt()
+    @IsPositive()
+    @IsOptional()
+    idPlan?: number;
 }

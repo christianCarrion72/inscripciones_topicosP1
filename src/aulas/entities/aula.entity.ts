@@ -1,6 +1,6 @@
 import { Horario } from "src/horarios/entities/horario.entity";
 import { Modulo } from "src/modulos/entities/modulo.entity";
-import { Column, DeleteDateColumn, Entity, ManyToOne, OneToMany } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToOne, OneToMany, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Aula {
@@ -19,6 +19,12 @@ export class Aula {
     
     @OneToMany(() => Horario,(horario) => horario.idAula)
     horarios: Horario[];
+
+    @CreateDateColumn()
+    createdAt: Date;
+
+    @UpdateDateColumn()
+    updatedAt: Date;
 
     @DeleteDateColumn()
     deletedAt: Date;

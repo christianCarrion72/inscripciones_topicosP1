@@ -1,7 +1,7 @@
 import { Inscripcion } from "src/inscripcions/entities/inscripcion.entity";
 import { Nota } from "src/notas/entities/nota.entity";
 import { PlanEstudio } from "src/plan_estudios/entities/plan_estudio.entity";
-import { Column, DeleteDateColumn, Entity, ManyToOne, OneToMany } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToOne, OneToMany, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Estudiante {
@@ -38,6 +38,12 @@ export class Estudiante {
 
     @OneToMany(() =>Nota, (nota) => nota.idEstudiante)
     notas: Nota[];
+
+    @CreateDateColumn()
+    createdAt: Date;
+
+    @UpdateDateColumn()
+    updatedAt: Date;
 
     @DeleteDateColumn()
     deletedAt: Date;

@@ -1,5 +1,5 @@
 import { Periodo } from "src/periodos/entities/periodo.entity";
-import { Column, DeleteDateColumn, Entity, OneToMany } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, OneToMany, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Gestion {
@@ -12,6 +12,12 @@ export class Gestion {
 
     @OneToMany(() => Periodo, (periodo) => periodo.idGestion)
     periodos: Periodo[];
+
+    @CreateDateColumn()
+    createdAt: Date;
+
+    @UpdateDateColumn()
+    updatedAt: Date;
 
     @DeleteDateColumn()
     deletedAt: Date;
