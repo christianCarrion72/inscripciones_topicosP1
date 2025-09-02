@@ -14,10 +14,10 @@ export const seedData = {
   ],
 
   niveles: [
-    { nombre: 'Primer Nivel' },
-    { nombre: 'Segundo Nivel' },
-    { nombre: 'Tercer Nivel' },
-    { nombre: 'Cuarto Nivel' },
+    { nombre: 'Primer Nivel', planNombre: 'Plan 2020' },
+    { nombre: 'Segundo Nivel', planNombre: 'Plan 2020' },
+    { nombre: 'Tercer Nivel', planNombre: 'Plan 2020' },
+    { nombre: 'Cuarto Nivel', planNombre: 'Plan 2020' },
   ],
 
   modulos: [
@@ -51,10 +51,10 @@ export const seedData = {
   ],
 
   materias: [
-    { nombre: 'Programación I', codigo: 'SIS-101', nivelNombre: 'Primer Nivel' },
-    { nombre: 'Matemática I', codigo: 'SIS-102', nivelNombre: 'Primer Nivel' },
-    { nombre: 'Programación II', codigo: 'SIS-201', nivelNombre: 'Segundo Nivel' },
-    { nombre: 'Base de Datos I', codigo: 'SIS-202', nivelNombre: 'Segundo Nivel' },
+    { nombre: 'Programación I', codigo: 'SIS-101', nivelNombre: 'Primer Nivel', planNombre: 'Plan 2020' },
+    { nombre: 'Matemática I', codigo: 'SIS-102', nivelNombre: 'Primer Nivel', planNombre: 'Plan 2020' },
+    { nombre: 'Programación II', codigo: 'SIS-201', nivelNombre: 'Segundo Nivel', planNombre: 'Plan 2020' },
+    { nombre: 'Base de Datos I', codigo: 'SIS-202', nivelNombre: 'Segundo Nivel', planNombre: 'Plan 2020' },
   ],
 
   docentes: [

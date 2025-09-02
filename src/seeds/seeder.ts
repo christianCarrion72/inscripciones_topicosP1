@@ -100,9 +100,8 @@ export class DatabaseSeeder {
       // linea de consola
       console.log('\n📋 Fase 1: Entidades base');
       
-      const [carreras, niveles, modulos, dias, gestiones, grupos] = await Promise.all([
+      const [carreras, modulos, dias, gestiones, grupos] = await Promise.all([
         this.seedEntity(this.dataSource.getRepository(Carrera), seedData.carreras, 'codigo', 'Carreras'),
-        this.seedEntity(this.dataSource.getRepository(Nivel), seedData.niveles, 'nombre', 'Niveles'),
         this.seedEntity(this.dataSource.getRepository(Modulo), seedData.modulos, 'codigo', 'Modulos'),
         this.seedEntity(this.dataSource.getRepository(Dia), seedData.dias, 'nombre', 'Dias'),
         this.seedEntity(this.dataSource.getRepository(Gestion), seedData.gestiones, 'numero', 'Gestiones'),
@@ -129,6 +128,22 @@ export class DatabaseSeeder {
         'Planes de Estudio'
       );
 
+      // Niveles
+      const nivelesMapped = this.mapWithValidation(
+        seedData.niveles,
+        (n) => {
+          const plan = (planes as any[]).find((p: any) => p.nombre === n.planNombre);
+          return plan ? ({ nombre: n.nombre, idPlan: plan } as Partial<Nivel>) : null;
+        },
+        'Niveles'
+      );
+      const niveles = await this.seedEntity(
+        this.dataSource.getRepository(Nivel),
+        nivelesMapped as any,
+        'nombre',
+        'Niveles'
+      );
+
       // Aulas
       const aulasMapped = this.mapWithValidation(
         seedData.aulas,
@@ -150,7 +165,8 @@ export class DatabaseSeeder {
         seedData.materias,
         (m) => {
           const nivel = (niveles as any[]).find((n: any) => n.nombre === m.nivelNombre);
-          return nivel ? ({ nombre: m.nombre, codigo: m.codigo, idNivel: nivel } as Partial<Materia>) : null;
+          const plan = (planes as any[]).find((p: any) => p.nombre === m.planNombre);
+          return (nivel && plan) ? ({ nombre: m.nombre, codigo: m.codigo, idNivel: nivel, idPlan: plan } as Partial<Materia>) : null;
         },
         'Materias'
       );
