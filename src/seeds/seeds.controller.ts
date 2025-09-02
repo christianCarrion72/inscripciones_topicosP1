@@ -2,7 +2,7 @@ import { Controller, Post, UseGuards, HttpStatus, HttpCode } from '@nestjs/commo
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { SeedsService } from './seeds.service';
 
-@ApiTags('Seeds')
+@ApiTags('seeds')
 @Controller('seeds')
 export class SeedsController {
   constructor(private readonly seedsService: SeedsService) {}
