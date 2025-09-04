@@ -5,15 +5,8 @@ export type TaskStatus = 'pending' | 'processing' | 'completed' | 'failed' | 'ca
 export interface TaskData<T = any> {
   type: OperationType;     // operación CRUD
   entity: string;          // entidad (ej: carrera, dia, aula)
-  status: TaskStatus;      // estado
   data?: T;                // DTO, parámetros, etc.
-  result?: any;
-  error?: string;
-  createdAt: Date;
-  updatedAt?: Date;
-  priority?: number;
-  retryCount?: number;
-  maxRetries?: number;
-  timeout?: number;
-  metadata?: Record<string, any>;
+  priority?: number;       // prioridad del job
+  timeout?: number;        // timeout del job
+  //metadata?: Record<string, any>; // datos extra personalizados
 }

@@ -3,23 +3,24 @@ import { InjectQueue } from '@nestjs/bullmq';
 import { Queue, QueueEvents, Job } from 'bullmq';
 import { randomUUID } from 'crypto';
 import { TaskData, OperationType } from './tareas.types';
+import { QUEUE } from './tareas.constants';
 
 @Injectable()
 export class TareasProducer implements OnModuleInit, OnModuleDestroy {
   private queueEvents: QueueEvents;
 
-  constructor(@InjectQueue('tareas') private readonly queue: Queue) {}
+  constructor(@InjectQueue(QUEUE) private readonly queue: Queue) {}
 
-  onModuleInit() {
-    // 🔹 Creamos QueueEvents para esta cola
-    this.queueEvents = new QueueEvents('tareas', {
+  async onModuleInit() {
+    // QueueEvents SOLO para waitUntilFinished
+    this.queueEvents = new QueueEvents(QUEUE, {
       connection: this.queue.opts.connection,
     });
+    await this.queueEvents.waitUntilReady();
   }
 
-  onModuleDestroy() {
-    // 🔹 Cerramos conexión a eventos al terminar
-    this.queueEvents.close();
+  async onModuleDestroy() {
+    await this.queueEvents.close();
   }
 
   async enqueue<T>(
@@ -28,31 +29,32 @@ export class TareasProducer implements OnModuleInit, OnModuleDestroy {
     data?: T,
     jobId?: string,
   ) {
-    const id=jobId ?? randomUUID();
+    const id = jobId ?? randomUUID();
+
     const task: TaskData<T> = {
       entity,
       type,
       data,
-      status: 'pending',
-      createdAt: new Date(),
     };
-    this.queue.add(`${entity}.${type}`, task, { jobId: id });
-    return { mensaje: "Procesando Tarea",jobId: id };
+
+    await this.queue.add(`${entity}.${type}`, task, { jobId: id });
+    return { mensaje: 'Procesando Tarea', jobId: id };
   }
 
   async enqueueAndWait<T>(
     entity: string,
     type: OperationType,
     data?: T,
-    timeout = 10000,
+    timeout?: number,
+    jobId?: string,
   ): Promise<any> {
-    const id= randomUUID();
+    const timeoutT = timeout ?? 0;
+    const id = jobId ?? randomUUID();
+
     const task: TaskData<T> = {
       entity,
       type,
       data,
-      status: 'pending',
-      createdAt: new Date(),
     };
 
     const job: Job = await this.queue.add(`${entity}.${type}`, task, { jobId: id });
@@ -61,12 +63,7 @@ export class TareasProducer implements OnModuleInit, OnModuleDestroy {
       throw new Error('QueueEvents no inicializado');
     }
 
-    // 🔹 Espera a que el Worker complete el Job
-    const result = await job.waitUntilFinished(this.queueEvents, timeout);
-    return result;
+    // 🔹 Espera hasta que el Worker lo complete/falle
+    return job.waitUntilFinished(this.queueEvents, timeoutT);
   }
-
-
-
-
 }

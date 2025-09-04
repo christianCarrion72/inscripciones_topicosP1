@@ -1,7 +1,7 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { BullModule } from '@nestjs/bullmq';
-import { TAREAS_QUEUE } from './tareas.constants';
+import { QUEUE } from './tareas.constants';
 import { TareasProducer } from './tareas.producer';
 import { TareasWorker } from './tareas.worker';
 import { TareasQueueService } from './tareas-queue.service';
@@ -30,11 +30,13 @@ import { DiaHorariosModule } from '../dia_horarios/dia_horarios.module';
 import { PrerequisitosModule } from '../prerequisitos/prerequisitos.module';
 import { CarrerasService } from 'src/carreras/carreras.service';
 import { DiasService } from 'src/dias/dias.service';
+import { TareasEvents } from './tareas.events';
+import { TareasGateway } from './tareas.gatway';
 
 @Module({
   imports: [
     ConfigModule, BullModule.registerQueue({ 
-      name: TAREAS_QUEUE,
+      name: QUEUE,
       connection: {
         host: 'localhost',
         port: 6379,
@@ -57,6 +59,8 @@ import { DiasService } from 'src/dias/dias.service';
     TareasProducer,
     TareasQueueService,
     TareasTestService,
+    TareasEvents,
+    TareasGateway,
     {
       provide: 'ENTITY_SERVICES',
       useFactory: (carreras: CarrerasService, dias: DiasService) => ({

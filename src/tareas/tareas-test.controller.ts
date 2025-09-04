@@ -103,6 +103,7 @@ export class TareasTestController {
     };
   }
 
+  /*
   @Post('priority-tasks')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Crear tareas con diferentes prioridades' })
@@ -127,4 +128,5 @@ export class TareasTestController {
       jobIds
     };
   }
+  */
 }

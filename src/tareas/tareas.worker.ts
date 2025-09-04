@@ -9,7 +9,7 @@ export class TareasWorker extends WorkerHost {
   private readonly logger = new Logger(TareasWorker.name);
 
   constructor(
-    @Inject('ENTITY_SERVICES') // Mapa dinámico { carrera: CarrerasService, dia: DiasService, ... }
+    @Inject('ENTITY_SERVICES')
     private readonly entityServices: Record<string, any>,
   ) {
     super();
@@ -17,49 +17,27 @@ export class TareasWorker extends WorkerHost {
 
   async process(job: Job<TaskData>): Promise<any> {
     const { entity, type, data } = job.data;
-    const attemptNumber = job.attemptsMade + 1;
-    
-    this.logger.debug(`Procesando ${entity}.${type} id=${job.id} (intento ${attemptNumber})`);
+    this.logger.debug(`🚀 Procesando ${entity}.${type} id=${job.id}`);
 
-    try {
-      const service = this.entityServices[entity];
-      if (!service) {
-        throw new Error(`Entidad no soportada: ${entity}`);
-      }
-
-      // 👇 dispatch dinámico
-      if (typeof service[type] !== 'function') {
-        throw new Error(`Operación no soportada: ${entity}.${type}`);
-      }
-
-      // Actualizar progreso
-      await job.updateProgress(25);
-
-      const result = await service[type](...(this.buildArgs(type, data)));
-      
-      // Actualizar progreso a 100%
-      await job.updateProgress(100);
-      
-      this.logger.log(`Trabajo ${entity}.${type} id=${job.id} completado exitosamente`);
-      return result;
-    } catch (error) {
-      this.logger.error(`Error en trabajo ${entity}.${type} id=${job.id} (intento ${attemptNumber}):`, error.message);
-      
-      // Si es el último intento, loggear el error completo
-      if (attemptNumber >= (job.opts.attempts || 3)) {
-        this.logger.error(`Trabajo ${job.id} falló definitivamente después de ${attemptNumber} intentos:`, error.stack);
-      }
-      
-      throw error; // Re-lanzar para que BullMQ maneje el reintento
+    // 🔹 Simulación de timeout para tareas de prueba
+    if (job.id?.startsWith('test-timeout')) {
+      this.logger.warn(`Simulando timeout para el job ${job.id}`);
+      await new Promise((res) => setTimeout(res, 15_000)); // 15s de retardo
     }
+
+    const service = this.entityServices[entity];
+    if (!service) throw new Error(`Entidad no soportada: ${entity}`);
+    if (typeof service[type] !== 'function') throw new Error(`Operación no soportada: ${entity}.${type}`);
+
+    await job.updateProgress(25);
+
+    const result = await service[type](...(this.buildArgs(type, data)));
+
+    await job.updateProgress(100);
+
+    return result;
   }
 
-  /**
-   * Construye los argumentos en base a la operación.
-   * - update/remove/findOne => necesitan un ID
-   * - create => DTO completo
-   * - findAll => sin args
-   */
   private buildArgs(type: string, data: any): any[] {
     switch (type) {
       case 'update': return [data.id, data];

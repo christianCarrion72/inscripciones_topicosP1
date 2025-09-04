@@ -49,7 +49,7 @@ export class CarrerasController {
     required: false, // <--- importante
   })
   update(@Param('id') id: number, @Body() updateCarreraDto: UpdateCarreraDto, @Headers('x-idempotency-key') idem?: string) {
-    const jobId = "id";
+    const jobId = generateJobId('carrera', 'update', { id, ...updateCarreraDto });
     return this.tareas.enqueue(
       'carrera',
       'update',
@@ -65,7 +65,7 @@ export class CarrerasController {
     required: false, // <--- importante
   })
   remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
-    const jobId = "id";
+    const jobId = generateJobId('carrera', 'remove', { id });
     return this.tareas.enqueue(
       'carrera',
       'remove',

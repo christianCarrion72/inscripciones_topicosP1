@@ -70,17 +70,19 @@ export class TareasTestService {
     const jobId = `test-timeout-${Date.now()}`;
     
     // Crear una tarea con un timeout muy corto para simular timeout
-    await this.tareasProducer.enqueue(
+    await this.tareasProducer.enqueueAndWait(
       'carrera',
       'findAll',
       undefined,
-      jobId
+      5_000, // timeout de 5s
+      jobId,
     );
 
     this.logger.log(`Tarea de timeout creada con ID: ${jobId}`);
     return jobId;
   }
 
+  
   /**
    * Crea tareas con diferentes prioridades
    */
