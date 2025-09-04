@@ -15,7 +15,7 @@ export class InscripcionsController {
     private readonly inscripcionsService: InscripcionsService,
     private readonly tareas: TareasProducer
   ) {}
-
+/*
   @Post()
   @ApiHeader({
     name: 'x-idempotency-key',
@@ -57,5 +57,5 @@ export class InscripcionsController {
   })
   remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
     return this.tareas.fireAndForget('inscripcion.delete', { params: { id }, meta: { requestId: idem } }, idem ?? `inscripcion:delete:${id}`);
-  }
+  }*/
 }

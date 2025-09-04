@@ -15,7 +15,7 @@ export class NivelsController {
     private readonly nivelsService: NivelsService,
     private readonly tareas: TareasProducer
   ) {}
-
+/*
   @Post()
   @ApiHeader({
     name: 'x-idempotency-key',
@@ -56,5 +56,5 @@ export class NivelsController {
   })
   remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
     return this.tareas.fireAndForget('nivel.delete', { params: { id }, meta: { requestId: idem } }, idem ?? `nivel:delete:${id}`);
-  }
+  }*/
 }

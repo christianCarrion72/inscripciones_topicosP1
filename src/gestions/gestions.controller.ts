@@ -15,7 +15,7 @@ export class GestionsController {
     private readonly gestionsService: GestionsService,
     private readonly tareas: TareasProducer
   ) {}
-
+/*
   @Post()
   @ApiHeader({
     name: 'x-idempotency-key',
@@ -56,5 +56,5 @@ export class GestionsController {
   })
   remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
     return this.tareas.fireAndForget('gestion.delete', { params: { id }, meta: { requestId: idem } }, idem ?? `gestion:delete:${id}`);
-  }
+  }*/
 }

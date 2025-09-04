@@ -2,8 +2,12 @@ import { forwardRef, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { BullModule } from '@nestjs/bullmq';
 import { TAREAS_QUEUE } from './tareas.constants';
-import { TareasProducer, TareasEventsProvider } from './tareas.producer';
+import { TareasProducer } from './tareas.producer';
 import { TareasWorker } from './tareas.worker';
+import { TareasQueueService } from './tareas-queue.service';
+import { TareasQueueController } from './tareas-queue.controller';
+import { TareasTestService } from './tareas-test.service';
+import { TareasTestController } from './tareas-test.controller';
 import { CarrerasModule } from '../carreras/carreras.module';
 import { DiasModule } from '../dias/dias.module';
 import { AulasModule } from '../aulas/aulas.module';
@@ -24,32 +28,45 @@ import { PlanEstudiosModule } from '../plan_estudios/plan_estudios.module';
 import { DetallesModule } from '../detalles/detalles.module';
 import { DiaHorariosModule } from '../dia_horarios/dia_horarios.module';
 import { PrerequisitosModule } from '../prerequisitos/prerequisitos.module';
+import { CarrerasService } from 'src/carreras/carreras.service';
+import { DiasService } from 'src/dias/dias.service';
 
 @Module({
   imports: [
-    ConfigModule, BullModule.registerQueue({ name: TAREAS_QUEUE }), 
-    forwardRef(() => CarrerasModule), 
+    ConfigModule, BullModule.registerQueue({ 
+      name: TAREAS_QUEUE,
+      connection: {
+        host: 'localhost',
+        port: 6379,
+      },
+      defaultJobOptions: {
+        removeOnComplete: 100, // Mantener los últimos 100 trabajos completados
+        removeOnFail: 50, // Mantener los últimos 50 trabajos fallidos
+        attempts: 3, // Reintentar hasta 3 veces
+        backoff: {
+          type: 'exponential', // Backoff exponencial
+          delay: 2000, // Empezar con 2 segundos
+        },
+      },
+     }), 
+    forwardRef(() => CarrerasModule),
     forwardRef(() => DiasModule),
-    forwardRef(() => AulasModule),
-    forwardRef(() => BoletaHorariosModule),
-    forwardRef(() => DocentesModule),
-    forwardRef(() => EstudiantesModule),
-    forwardRef(() => GestionsModule),
-    forwardRef(() => GrupoMateriasModule),
-    forwardRef(() => GruposModule),
-    forwardRef(() => HorariosModule),
-    forwardRef(() => InscripcionsModule),
-    forwardRef(() => MateriasModule),
-    forwardRef(() => ModulosModule),
-    forwardRef(() => NivelsModule),
-    forwardRef(() => NotasModule),
-    forwardRef(() => PeriodosModule),
-    forwardRef(() => PlanEstudiosModule),
-    forwardRef(() => DetallesModule),
-    forwardRef(() => DiaHorariosModule),
-    forwardRef(() => PrerequisitosModule),
     ],
-  providers: [TareasProducer, TareasWorker, TareasEventsProvider],
-  exports: [TareasProducer],
+  providers: [
+    TareasWorker,
+    TareasProducer,
+    TareasQueueService,
+    TareasTestService,
+    {
+      provide: 'ENTITY_SERVICES',
+      useFactory: (carreras: CarrerasService, dias: DiasService) => ({
+        carrera: carreras,
+        dia: dias,
+      }),
+      inject: [CarrerasService, DiasService],
+    },
+  ],
+  controllers: [TareasQueueController, TareasTestController],
+  exports: [TareasProducer, TareasQueueService, TareasTestService, TareasModule],
 })
 export class TareasModule {}

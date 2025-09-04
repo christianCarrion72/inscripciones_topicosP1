@@ -15,7 +15,7 @@ export class BoletaHorariosController {
     private readonly boletaHorariosService: BoletaHorariosService,
     private readonly tareas: TareasProducer
   ) {}
-
+/*
   @Post()
   @ApiHeader({
     name: 'x-idempotency-key',
@@ -57,5 +57,5 @@ export class BoletaHorariosController {
   })
   remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
     return this.tareas.fireAndForget('boleta_horario.delete', { params: { id }, meta: { requestId: idem } }, idem ?? `boleta_horario:delete:${id}`);
-  }
+  }*/
 }

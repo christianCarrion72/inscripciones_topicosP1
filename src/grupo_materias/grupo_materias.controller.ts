@@ -15,7 +15,7 @@ export class GrupoMateriasController {
     private readonly grupoMateriasService: GrupoMateriasService,
     private readonly tareas: TareasProducer
   ) {}
-
+/*
   @Post()
   @ApiHeader({
     name: 'x-idempotency-key',
@@ -57,5 +57,5 @@ export class GrupoMateriasController {
   })
   remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
     return this.tareas.fireAndForget('grupo_materia.delete', { params: { id }, meta: { requestId: idem } }, idem ?? `grupo_materia:delete:${id}`);
-  }
+  }*/
 }

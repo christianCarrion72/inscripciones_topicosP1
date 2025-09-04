@@ -15,7 +15,7 @@ export class PrerequisitosController {
     private readonly prerequisitosService: PrerequisitosService,
     private readonly tareas: TareasProducer
   ) {}
-
+/*
   @Post()
   @ApiHeader({
     name: 'x-idempotency-key',
@@ -62,5 +62,5 @@ export class PrerequisitosController {
   @Get('materia/:id')
   async findPrerequisitosMateria(@Param('id') id: number) {
     return this.prerequisitosService.findPrerequisitosMateria(id);
-  }
+  }*/
 }

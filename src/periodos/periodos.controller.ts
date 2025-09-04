@@ -15,7 +15,7 @@ export class PeriodosController {
     private readonly periodosService: PeriodosService,
     private readonly tareas: TareasProducer
   ) {}
-
+/*
   @Post()
   @ApiHeader({
     name: 'x-idempotency-key',
@@ -56,5 +56,5 @@ export class PeriodosController {
   })
   remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
     return this.tareas.fireAndForget('periodo.delete', { params: { id }, meta: { requestId: idem } }, idem ?? `periodo:delete:${id}`);
-  }
+  }*/
 }

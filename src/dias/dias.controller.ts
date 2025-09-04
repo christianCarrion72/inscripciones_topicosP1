@@ -20,19 +20,23 @@ export class DiasController {
     required: false, // <--- importante
   })
   async create(@Body() createDiaDto: CreateDiaDto, @Headers('x-idempotency-key') idem?: string) {
-    return this.tareas.fireAndForget('dia.create', { body: createDiaDto, meta: { requestId: idem } }, idem ?? `dia:create:${createDiaDto.nombre}`);
+    const jobId = "id";
+    return this.tareas.enqueue(
+      'dia',       // entidad
+      'create',        // operación CRUD
+      createDiaDto,             // datos del DTO
+      idem ?? jobId, // idempotencia
+    );
   }
 
   @Get()
   async findAll() {
-    const { result } = await this.tareas.requestAndWait('dias.getAll', { }, 10_000);
-    return result;
+    return this.tareas.enqueue('dia', 'findAll');
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    const { result } = await this.tareas.requestAndWait('dia.get', { params: { id } }, 10_000);
-    return result;
+    return this.tareas.enqueue('dia', 'findOne', { id });
   }
 
   @Patch(':id')
@@ -42,7 +46,13 @@ export class DiasController {
     required: false, // <--- importante
   })
   async update(@Param('id') id: number, @Body() updateDiaDto: UpdateDiaDto, @Headers('x-idempotency-key') idem?: string) {
-    return this.tareas.fireAndForget('dia.update', { params: { id }, body: updateDiaDto, meta: { requestId: idem } }, idem ?? `dia:update:${id}`);
+    const jobId = "id";
+    return this.tareas.enqueue(
+      'dia',
+      'update',
+      { id, ...updateDiaDto },
+      idem ?? jobId,
+    );
   }
 
   @Delete(':id')
@@ -52,6 +62,12 @@ export class DiasController {
     required: false, // <--- importante
   })
   async remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
-    return this.tareas.fireAndForget('dia.delete', { params: { id }, meta: { requestId: idem } }, idem ?? `dia:delete:${id}`);
+    const jobId = "id";
+    return this.tareas.enqueue(
+      'dia',
+      'remove',
+      { id },
+      idem ?? jobId,
+    );
   }
 }
