@@ -48,22 +48,25 @@ export class TareasProducer implements OnModuleInit, OnModuleDestroy {
     timeout?: number,
     jobId?: string,
   ): Promise<any> {
-    const timeoutT = timeout ?? 0;
+    const timeoutMs = timeout ?? 0;
     const id = jobId ?? randomUUID();
+    const name = `${entity}.${type}`;
+    
 
     const task: TaskData<T> = {
       entity,
       type,
       data,
+      timeout: timeoutMs,
     };
 
-    const job: Job = await this.queue.add(`${entity}.${type}`, task, { jobId: id });
+    const job: Job = await this.queue.add(name, task, { jobId: id },);
 
     if (!this.queueEvents) {
       throw new Error('QueueEvents no inicializado');
     }
 
     // 🔹 Espera hasta que el Worker lo complete/falle
-    return job.waitUntilFinished(this.queueEvents, timeoutT);
+    return job.waitUntilFinished(this.queueEvents, timeoutMs);
   }
 }
