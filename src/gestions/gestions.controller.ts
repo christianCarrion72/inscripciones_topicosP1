@@ -5,6 +5,7 @@ import { GestionsService } from './gestions.service';
 import { CreateGestionDto } from './dto/create-gestion.dto';
 import { UpdateGestionDto } from './dto/update-gestion.dto';
 import { TareasProducer } from '../tareas/tareas.producer';
+import { generateJobId } from 'src/common/utils/idempotency.util';
 
 @ApiTags('gestions')
 @ApiBearerAuth()
@@ -15,7 +16,7 @@ export class GestionsController {
     private readonly gestionsService: GestionsService,
     private readonly tareas: TareasProducer
   ) {}
-/*
+
   @Post()
   @ApiHeader({
     name: 'x-idempotency-key',
@@ -23,19 +24,23 @@ export class GestionsController {
     required: false,
   })
   async create(@Body() createGestionDto: CreateGestionDto, @Headers('x-idempotency-key') idem?: string) {
-    return this.tareas.fireAndForget('gestion.create', { body: createGestionDto, meta: { requestId: idem } }, idem ?? `gestion:create:${createGestionDto.numero}`);
+    const jobId = generateJobId('gestion', 'create', createGestionDto);
+    return this.tareas.enqueue(
+      'gestion',
+      'create',
+      createGestionDto,
+      idem ?? jobId,
+    );
   }
 
   @Get()
   async findAll() {
-    const { result } = await this.tareas.requestAndWait('gestions.getAll', { }, 10_000);
-    return result;
+    return this.tareas.enqueueAndWait('gestion', 'findAll');
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    const { result } = await this.tareas.requestAndWait('gestion.get', { params: { id } }, 10_000);
-    return result;
+    return this.tareas.enqueueAndWait('gestion', 'findOne', { id });
   }
 
   @Patch(':id')
@@ -45,7 +50,13 @@ export class GestionsController {
     required: false,
   })
   update(@Param('id') id: number, @Body() updateGestionDto: UpdateGestionDto, @Headers('x-idempotency-key') idem?: string) {
-    return this.tareas.fireAndForget('gestion.update', { params: { id }, body: updateGestionDto, meta: { requestId: idem } }, idem ?? `gestion:update:${id}`);
+    const jobId = generateJobId('gestion', 'update', { id, ...updateGestionDto });
+    return this.tareas.enqueue(
+      'gestion',
+      'update',
+      { id, ...updateGestionDto },
+      idem ?? jobId,
+    );
   }
 
   @Delete(':id')
@@ -55,6 +66,12 @@ export class GestionsController {
     required: false,
   })
   remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
-    return this.tareas.fireAndForget('gestion.delete', { params: { id }, meta: { requestId: idem } }, idem ?? `gestion:delete:${id}`);
-  }*/
+    const jobId = generateJobId('gestion', 'remove', { id });
+    return this.tareas.enqueue(
+      'gestion',
+      'remove',
+      { id },
+      idem ?? jobId,
+    );
+  }
 }

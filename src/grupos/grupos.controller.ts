@@ -5,6 +5,7 @@ import { GruposService } from './grupos.service';
 import { CreateGrupoDto } from './dto/create-grupo.dto';
 import { UpdateGrupoDto } from './dto/update-grupo.dto';
 import { TareasProducer } from '../tareas/tareas.producer';
+import { generateJobId } from 'src/common/utils/idempotency.util';
 
 @ApiTags('grupos')
 @ApiBearerAuth()
@@ -15,7 +16,7 @@ export class GruposController {
     private readonly gruposService: GruposService,
     private readonly tareas: TareasProducer
   ) {}
-/*
+
   @Post()
   @ApiHeader({
     name: 'x-idempotency-key',
@@ -23,19 +24,23 @@ export class GruposController {
     required: false,
   })
   async create(@Body() createGrupoDto: CreateGrupoDto, @Headers('x-idempotency-key') idem?: string) {
-    return this.tareas.fireAndForget('grupo.create', { body: createGrupoDto, meta: { requestId: idem } }, idem ?? `grupo:create:${createGrupoDto.sigla}`);
+    const jobId = generateJobId('grupo', 'create', createGrupoDto);
+    return this.tareas.enqueue(
+      'grupo',
+      'create',
+      createGrupoDto,
+      idem ?? jobId,
+    );
   }
 
   @Get()
   async findAll() {
-    const { result } = await this.tareas.requestAndWait('grupos.getAll', { }, 10_000);
-    return result;
+    return this.tareas.enqueueAndWait('grupo', 'findAll');
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    const { result } = await this.tareas.requestAndWait('grupo.get', { params: { id } }, 10_000);
-    return result;
+    return this.tareas.enqueueAndWait('grupo', 'findOne', { id });
   }
 
   @Patch(':id')
@@ -45,7 +50,13 @@ export class GruposController {
     required: false,
   })
   update(@Param('id') id: number, @Body() updateGrupoDto: UpdateGrupoDto, @Headers('x-idempotency-key') idem?: string) {
-    return this.tareas.fireAndForget('grupo.update', { params: { id }, body: updateGrupoDto, meta: { requestId: idem } }, idem ?? `grupo:update:${id}`);
+    const jobId = generateJobId('grupo', 'update', { id, ...updateGrupoDto });
+    return this.tareas.enqueue(
+      'grupo',
+      'update',
+      { id, ...updateGrupoDto },
+      idem ?? jobId,
+    );
   }
 
   @Delete(':id')
@@ -55,6 +66,12 @@ export class GruposController {
     required: false,
   })
   remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
-    return this.tareas.fireAndForget('grupo.delete', { params: { id }, meta: { requestId: idem } }, idem ?? `grupo:delete:${id}`);
-  }*/
+    const jobId = generateJobId('grupo', 'remove', { id });
+    return this.tareas.enqueue(
+      'grupo',
+      'remove',
+      { id },
+      idem ?? jobId,
+    );
+  }
 }

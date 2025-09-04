@@ -66,7 +66,7 @@ export class TareasProducer implements OnModuleInit, OnModuleDestroy {
       throw new Error('QueueEvents no inicializado');
     }
 
-    // 🔹 Espera hasta que el Worker lo complete/falle
+    //Espera hasta que el Worker lo complete/falle
     return job.waitUntilFinished(this.queueEvents, timeoutMs);
   }
 }

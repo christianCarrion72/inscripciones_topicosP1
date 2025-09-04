@@ -5,6 +5,7 @@ import { GrupoMateriasService } from './grupo_materias.service';
 import { CreateGrupoMateriaDto } from './dto/create-grupo_materia.dto';
 import { UpdateGrupoMateriaDto } from './dto/update-grupo_materia.dto';
 import { TareasProducer } from '../tareas/tareas.producer';
+import { generateJobId } from 'src/common/utils/idempotency.util';
 
 @ApiTags('grupo-materias')
 @ApiBearerAuth()
@@ -15,7 +16,7 @@ export class GrupoMateriasController {
     private readonly grupoMateriasService: GrupoMateriasService,
     private readonly tareas: TareasProducer
   ) {}
-/*
+
   @Post()
   @ApiHeader({
     name: 'x-idempotency-key',
@@ -23,20 +24,23 @@ export class GrupoMateriasController {
     required: false,
   })
   async create(@Body() createGrupoMateriaDto: CreateGrupoMateriaDto, @Headers('x-idempotency-key') idem?: string) {
-    const idempotencyKey = idem ?? `grupo_materia:create:${createGrupoMateriaDto.idMateria}:${createGrupoMateriaDto.idDocente}:${createGrupoMateriaDto.idGrupo}`;
-    return this.tareas.fireAndForget('grupo_materia.create', { body: createGrupoMateriaDto, meta: { requestId: idem } }, idempotencyKey);
+    const jobId = generateJobId('grupo_materia', 'create', createGrupoMateriaDto);
+    return this.tareas.enqueue(
+      'grupo_materia',
+      'create',
+      createGrupoMateriaDto,
+      idem ?? jobId,
+    );
   }
 
   @Get()
   async findAll() {
-    const { result } = await this.tareas.requestAndWait('grupo_materias.getAll', { }, 10_000);
-    return result;
+    return this.tareas.enqueueAndWait('grupo_materia', 'findAll');
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    const { result } = await this.tareas.requestAndWait('grupo_materia.get', { params: { id } }, 10_000);
-    return result;
+    return this.tareas.enqueueAndWait('grupo_materia', 'findOne', { id });
   }
 
   @Patch(':id')
@@ -46,7 +50,13 @@ export class GrupoMateriasController {
     required: false,
   })
   update(@Param('id') id: number, @Body() updateGrupoMateriaDto: UpdateGrupoMateriaDto, @Headers('x-idempotency-key') idem?: string) {
-    return this.tareas.fireAndForget('grupo_materia.update', { params: { id }, body: updateGrupoMateriaDto, meta: { requestId: idem } }, idem ?? `grupo_materia:update:${id}`);
+    const jobId = generateJobId('grupo_materia', 'update', { id, ...updateGrupoMateriaDto });
+    return this.tareas.enqueue(
+      'grupo_materia',
+      'update',
+      { id, ...updateGrupoMateriaDto },
+      idem ?? jobId,
+    );
   }
 
   @Delete(':id')
@@ -56,6 +66,12 @@ export class GrupoMateriasController {
     required: false,
   })
   remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
-    return this.tareas.fireAndForget('grupo_materia.delete', { params: { id }, meta: { requestId: idem } }, idem ?? `grupo_materia:delete:${id}`);
-  }*/
+    const jobId = generateJobId('grupo_materia', 'remove', { id });
+    return this.tareas.enqueue(
+      'grupo_materia',
+      'remove',
+      { id },
+      idem ?? jobId,
+    );
+  }
 }

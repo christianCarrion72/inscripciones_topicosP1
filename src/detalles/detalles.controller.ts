@@ -5,6 +5,7 @@ import { CreateDetalleDto } from './dto/create-detalle.dto';
 import { UpdateDetalleDto } from './dto/update-detalle.dto';
 import { ApiBearerAuth, ApiHeader, ApiTags } from '@nestjs/swagger';
 import { TareasProducer } from '../tareas/tareas.producer';
+import { generateJobId } from 'src/common/utils/idempotency.util';
 
 @ApiTags('detalles')
 @ApiBearerAuth()
@@ -15,7 +16,7 @@ export class DetallesController {
     private readonly detallesService: DetallesService,
     private readonly tareas: TareasProducer
   ) {}
-/*
+
   @Post()
   @ApiHeader({
     name: 'x-idempotency-key',
@@ -23,20 +24,23 @@ export class DetallesController {
     required: false,
   })
   async create(@Body() createDetalleDto: CreateDetalleDto, @Headers('x-idempotency-key') idem?: string) {
-    const idempotencyKey = idem ?? `detalle:create:${Date.now()}`;
-    return this.tareas.fireAndForget('detalle.create', { body: createDetalleDto, meta: { requestId: idem } }, idempotencyKey);
+    const jobId = generateJobId('detalle', 'create', createDetalleDto);
+    return this.tareas.enqueue(
+      'detalle',
+      'create',
+      createDetalleDto,
+      idem ?? jobId,
+    );
   }
 
   @Get()
   async findAll() {
-    const { result } = await this.tareas.requestAndWait('detalles.getAll', { }, 10_000);
-    return result;
+    return this.tareas.enqueueAndWait('detalle', 'findAll');
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    const { result } = await this.tareas.requestAndWait('detalle.get', { params: { id } }, 10_000);
-    return result;
+    return this.tareas.enqueueAndWait('detalle', 'findOne', { id });
   }
 
   @Patch(':id')
@@ -46,7 +50,13 @@ export class DetallesController {
     required: false,
   })
   update(@Param('id') id: number, @Body() updateDetalleDto: UpdateDetalleDto, @Headers('x-idempotency-key') idem?: string) {
-    return this.tareas.fireAndForget('detalle.update', { params: { id }, body: updateDetalleDto, meta: { requestId: idem } }, idem ?? `detalle:update:${id}`);
+    const jobId = generateJobId('detalle', 'update', { id, ...updateDetalleDto });
+    return this.tareas.enqueue(
+      'detalle',
+      'update',
+      { id, ...updateDetalleDto },
+      idem ?? jobId,
+    );
   }
 
   @Delete(':id')
@@ -56,6 +66,12 @@ export class DetallesController {
     required: false,
   })
   remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
-    return this.tareas.fireAndForget('detalle.delete', { params: { id }, meta: { requestId: idem } }, idem ?? `detalle:delete:${id}`);
-  }*/
+    const jobId = generateJobId('detalle', 'remove', { id });
+    return this.tareas.enqueue(
+      'detalle',
+      'remove',
+      { id },
+      idem ?? jobId,
+    );
+  }
 }

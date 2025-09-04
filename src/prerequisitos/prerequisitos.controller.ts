@@ -5,6 +5,7 @@ import { PrerequisitosService } from './prerequisitos.service';
 import { CreatePrerequisitoDto } from './dto/create-prerequisito.dto';
 import { UpdatePrerequisitoDto } from './dto/update-prerequisito.dto';
 import { TareasProducer } from '../tareas/tareas.producer';
+import { generateJobId } from 'src/common/utils/idempotency.util';
 
 @ApiTags('prerequisitos')
 @ApiBearerAuth()
@@ -15,7 +16,7 @@ export class PrerequisitosController {
     private readonly prerequisitosService: PrerequisitosService,
     private readonly tareas: TareasProducer
   ) {}
-/*
+
   @Post()
   @ApiHeader({
     name: 'x-idempotency-key',
@@ -23,20 +24,23 @@ export class PrerequisitosController {
     required: false,
   })
   async create(@Body() createPrerequisitoDto: CreatePrerequisitoDto, @Headers('x-idempotency-key') idem?: string) {
-    const idempotencyKey = idem ?? `prerequisito:create:${createPrerequisitoDto.idMateria}:${createPrerequisitoDto.idPrerequisito}`;
-    return this.tareas.fireAndForget('prerequisito.create', { body: createPrerequisitoDto, meta: { requestId: idem } }, idempotencyKey);
+    const jobId = generateJobId('prerequisito', 'create', createPrerequisitoDto);
+    return this.tareas.enqueue(
+      'prerequisito',
+      'create',
+      createPrerequisitoDto,
+      idem ?? jobId,
+    );
   }
 
   @Get()
   async findAll() {
-    const { result } = await this.tareas.requestAndWait('prerequisitos.getAll', { }, 10_000);
-    return result;
+    return this.tareas.enqueueAndWait('prerequisito', 'findAll');
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    const { result } = await this.tareas.requestAndWait('prerequisito.get', { params: { id } }, 10_000);
-    return result;
+    return this.tareas.enqueueAndWait('prerequisito', 'findOne', { id });
   }
 
   @Patch(':id')
@@ -46,7 +50,13 @@ export class PrerequisitosController {
     required: false,
   })
   update(@Param('id') id: number, @Body() updatePrerequisitoDto: UpdatePrerequisitoDto, @Headers('x-idempotency-key') idem?: string) {
-    return this.tareas.fireAndForget('prerequisito.update', { params: { id }, body: updatePrerequisitoDto, meta: { requestId: idem } }, idem ?? `prerequisito:update:${id}`);
+    const jobId = generateJobId('prerequisito', 'update', { id, ...updatePrerequisitoDto });
+    return this.tareas.enqueue(
+      'prerequisito',
+      'update',
+      { id, ...updatePrerequisitoDto },
+      idem ?? jobId,
+    );
   }
 
   @Delete(':id')
@@ -56,11 +66,17 @@ export class PrerequisitosController {
     required: false,
   })
   remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
-    return this.tareas.fireAndForget('prerequisito.delete', { params: { id }, meta: { requestId: idem } }, idem ?? `prerequisito:delete:${id}`);
+    const jobId = generateJobId('prerequisito', 'remove', { id });
+    return this.tareas.enqueue(
+      'prerequisito',
+      'remove',
+      { id },
+      idem ?? jobId,
+    );
   }
 
   @Get('materia/:id')
   async findPrerequisitosMateria(@Param('id') id: number) {
     return this.prerequisitosService.findPrerequisitosMateria(id);
-  }*/
+  }
 }

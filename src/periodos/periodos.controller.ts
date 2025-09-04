@@ -5,6 +5,7 @@ import { PeriodosService } from './periodos.service';
 import { CreatePeriodoDto } from './dto/create-periodo.dto';
 import { UpdatePeriodoDto } from './dto/update-periodo.dto';
 import { TareasProducer } from '../tareas/tareas.producer';
+import { generateJobId } from 'src/common/utils/idempotency.util';
 
 @ApiTags('periodos')
 @ApiBearerAuth()
@@ -15,7 +16,7 @@ export class PeriodosController {
     private readonly periodosService: PeriodosService,
     private readonly tareas: TareasProducer
   ) {}
-/*
+
   @Post()
   @ApiHeader({
     name: 'x-idempotency-key',
@@ -23,19 +24,23 @@ export class PeriodosController {
     required: false,
   })
   async create(@Body() createPeriodoDto: CreatePeriodoDto, @Headers('x-idempotency-key') idem?: string) {
-    return this.tareas.fireAndForget('periodo.create', { body: createPeriodoDto, meta: { requestId: idem } }, idem ?? `periodo:create:${createPeriodoDto.numero}`);
+    const jobId = generateJobId('periodo', 'create', createPeriodoDto);
+    return this.tareas.enqueue(
+      'periodo',
+      'create',
+      createPeriodoDto,
+      idem ?? jobId,
+    );
   }
 
   @Get()
   async findAll() {
-    const { result } = await this.tareas.requestAndWait('periodos.getAll', { }, 10_000);
-    return result;
+    return this.tareas.enqueueAndWait('periodo', 'findAll');
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    const { result } = await this.tareas.requestAndWait('periodo.get', { params: { id } }, 10_000);
-    return result;
+    return this.tareas.enqueueAndWait('periodo', 'findOne', { id });
   }
 
   @Patch(':id')
@@ -45,7 +50,13 @@ export class PeriodosController {
     required: false,
   })
   update(@Param('id') id: number, @Body() updatePeriodoDto: UpdatePeriodoDto, @Headers('x-idempotency-key') idem?: string) {
-    return this.tareas.fireAndForget('periodo.update', { params: { id }, body: updatePeriodoDto, meta: { requestId: idem } }, idem ?? `periodo:update:${id}`);
+    const jobId = generateJobId('periodo', 'update', { id, ...updatePeriodoDto });
+    return this.tareas.enqueue(
+      'periodo',
+      'update',
+      { id, ...updatePeriodoDto },
+      idem ?? jobId,
+    );
   }
 
   @Delete(':id')
@@ -55,6 +66,12 @@ export class PeriodosController {
     required: false,
   })
   remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
-    return this.tareas.fireAndForget('periodo.delete', { params: { id }, meta: { requestId: idem } }, idem ?? `periodo:delete:${id}`);
-  }*/
+    const jobId = generateJobId('periodo', 'remove', { id });
+    return this.tareas.enqueue(
+      'periodo',
+      'remove',
+      { id },
+      idem ?? jobId,
+    );
+  }
 }
