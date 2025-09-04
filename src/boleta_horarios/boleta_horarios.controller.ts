@@ -5,6 +5,7 @@ import { CreateBoletaHorarioDto } from './dto/create-boleta_horario.dto';
 import { UpdateBoletaHorarioDto } from './dto/update-boleta_horario.dto';
 import { ApiBearerAuth, ApiHeader, ApiTags } from '@nestjs/swagger';
 import { TareasProducer } from '../tareas/tareas.producer';
+import { generateJobId } from 'src/common/utils/idempotency.util';
 
 @ApiTags('boleta-horarios')
 @ApiBearerAuth()
@@ -15,7 +16,7 @@ export class BoletaHorariosController {
     private readonly boletaHorariosService: BoletaHorariosService,
     private readonly tareas: TareasProducer
   ) {}
-/*
+
   @Post()
   @ApiHeader({
     name: 'x-idempotency-key',
@@ -23,20 +24,23 @@ export class BoletaHorariosController {
     required: false,
   })
   async create(@Body() createBoletaHorarioDto: CreateBoletaHorarioDto, @Headers('x-idempotency-key') idem?: string) {
-    const idempotencyKey = idem ?? `boleta_horario:create:${createBoletaHorarioDto.idHorario}:${createBoletaHorarioDto.idGrupoMateria}`;
-    return this.tareas.fireAndForget('boleta_horario.create', { body: createBoletaHorarioDto, meta: { requestId: idem } }, idempotencyKey);
+    const jobId = generateJobId('boleta_horario', 'create', createBoletaHorarioDto);
+    return this.tareas.enqueue(
+      'boleta_horario',
+      'create',
+      createBoletaHorarioDto,
+      idem ?? jobId,
+    );
   }
 
   @Get()
   async findAll() {
-    const { result } = await this.tareas.requestAndWait('boleta_horarios.getAll', { }, 10_000);
-    return result;
+    return this.tareas.enqueueAndWait('boleta_horario', 'findAll');
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    const { result } = await this.tareas.requestAndWait('boleta_horario.get', { params: { id } }, 10_000);
-    return result;
+    return this.tareas.enqueueAndWait('boleta_horario', 'findOne', { id });
   }
 
   @Patch(':id')
@@ -46,7 +50,13 @@ export class BoletaHorariosController {
     required: false,
   })
   update(@Param('id') id: number, @Body() updateBoletaHorarioDto: UpdateBoletaHorarioDto, @Headers('x-idempotency-key') idem?: string) {
-    return this.tareas.fireAndForget('boleta_horario.update', { params: { id }, body: updateBoletaHorarioDto, meta: { requestId: idem } }, idem ?? `boleta_horario:update:${id}`);
+    const jobId = generateJobId('boleta_horario', 'update', { id, ...updateBoletaHorarioDto });
+    return this.tareas.enqueue(
+      'boleta_horario',
+      'update',
+      { id, ...updateBoletaHorarioDto },
+      idem ?? jobId,
+    );
   }
 
   @Delete(':id')
@@ -56,6 +66,12 @@ export class BoletaHorariosController {
     required: false,
   })
   remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
-    return this.tareas.fireAndForget('boleta_horario.delete', { params: { id }, meta: { requestId: idem } }, idem ?? `boleta_horario:delete:${id}`);
-  }*/
+    const jobId = generateJobId('boleta_horario', 'remove', { id });
+    return this.tareas.enqueue(
+      'boleta_horario',
+      'remove',
+      { id },
+      idem ?? jobId,
+    );
+  }
 }

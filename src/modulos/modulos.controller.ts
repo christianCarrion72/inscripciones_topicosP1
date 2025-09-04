@@ -5,6 +5,7 @@ import { ModulosService } from './modulos.service';
 import { CreateModuloDto } from './dto/create-modulo.dto';
 import { UpdateModuloDto } from './dto/update-modulo.dto';
 import { TareasProducer } from '../tareas/tareas.producer';
+import { generateJobId } from 'src/common/utils/idempotency.util';
 
 @ApiTags('modulos')
 @ApiBearerAuth()
@@ -15,7 +16,7 @@ export class ModulosController {
     private readonly modulosService: ModulosService,
     private readonly tareas: TareasProducer
   ) {}
-/*
+
   @Post()
   @ApiHeader({
     name: 'x-idempotency-key',
@@ -23,19 +24,23 @@ export class ModulosController {
     required: false,
   })
   async create(@Body() createModuloDto: CreateModuloDto, @Headers('x-idempotency-key') idem?: string) {
-    return this.tareas.fireAndForget('modulo.create', { body: createModuloDto, meta: { requestId: idem } }, idem ?? `modulo:create:${createModuloDto.codigo}`);
+    const jobId = generateJobId('modulo', 'create', createModuloDto);
+    return this.tareas.enqueue(
+      'modulo',
+      'create',
+      createModuloDto,
+      idem ?? jobId,
+    );
   }
 
   @Get()
   async findAll() {
-    const { result } = await this.tareas.requestAndWait('modulos.getAll', { }, 10_000);
-    return result;
+    return this.tareas.enqueueAndWait('modulo', 'findAll');
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    const { result } = await this.tareas.requestAndWait('modulo.get', { params: { id } }, 10_000);
-    return result;
+    return this.tareas.enqueueAndWait('modulo', 'findOne', { id });
   }
 
   @Patch(':id')
@@ -45,7 +50,13 @@ export class ModulosController {
     required: false,
   })
   update(@Param('id') id: number, @Body() updateModuloDto: UpdateModuloDto, @Headers('x-idempotency-key') idem?: string) {
-    return this.tareas.fireAndForget('modulo.update', { params: { id }, body: updateModuloDto, meta: { requestId: idem } }, idem ?? `modulo:update:${id}`);
+    const jobId = generateJobId('modulo', 'update', { id, ...updateModuloDto });
+    return this.tareas.enqueue(
+      'modulo',
+      'update',
+      { id, ...updateModuloDto },
+      idem ?? jobId,
+    );
   }
 
   @Delete(':id')
@@ -55,6 +66,12 @@ export class ModulosController {
     required: false,
   })
   remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
-    return this.tareas.fireAndForget('modulo.delete', { params: { id }, meta: { requestId: idem } }, idem ?? `modulo:delete:${id}`);
-  }*/
+    const jobId = generateJobId('modulo', 'remove', { id });
+    return this.tareas.enqueue(
+      'modulo',
+      'remove',
+      { id },
+      idem ?? jobId,
+    );
+  }
 }

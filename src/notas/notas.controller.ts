@@ -5,6 +5,7 @@ import { NotasService } from './notas.service';
 import { CreateNotaDto } from './dto/create-nota.dto';
 import { UpdateNotaDto } from './dto/update-nota.dto';
 import { TareasProducer } from '../tareas/tareas.producer';
+import { generateJobId } from 'src/common/utils/idempotency.util';
 
 @ApiTags('notas')
 @ApiBearerAuth()
@@ -15,7 +16,7 @@ export class NotasController {
     private readonly notasService: NotasService,
     private readonly tareas: TareasProducer
   ) {}
-/*
+
   @Post()
   @ApiHeader({
     name: 'x-idempotency-key',
@@ -23,20 +24,23 @@ export class NotasController {
     required: false,
   })
   async create(@Body() createNotaDto: CreateNotaDto, @Headers('x-idempotency-key') idem?: string) {
-    const idempotencyKey = idem ?? `nota:create:${createNotaDto.idEstudiante}:${createNotaDto.idMatGrup}`;
-    return this.tareas.fireAndForget('nota.create', { body: createNotaDto, meta: { requestId: idem } }, idempotencyKey);
+    const jobId = generateJobId('nota', 'create', createNotaDto);
+    return this.tareas.enqueue(
+      'nota',
+      'create',
+      createNotaDto,
+      idem ?? jobId,
+    );
   }
 
   @Get()
   async findAll() {
-    const { result } = await this.tareas.requestAndWait('notas.getAll', { }, 10_000);
-    return result;
+    return this.tareas.enqueueAndWait('nota', 'findAll');
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    const { result } = await this.tareas.requestAndWait('nota.get', { params: { id } }, 10_000);
-    return result;
+    return this.tareas.enqueueAndWait('nota', 'findOne', { id });
   }
 
   @Patch(':id')
@@ -46,7 +50,13 @@ export class NotasController {
     required: false,
   })
   update(@Param('id') id: number, @Body() updateNotaDto: UpdateNotaDto, @Headers('x-idempotency-key') idem?: string) {
-    return this.tareas.fireAndForget('nota.update', { params: { id }, body: updateNotaDto, meta: { requestId: idem } }, idem ?? `nota:update:${id}`);
+    const jobId = generateJobId('nota', 'update', { id, ...updateNotaDto });
+    return this.tareas.enqueue(
+      'nota',
+      'update',
+      { id, ...updateNotaDto },
+      idem ?? jobId,
+    );
   }
 
   @Delete(':id')
@@ -56,6 +66,12 @@ export class NotasController {
     required: false,
   })
   remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
-    return this.tareas.fireAndForget('nota.delete', { params: { id }, meta: { requestId: idem } }, idem ?? `nota:delete:${id}`);
-  }*/
+    const jobId = generateJobId('nota', 'remove', { id });
+    return this.tareas.enqueue(
+      'nota',
+      'remove',
+      { id },
+      idem ?? jobId,
+    );
+  }
 }

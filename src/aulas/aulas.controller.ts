@@ -5,6 +5,7 @@ import { UpdateAulaDto } from './dto/update-aula.dto';
 import { ApiBearerAuth, ApiHeader, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { TareasProducer } from '../tareas/tareas.producer';
+import { generateJobId } from 'src/common/utils/idempotency.util';
 
 @ApiTags('aulas')
 @ApiBearerAuth()
@@ -15,7 +16,7 @@ export class AulasController {
     private readonly aulasService: AulasService,
     private readonly tareas: TareasProducer
   ) {}
-/*
+
   @Post()
   @ApiHeader({
     name: 'x-idempotency-key',
@@ -23,19 +24,23 @@ export class AulasController {
     required: false,
   })
   async create(@Body() createAulaDto: CreateAulaDto, @Headers('x-idempotency-key') idem?: string) {
-    return this.tareas.fireAndForget('aula.create', { body: createAulaDto, meta: { requestId: idem } }, idem ?? `aula:create:${createAulaDto.numero}`);
+    const jobId = generateJobId('aula', 'create', createAulaDto);
+    return this.tareas.enqueue(
+      'aula',
+      'create',
+      createAulaDto,
+      idem ?? jobId,
+    );
   }
 
   @Get()
   async findAll() {
-    const { result } = await this.tareas.requestAndWait('aulas.getAll', { }, 10_000);
-    return result;
+    return this.tareas.enqueueAndWait('aula', 'findAll');
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    const { result } = await this.tareas.requestAndWait('aula.get', { params: { id } }, 10_000);
-    return result;
+    return this.tareas.enqueueAndWait('aula', 'findOne', { id });
   }
 
   @Patch(':id')
@@ -45,7 +50,13 @@ export class AulasController {
     required: false,
   })
   update(@Param('id') id: number, @Body() updateAulaDto: UpdateAulaDto, @Headers('x-idempotency-key') idem?: string) {
-    return this.tareas.fireAndForget('aula.update', { params: { id }, body: updateAulaDto, meta: { requestId: idem } }, idem ?? `aula:update:${id}`);
+    const jobId = generateJobId('aula', 'update', { id, ...updateAulaDto });
+    return this.tareas.enqueue(
+      'aula',
+      'update',
+      { id, ...updateAulaDto },
+      idem ?? jobId,
+    );
   }
 
   @Delete(':id')
@@ -55,6 +66,12 @@ export class AulasController {
     required: false,
   })
   remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
-    return this.tareas.fireAndForget('aula.delete', { params: { id }, meta: { requestId: idem } }, idem ?? `aula:delete:${id}`);
-  }*/
+    const jobId = generateJobId('aula', 'remove', { id });
+    return this.tareas.enqueue(
+      'aula',
+      'remove',
+      { id },
+      idem ?? jobId,
+    );
+  }
 }

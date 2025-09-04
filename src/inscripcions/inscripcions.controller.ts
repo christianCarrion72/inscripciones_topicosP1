@@ -5,6 +5,7 @@ import { InscripcionsService } from './inscripcions.service';
 import { CreateInscripcionDto } from './dto/create-inscripcion.dto';
 import { UpdateInscripcionDto } from './dto/update-inscripcion.dto';
 import { TareasProducer } from '../tareas/tareas.producer';
+import { generateJobId } from 'src/common/utils/idempotency.util';
 
 @ApiTags('inscripcions')
 @ApiBearerAuth()
@@ -15,7 +16,7 @@ export class InscripcionsController {
     private readonly inscripcionsService: InscripcionsService,
     private readonly tareas: TareasProducer
   ) {}
-/*
+
   @Post()
   @ApiHeader({
     name: 'x-idempotency-key',
@@ -23,20 +24,23 @@ export class InscripcionsController {
     required: false,
   })
   async create(@Body() createInscripcionDto: CreateInscripcionDto, @Headers('x-idempotency-key') idem?: string) {
-    const idempotencyKey = idem ?? `inscripcion:create:${createInscripcionDto.idEstudiante}:${createInscripcionDto.fechaInscripcion}`;
-    return this.tareas.fireAndForget('inscripcion.create', { body: createInscripcionDto, meta: { requestId: idem } }, idempotencyKey);
+    const jobId = generateJobId('inscripcion', 'create', createInscripcionDto);
+    return this.tareas.enqueue(
+      'inscripcion',
+      'create',
+      createInscripcionDto,
+      idem ?? jobId,
+    );
   }
 
   @Get()
   async findAll() {
-    const { result } = await this.tareas.requestAndWait('inscripciones.getAll', { }, 10_000);
-    return result;
+    return this.tareas.enqueueAndWait('inscripcion', 'findAll');
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    const { result } = await this.tareas.requestAndWait('inscripcion.get', { params: { id } }, 10_000);
-    return result;
+    return this.tareas.enqueueAndWait('inscripcion', 'findOne', { id });
   }
 
   @Patch(':id')
@@ -46,7 +50,13 @@ export class InscripcionsController {
     required: false,
   })
   update(@Param('id') id: number, @Body() updateInscripcionDto: UpdateInscripcionDto, @Headers('x-idempotency-key') idem?: string) {
-    return this.tareas.fireAndForget('inscripcion.update', { params: { id }, body: updateInscripcionDto, meta: { requestId: idem } }, idem ?? `inscripcion:update:${id}`);
+    const jobId = generateJobId('inscripcion', 'update', { id, ...updateInscripcionDto });
+    return this.tareas.enqueue(
+      'inscripcion',
+      'update',
+      { id, ...updateInscripcionDto },
+      idem ?? jobId,
+    );
   }
 
   @Delete(':id')
@@ -56,6 +66,12 @@ export class InscripcionsController {
     required: false,
   })
   remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
-    return this.tareas.fireAndForget('inscripcion.delete', { params: { id }, meta: { requestId: idem } }, idem ?? `inscripcion:delete:${id}`);
-  }*/
+    const jobId = generateJobId('inscripcion', 'remove', { id });
+    return this.tareas.enqueue(
+      'inscripcion',
+      'remove',
+      { id },
+      idem ?? jobId,
+    );
+  }
 }

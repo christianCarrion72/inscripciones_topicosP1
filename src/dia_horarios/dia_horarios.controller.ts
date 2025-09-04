@@ -5,6 +5,7 @@ import { CreateDiaHorarioDto } from './dto/create-dia_horario.dto';
 import { UpdateDiaHorarioDto } from './dto/update-dia_horario.dto';
 import { ApiBearerAuth, ApiHeader, ApiTags } from '@nestjs/swagger';
 import { TareasProducer } from '../tareas/tareas.producer';
+import { generateJobId } from 'src/common/utils/idempotency.util';
 
 @ApiTags('dia-horarios')
 @ApiBearerAuth()
@@ -15,7 +16,7 @@ export class DiaHorariosController {
     private readonly diaHorariosService: DiaHorariosService,
     private readonly tareas: TareasProducer
   ) {}
-/*
+
   @Post()
   @ApiHeader({
     name: 'x-idempotency-key',
@@ -23,20 +24,23 @@ export class DiaHorariosController {
     required: false,
   })
   async create(@Body() createDiaHorarioDto: CreateDiaHorarioDto, @Headers('x-idempotency-key') idem?: string) {
-    const idempotencyKey = idem ?? `dia_horario:create:${createDiaHorarioDto.idDia}:${createDiaHorarioDto.idHorario}`;
-    return this.tareas.fireAndForget('dia_horario.create', { body: createDiaHorarioDto, meta: { requestId: idem } }, idempotencyKey);
+    const jobId = generateJobId('dia_horario', 'create', createDiaHorarioDto);
+    return this.tareas.enqueue(
+      'dia_horario',
+      'create',
+      createDiaHorarioDto,
+      idem ?? jobId,
+    );
   }
 
   @Get()
   async findAll() {
-    const { result } = await this.tareas.requestAndWait('dia_horarios.getAll', { }, 10_000);
-    return result;
+    return this.tareas.enqueueAndWait('dia_horario', 'findAll');
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    const { result } = await this.tareas.requestAndWait('dia_horario.get', { params: { id } }, 10_000);
-    return result;
+    return this.tareas.enqueueAndWait('dia_horario', 'findOne', { id });
   }
 
   @Patch(':id')
@@ -46,7 +50,13 @@ export class DiaHorariosController {
     required: false,
   })
   update(@Param('id') id: number, @Body() updateDiaHorarioDto: UpdateDiaHorarioDto, @Headers('x-idempotency-key') idem?: string) {
-    return this.tareas.fireAndForget('dia_horario.update', { params: { id }, body: updateDiaHorarioDto, meta: { requestId: idem } }, idem ?? `dia_horario:update:${id}`);
+    const jobId = generateJobId('dia_horario', 'update', { id, ...updateDiaHorarioDto });
+    return this.tareas.enqueue(
+      'dia_horario',
+      'update',
+      { id, ...updateDiaHorarioDto },
+      idem ?? jobId,
+    );
   }
 
   @Delete(':id')
@@ -56,6 +66,12 @@ export class DiaHorariosController {
     required: false,
   })
   remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
-    return this.tareas.fireAndForget('dia_horario.delete', { params: { id }, meta: { requestId: idem } }, idem ?? `dia_horario:delete:${id}`);
-  }*/
+    const jobId = generateJobId('dia_horario', 'remove', { id });
+    return this.tareas.enqueue(
+      'dia_horario',
+      'remove',
+      { id },
+      idem ?? jobId,
+    );
+  }
 }

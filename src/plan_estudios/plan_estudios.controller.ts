@@ -5,6 +5,7 @@ import { PlanEstudiosService } from './plan_estudios.service';
 import { CreatePlanEstudioDto } from './dto/create-plan_estudio.dto';
 import { UpdatePlanEstudioDto } from './dto/update-plan_estudio.dto';
 import { TareasProducer } from '../tareas/tareas.producer';
+import { generateJobId } from 'src/common/utils/idempotency.util';
 
 @ApiTags('plan-estudios')
 @ApiBearerAuth()
@@ -15,7 +16,7 @@ export class PlanEstudiosController {
     private readonly planEstudiosService: PlanEstudiosService,
     private readonly tareas: TareasProducer
   ) {}
-/*
+
   @Post()
   @ApiHeader({
     name: 'x-idempotency-key',
@@ -23,19 +24,23 @@ export class PlanEstudiosController {
     required: false,
   })
   async create(@Body() createPlanEstudioDto: CreatePlanEstudioDto, @Headers('x-idempotency-key') idem?: string) {
-    return this.tareas.fireAndForget('plan_estudio.create', { body: createPlanEstudioDto, meta: { requestId: idem } }, idem ?? `plan_estudio:create:${createPlanEstudioDto.nombre}`);
+    const jobId = generateJobId('plan_estudio', 'create', createPlanEstudioDto);
+    return this.tareas.enqueue(
+      'plan_estudio',
+      'create',
+      createPlanEstudioDto,
+      idem ?? jobId,
+    );
   }
 
   @Get()
   async findAll() {
-    const { result } = await this.tareas.requestAndWait('plan_estudios.getAll', { }, 10_000);
-    return result;
+    return this.tareas.enqueueAndWait('plan_estudio', 'findAll');
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    const { result } = await this.tareas.requestAndWait('plan_estudio.get', { params: { id } }, 10_000);
-    return result;
+    return this.tareas.enqueueAndWait('plan_estudio', 'findOne', { id });
   }
 
   @Patch(':id')
@@ -45,7 +50,13 @@ export class PlanEstudiosController {
     required: false,
   })
   update(@Param('id') id: number, @Body() updatePlanEstudioDto: UpdatePlanEstudioDto, @Headers('x-idempotency-key') idem?: string) {
-    return this.tareas.fireAndForget('plan_estudio.update', { params: { id }, body: updatePlanEstudioDto, meta: { requestId: idem } }, idem ?? `plan_estudio:update:${id}`);
+    const jobId = generateJobId('plan_estudio', 'update', { id, ...updatePlanEstudioDto });
+    return this.tareas.enqueue(
+      'plan_estudio',
+      'update',
+      { id, ...updatePlanEstudioDto },
+      idem ?? jobId,
+    );
   }
 
   @Delete(':id')
@@ -55,6 +66,12 @@ export class PlanEstudiosController {
     required: false,
   })
   remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
-    return this.tareas.fireAndForget('plan_estudio.delete', { params: { id }, meta: { requestId: idem } }, idem ?? `plan_estudio:delete:${id}`);
-  }*/
+    const jobId = generateJobId('plan_estudio', 'remove', { id });
+    return this.tareas.enqueue(
+      'plan_estudio',
+      'remove',
+      { id },
+      idem ?? jobId,
+    );
+  }
 }

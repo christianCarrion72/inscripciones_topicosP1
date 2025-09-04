@@ -5,6 +5,7 @@ import { CreateEstudianteDto } from './dto/create-estudiante.dto';
 import { UpdateEstudianteDto } from './dto/update-estudiante.dto';
 import { ApiBearerAuth, ApiHeader, ApiTags } from '@nestjs/swagger';
 import { TareasProducer } from '../tareas/tareas.producer';
+import { generateJobId } from 'src/common/utils/idempotency.util';
 
 @ApiTags('estudiantes')
 @ApiBearerAuth()
@@ -15,7 +16,7 @@ export class EstudiantesController {
     private readonly estudiantesService: EstudiantesService,
     private readonly tareas: TareasProducer
   ) {}
-/*
+
   @Post()
   @ApiHeader({
     name: 'x-idempotency-key',
@@ -23,19 +24,23 @@ export class EstudiantesController {
     required: false,
   })
   async create(@Body() createEstudianteDto: CreateEstudianteDto, @Headers('x-idempotency-key') idem?: string) {
-    return this.tareas.fireAndForget('estudiante.create', { body: createEstudianteDto, meta: { requestId: idem } }, idem ?? `estudiante:create:${createEstudianteDto.ci}`);
+    const jobId = generateJobId('estudiante', 'create', createEstudianteDto);
+    return this.tareas.enqueue(
+      'estudiante',
+      'create',
+      createEstudianteDto,
+      idem ?? jobId,
+    );
   }
 
   @Get()
   async findAll() {
-    const { result } = await this.tareas.requestAndWait('estudiantes.getAll', { }, 10_000);
-    return result;
+    return this.tareas.enqueueAndWait('estudiante', 'findAll');
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    const { result } = await this.tareas.requestAndWait('estudiante.get', { params: { id } }, 10_000);
-    return result;
+    return this.tareas.enqueueAndWait('estudiante', 'findOne', { id });
   }
 
   @Patch(':id')
@@ -45,7 +50,13 @@ export class EstudiantesController {
     required: false,
   })
   update(@Param('id') id: number, @Body() updateEstudianteDto: UpdateEstudianteDto, @Headers('x-idempotency-key') idem?: string) {
-    return this.tareas.fireAndForget('estudiante.update', { params: { id }, body: updateEstudianteDto, meta: { requestId: idem } }, idem ?? `estudiante:update:${id}`);
+    const jobId = generateJobId('estudiante', 'update', { id, ...updateEstudianteDto });
+    return this.tareas.enqueue(
+      'estudiante',
+      'update',
+      { id, ...updateEstudianteDto },
+      idem ?? jobId,
+    );
   }
 
   @Delete(':id')
@@ -55,6 +66,12 @@ export class EstudiantesController {
     required: false,
   })
   remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
-    return this.tareas.fireAndForget('estudiante.delete', { params: { id }, meta: { requestId: idem } }, idem ?? `estudiante:delete:${id}`);
-  }*/
+    const jobId = generateJobId('estudiante', 'remove', { id });
+    return this.tareas.enqueue(
+      'estudiante',
+      'remove',
+      { id },
+      idem ?? jobId,
+    );
+  }
 }
