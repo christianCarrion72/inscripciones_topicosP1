@@ -15,7 +15,7 @@ export class AulasController {
     private readonly aulasService: AulasService,
     private readonly tareas: TareasProducer
   ) {}
-
+/*
   @Post()
   @ApiHeader({
     name: 'x-idempotency-key',
@@ -56,5 +56,5 @@ export class AulasController {
   })
   remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
     return this.tareas.fireAndForget('aula.delete', { params: { id }, meta: { requestId: idem } }, idem ?? `aula:delete:${id}`);
-  }
+  }*/
 }

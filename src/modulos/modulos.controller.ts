@@ -15,7 +15,7 @@ export class ModulosController {
     private readonly modulosService: ModulosService,
     private readonly tareas: TareasProducer
   ) {}
-
+/*
   @Post()
   @ApiHeader({
     name: 'x-idempotency-key',
@@ -56,5 +56,5 @@ export class ModulosController {
   })
   remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
     return this.tareas.fireAndForget('modulo.delete', { params: { id }, meta: { requestId: idem } }, idem ?? `modulo:delete:${id}`);
-  }
+  }*/
 }

@@ -15,7 +15,7 @@ export class NotasController {
     private readonly notasService: NotasService,
     private readonly tareas: TareasProducer
   ) {}
-
+/*
   @Post()
   @ApiHeader({
     name: 'x-idempotency-key',
@@ -57,5 +57,5 @@ export class NotasController {
   })
   remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
     return this.tareas.fireAndForget('nota.delete', { params: { id }, meta: { requestId: idem } }, idem ?? `nota:delete:${id}`);
-  }
+  }*/
 }

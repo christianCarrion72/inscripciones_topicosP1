@@ -1,54 +1,72 @@
-import { Inject, Injectable, OnModuleDestroy } from '@nestjs/common';
+import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bullmq';
-import { Queue, QueueEvents } from 'bullmq';
-import { randomUUID } from 'node:crypto';
-import { TAREAS_QUEUE } from './tareas.constants';
-import { TaskName, TaskPayload } from './tareas.types';
-import { ConfigService } from '@nestjs/config';
-
-export const TAREAS_EVENTS = Symbol('TAREAS_EVENTS');
+import { Queue, QueueEvents, Job } from 'bullmq';
+import { randomUUID } from 'crypto';
+import { TaskData, OperationType } from './tareas.types';
 
 @Injectable()
-export class TareasProducer implements OnModuleDestroy {
-  constructor(
-    @InjectQueue(TAREAS_QUEUE) private readonly queue: Queue,
-    @Inject(TAREAS_EVENTS) private readonly events: QueueEvents,
-  ) {}
+export class TareasProducer implements OnModuleInit, OnModuleDestroy {
+  private queueEvents: QueueEvents;
 
-  async fireAndForget(name: TaskName, payload: TaskPayload, jobId?: string) {
-    const id = jobId ?? payload?.meta?.requestId ?? randomUUID();
-    const job = await this.queue.add(name, payload, { jobId: id });
-    return { enqueued: true, jobId: job.id, name };
+  constructor(@InjectQueue('tareas') private readonly queue: Queue) {}
+
+  onModuleInit() {
+    // 🔹 Creamos QueueEvents para esta cola
+    this.queueEvents = new QueueEvents('tareas', {
+      connection: this.queue.opts.connection,
+    });
   }
 
-  // Útil para GET u operaciones donde necesitas el resultado ahora mismo.
-  // Úsalo con criterio; no abuses de waitUntilFinished en controladores.
-  async requestAndWait<T = any>(
-    name: TaskName,
-    payload: TaskPayload,
-    ttlMs = 15_000,
+  onModuleDestroy() {
+    // 🔹 Cerramos conexión a eventos al terminar
+    this.queueEvents.close();
+  }
+
+  async enqueue<T>(
+    entity: string,
+    type: OperationType,
+    data?: T,
     jobId?: string,
-  ): Promise<{ jobId: string; result: T }> {
-    const id = jobId ?? payload?.meta?.requestId ?? randomUUID();
-    const job = await this.queue.add(name, payload, { jobId: id });
-    const result = await job.waitUntilFinished(this.events, ttlMs);
-    return { jobId: job.id!, result: result as T };
+  ) {
+    const id=jobId ?? randomUUID();
+    const task: TaskData<T> = {
+      entity,
+      type,
+      data,
+      status: 'pending',
+      createdAt: new Date(),
+    };
+    this.queue.add(`${entity}.${type}`, task, { jobId: id });
+    return { mensaje: "Procesando Tarea",jobId: id };
   }
 
-  async onModuleDestroy() {
-    await this.events.close();
+  async enqueueAndWait<T>(
+    entity: string,
+    type: OperationType,
+    data?: T,
+    timeout = 10000,
+  ): Promise<any> {
+    const id= randomUUID();
+    const task: TaskData<T> = {
+      entity,
+      type,
+      data,
+      status: 'pending',
+      createdAt: new Date(),
+    };
+
+    const job: Job = await this.queue.add(`${entity}.${type}`, task, { jobId: id });
+
+    if (!this.queueEvents) {
+      throw new Error('QueueEvents no inicializado');
+    }
+
+    // 🔹 Espera a que el Worker complete el Job
+    const result = await job.waitUntilFinished(this.queueEvents, timeout);
+    return result;
   }
+
+
+
+
 }
-
-// Provider de QueueEvents (requiere conexión dedicada)
-export const TareasEventsProvider = {
-  provide: TAREAS_EVENTS,
-  useFactory: (config: ConfigService) =>
-    new QueueEvents(TAREAS_QUEUE, {
-      connection: {
-        host: config.get<string>('REDIS_HOST', '127.0.0.1'),
-        port: +config.get<number>('REDIS_PORT', 6379),
-      },
-    }),
-  inject: [ConfigService],
-};

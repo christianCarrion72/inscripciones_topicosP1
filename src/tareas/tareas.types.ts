@@ -1,108 +1,19 @@
-export type TaskName =
-| 'aula.create'
-| 'aula.update'
-| 'aulas.getAll'
-| 'aula.get'
-| 'aula.delete'
-| 'boleta_horario.create'
-| 'boleta_horario.update'
-| 'boleta_horarios.getAll'
-| 'boleta_horario.get'
-| 'boleta_horario.delete'
-| 'carrera.create'
-| 'carrera.update'
-| 'carreras.getAll'
-| 'carrera.get'
-| 'carrera.delete'
-| 'detalle.create'
-| 'detalle.update'
-| 'detalle.get'
-| 'detalles.getAll'
-| 'detalle.delete'
-| 'dia_horario.create'
-| 'dia_horario.update'
-| 'dia_horario.get'
-| 'dia_horarios.getAll'
-| 'dia_horario.delete'
-| 'dia.create'
-| 'dia.update'
-| 'dia.get'
-| 'dias.getAll'
-| 'dia.delete'
-| 'docente.create'
-| 'docente.update'
-| 'docentes.getAll'
-| 'docente.get'
-| 'docente.delete'
-| 'estudiante.create'
-| 'estudiante.update'
-| 'estudiantes.getAll'
-| 'estudiante.get'
-| 'estudiante.delete'
-| 'gestion.create'
-| 'gestion.update'
-| 'gestions.getAll'
-| 'gestion.get'
-| 'gestion.delete'
-| 'grupo_materia.create'
-| 'grupo_materia.update'
-| 'grupo_materias.getAll'
-| 'grupo_materia.get'
-| 'grupo_materia.delete'
-| 'grupo.create'
-| 'grupo.update'
-| 'grupos.getAll'
-| 'grupo.get'
-| 'grupo.delete'
-| 'horario.create'
-| 'horario.update'
-| 'horarios.getAll'
-| 'horario.get'
-| 'horario.delete'
-| 'inscripcion.create'
-| 'inscripcion.update'
-| 'inscripciones.getAll'
-| 'inscripcion.get'
-| 'inscripcion.delete'
-| 'materia.create'
-| 'materia.update'
-| 'materias.getAll'
-| 'materia.get'
-| 'materia.delete'
-| 'modulo.create'
-| 'modulo.update'
-| 'modulos.getAll'
-| 'modulo.get'
-| 'modulo.delete'
-| 'nivel.create'
-| 'nivel.update'
-| 'nivels.getAll'
-| 'nivel.get'
-| 'nivel.delete'
-| 'nota.create'
-| 'nota.update'
-| 'notas.getAll'
-| 'nota.get'
-| 'nota.delete'
-| 'periodo.create'
-| 'periodo.update'
-| 'periodos.getAll'
-| 'periodo.get'
-| 'periodo.delete'
-| 'plan_estudio.create'
-| 'plan_estudio.update'
-| 'plan_estudios.getAll'
-| 'plan_estudio.get'
-| 'plan_estudio.delete'
-| 'prerequisito.create'
-| 'prerequisito.update'
-| 'prerequisitos.getAll'
-| 'prerequisito.get'
-| 'prerequisito.delete';
+// src/tareas/task.types.ts
+export type OperationType = 'create' | 'update' | 'findOne' | 'findAll' | 'remove';
+export type TaskStatus = 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled';
 
-export interface TaskPayload<T = any> {
-    // payload flexible; puedes tiparlo por acción si quieres
-    params?: Record<string, any>; // ej: { id: string }
-    body?: T;                     // ej: DTO para create/update
-    meta?: { requestId?: string }; // idempotencia opcional
-  }
+export interface TaskData<T = any> {
+  type: OperationType;     // operación CRUD
+  entity: string;          // entidad (ej: carrera, dia, aula)
+  status: TaskStatus;      // estado
+  data?: T;                // DTO, parámetros, etc.
+  result?: any;
+  error?: string;
+  createdAt: Date;
+  updatedAt?: Date;
+  priority?: number;
+  retryCount?: number;
+  maxRetries?: number;
+  timeout?: number;
+  metadata?: Record<string, any>;
+}

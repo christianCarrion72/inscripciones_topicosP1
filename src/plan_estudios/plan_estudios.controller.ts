@@ -15,7 +15,7 @@ export class PlanEstudiosController {
     private readonly planEstudiosService: PlanEstudiosService,
     private readonly tareas: TareasProducer
   ) {}
-
+/*
   @Post()
   @ApiHeader({
     name: 'x-idempotency-key',
@@ -56,5 +56,5 @@ export class PlanEstudiosController {
   })
   remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
     return this.tareas.fireAndForget('plan_estudio.delete', { params: { id }, meta: { requestId: idem } }, idem ?? `plan_estudio:delete:${id}`);
-  }
+  }*/
 }

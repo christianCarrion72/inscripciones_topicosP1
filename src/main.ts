@@ -3,6 +3,10 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import { createBullBoard } from '@bull-board/api';
+import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
+import { ExpressAdapter } from '@bull-board/express';
+import { Queue } from 'bullmq';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -38,6 +42,19 @@ async function bootstrap() {
       showRequestDuration: true,
     }
   });
+
+  const serverAdapter = new ExpressAdapter();
+  serverAdapter.setBasePath('/admin/queues');
+
+  // obtener la cola bullmq
+  const tareasQueue = app.get<Queue>('BullQueue_tareas'); 
+
+  createBullBoard({
+    queues: [new BullMQAdapter(tareasQueue)],
+    serverAdapter,
+  });
+
+  app.use('/admin/queues', serverAdapter.getRouter());
 
   const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
   await app.listen(port);
