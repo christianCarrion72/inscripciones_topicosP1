@@ -56,8 +56,8 @@ import { TareasGateway } from './tareas.gatway';
     ConfigModule, BullModule.registerQueue({ 
       name: QUEUE,
       connection: {
-        host: 'localhost',
-        port: 6379,
+        host: process.env.REDIS_HOST ?? '127.0.0.1',
+        port: +(process.env.REDIS_PORT ?? 6379),
       },
       defaultJobOptions: {
         removeOnComplete: 100, // Mantener los últimos 100 trabajos completados
