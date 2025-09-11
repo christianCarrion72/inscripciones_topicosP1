@@ -17,18 +17,13 @@ export class CarrerasController {
     private readonly tareas: TareasProducer) {}
 
   @Post()
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false, // <--- importante
-  })
-  async create(@Body() createCarreraDto: CreateCarreraDto, @Headers('x-idempotency-key') idem?: string) {
+  async create(@Body() createCarreraDto: CreateCarreraDto) {
     const jobId = generateJobId('carrera', 'create', createCarreraDto);
     return this.tareas.enqueue(
       'carrera',       // entidad
       'create',        // operación CRUD
       createCarreraDto,             // datos del DTO
-      idem ?? jobId, // idempotencia
+      jobId, // idempotencia
     );
   }
 
@@ -43,34 +38,24 @@ export class CarrerasController {
   }
 
   @Patch(':id')
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false, // <--- importante
-  })
-  update(@Param('id') id: number, @Body() updateCarreraDto: UpdateCarreraDto, @Headers('x-idempotency-key') idem?: string) {
+  update(@Param('id') id: number, @Body() updateCarreraDto: UpdateCarreraDto) {
     const jobId = generateJobId('carrera', 'update', { id, ...updateCarreraDto });
     return this.tareas.enqueue(
       'carrera',
       'update',
       { id, ...updateCarreraDto },
-      idem ?? jobId,
+      jobId,
     );
   }
 
   @Delete(':id')
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false, // <--- importante
-  })
-  remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
+  remove(@Param('id') id: number) {
     const jobId = generateJobId('carrera', 'remove', { id });
     return this.tareas.enqueue(
       'carrera',
       'remove',
       { id },
-      idem ?? jobId,
+      jobId,
     );
   }
 
