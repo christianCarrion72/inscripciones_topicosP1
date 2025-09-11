@@ -1,23 +1,41 @@
-
 // src/common/utils/idempotency.util.ts
 import { createHash } from 'crypto';
 
+/**
+ * Serializa un objeto de manera determinista
+ * - Ordena todas las claves de forma recursiva
+ * - Mantiene el orden de arrays
+ */
+function stableStringify(obj: any): string {
+  if (obj === null || typeof obj !== 'object') {
+    return JSON.stringify(obj);
+  }
+
+  if (Array.isArray(obj)) {
+    // Mantener orden en arrays
+    return `[${obj.map(stableStringify).join(',')}]`;
+  }
+
+  // Ordenar claves de objetos
+  const keys = Object.keys(obj).sort();
+  return `{${keys.map((k) => `${JSON.stringify(k)}:${stableStringify(obj[k])}`).join(',')}}`;
+}
+
+/**
+ * Genera un hash consistente a partir de un DTO,
+ * independiente del orden de las propiedades.
+ */
 export function hashBody(dto: any): string {
-  // Ordenar las claves del objeto para generar hashes consistentes
-  const sortedDto = JSON.stringify(dto, Object.keys(dto).sort());
+  const stable = stableStringify(dto);
   return createHash('sha256')
-    .update(sortedDto)
+    .update(stable)
     .digest('hex')
-    .substring(0, 16); // Acortar para jobIds más manejables
+    .substring(0, 16);
 }
 
 /**
  * Genera un jobId único para tareas de BullMQ con formato:
  * {entity}:{operation}:{uniqueKey}
- *
- * @param entity Nombre de la entidad (ej: 'carrera')
- * @param operation Tipo de operación (ej: 'create', 'update', 'delete')
- * @param data Datos usados para generar hash o clave
  */
 export function generateJobId(
   entity: string,
@@ -26,18 +44,12 @@ export function generateJobId(
 ): string {
   let uniqueValue: string;
 
-  // Para operaciones que solo dependen del ID
   if (operation === 'remove' && data.id) {
     uniqueValue = `${data.id}`;
-  } 
-  // Para operaciones que modifican datos
-  else if (operation === 'update' && data.id) {
-    // Incluir ID + hash de los datos para update
+  } else if (operation === 'update' && data.id) {
     const dataHash = hashBody(data);
     uniqueValue = `${data.id}-${dataHash}`;
-  }
-  // Para create y otros casos
-  else {
+  } else {
     uniqueValue = hashBody(data);
   }
 
