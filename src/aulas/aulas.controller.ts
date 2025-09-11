@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Headers } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { AulasService } from './aulas.service';
 import { CreateAulaDto } from './dto/create-aula.dto';
 import { UpdateAulaDto } from './dto/update-aula.dto';
@@ -24,13 +24,13 @@ export class AulasController {
     required: false,
   })
   @ApiOperation({ summary: 'Crear aula (asíncrono)' })
-  async create(@Body() createAulaDto: CreateAulaDto, @Headers('x-idempotency-key') idem?: string) {
+  async create(@Body() createAulaDto: CreateAulaDto) {
     const jobId = generateJobId('aula', 'create', createAulaDto);
     return await this.tareas.enqueue(
       'aula',
       'create',
       createAulaDto,
-      idem ?? jobId,
+      jobId,
     );
   }
 
@@ -53,13 +53,13 @@ export class AulasController {
     required: false,
   })
   @ApiOperation({ summary: 'Actualizar aula (asíncrono)' })
-  async update(@Param('id') id: number, @Body() updateAulaDto: UpdateAulaDto, @Headers('x-idempotency-key') idem?: string) {
+  async update(@Param('id') id: number, @Body() updateAulaDto: UpdateAulaDto) {
     const jobId = generateJobId('aula', 'update', { id, ...updateAulaDto });
     return await this.tareas.enqueue(
       'aula',
       'update',
       { id, ...updateAulaDto },
-      idem ?? jobId,
+      jobId,
     );
   }
 
@@ -70,15 +70,18 @@ export class AulasController {
     required: false,
   })
   @ApiOperation({ summary: 'Eliminar aula (asíncrono)' })
-  async remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
+  async remove(@Param('id') id: number) {
     const jobId = generateJobId('aula', 'remove', { id });
     return await this.tareas.enqueue(
       'aula',
       'remove',
       { id },
-      idem ?? jobId,
+      jobId,
     );
   }
+
+  //Endpoint de respuesta
+  
   
   // Endpoints síncronos
   @Post('sync')

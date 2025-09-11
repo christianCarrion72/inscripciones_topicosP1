@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Headers } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { ApiBearerAuth, ApiHeader, ApiTags } from '@nestjs/swagger';
 import { PrerequisitosService } from './prerequisitos.service';
@@ -23,13 +23,13 @@ export class PrerequisitosController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
-  async create(@Body() createPrerequisitoDto: CreatePrerequisitoDto, @Headers('x-idempotency-key') idem?: string) {
+  async create(@Body() createPrerequisitoDto: CreatePrerequisitoDto) {
     const jobId = generateJobId('prerequisito', 'create', createPrerequisitoDto);
     return this.tareas.enqueue(
       'prerequisito',
       'create',
       createPrerequisitoDto,
-      idem ?? jobId,
+      jobId,
     );
   }
 
@@ -49,13 +49,13 @@ export class PrerequisitosController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
-  update(@Param('id') id: number, @Body() updatePrerequisitoDto: UpdatePrerequisitoDto, @Headers('x-idempotency-key') idem?: string) {
+  update(@Param('id') id: number, @Body() updatePrerequisitoDto: UpdatePrerequisitoDto) {
     const jobId = generateJobId('prerequisito', 'update', { id, ...updatePrerequisitoDto });
     return this.tareas.enqueue(
       'prerequisito',
       'update',
       { id, ...updatePrerequisitoDto },
-      idem ?? jobId,
+      jobId,
     );
   }
 
@@ -65,13 +65,13 @@ export class PrerequisitosController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
-  remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
+  remove(@Param('id') id: number) {
     const jobId = generateJobId('prerequisito', 'remove', { id });
     return this.tareas.enqueue(
       'prerequisito',
       'remove',
       { id },
-      idem ?? jobId,
+      jobId,
     );
   }
 

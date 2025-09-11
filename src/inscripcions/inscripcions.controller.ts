@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Headers } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { ApiBearerAuth, ApiHeader, ApiTags } from '@nestjs/swagger';
 import { InscripcionsService } from './inscripcions.service';
@@ -23,13 +23,13 @@ export class InscripcionsController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
-  async create(@Body() createInscripcionDto: CreateInscripcionDto, @Headers('x-idempotency-key') idem?: string) {
+  async create(@Body() createInscripcionDto: CreateInscripcionDto) {
     const jobId = generateJobId('inscripcion', 'create', createInscripcionDto);
     return this.tareas.enqueue(
       'inscripcion',
       'create',
       createInscripcionDto,
-      idem ?? jobId,
+      jobId,
     );
   }
 
@@ -49,13 +49,13 @@ export class InscripcionsController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
-  update(@Param('id') id: number, @Body() updateInscripcionDto: UpdateInscripcionDto, @Headers('x-idempotency-key') idem?: string) {
+  update(@Param('id') id: number, @Body() updateInscripcionDto: UpdateInscripcionDto) {
     const jobId = generateJobId('inscripcion', 'update', { id, ...updateInscripcionDto });
     return this.tareas.enqueue(
       'inscripcion',
       'update',
       { id, ...updateInscripcionDto },
-      idem ?? jobId,
+      jobId,
     );
   }
 
@@ -65,13 +65,13 @@ export class InscripcionsController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
-  remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
+  remove(@Param('id') id: number) {
     const jobId = generateJobId('inscripcion', 'remove', { id });
     return this.tareas.enqueue(
       'inscripcion',
       'remove',
       { id },
-      idem ?? jobId,
+      jobId,
     );
   }
 }

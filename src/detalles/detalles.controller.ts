@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Headers } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { DetallesService } from './detalles.service';
 import { CreateDetalleDto } from './dto/create-detalle.dto';
@@ -23,13 +23,13 @@ export class DetallesController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
-  async create(@Body() createDetalleDto: CreateDetalleDto, @Headers('x-idempotency-key') idem?: string) {
+  async create(@Body() createDetalleDto: CreateDetalleDto) {
     const jobId = generateJobId('detalle', 'create', createDetalleDto);
     return this.tareas.enqueue(
       'detalle',
       'create',
       createDetalleDto,
-      idem ?? jobId,
+      jobId,
     );
   }
 
@@ -49,13 +49,13 @@ export class DetallesController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
-  update(@Param('id') id: number, @Body() updateDetalleDto: UpdateDetalleDto, @Headers('x-idempotency-key') idem?: string) {
+  update(@Param('id') id: number, @Body() updateDetalleDto: UpdateDetalleDto) {
     const jobId = generateJobId('detalle', 'update', { id, ...updateDetalleDto });
     return this.tareas.enqueue(
       'detalle',
       'update',
       { id, ...updateDetalleDto },
-      idem ?? jobId,
+      jobId,
     );
   }
 
@@ -65,13 +65,13 @@ export class DetallesController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
-  remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
+  remove(@Param('id') id: number) {
     const jobId = generateJobId('detalle', 'remove', { id });
     return this.tareas.enqueue(
       'detalle',
       'remove',
       { id },
-      idem ?? jobId,
+      jobId,
     );
   }
 

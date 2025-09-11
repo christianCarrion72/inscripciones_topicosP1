@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Headers } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { ApiBearerAuth, ApiHeader, ApiTags } from '@nestjs/swagger';
 import { PlanEstudiosService } from './plan_estudios.service';
@@ -23,13 +23,13 @@ export class PlanEstudiosController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
-  async create(@Body() createPlanEstudioDto: CreatePlanEstudioDto, @Headers('x-idempotency-key') idem?: string) {
+  async create(@Body() createPlanEstudioDto: CreatePlanEstudioDto) {
     const jobId = generateJobId('plan_estudio', 'create', createPlanEstudioDto);
     return this.tareas.enqueue(
       'plan_estudio',
       'create',
       createPlanEstudioDto,
-      idem ?? jobId,
+      jobId,
     );
   }
 
@@ -49,13 +49,13 @@ export class PlanEstudiosController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
-  update(@Param('id') id: number, @Body() updatePlanEstudioDto: UpdatePlanEstudioDto, @Headers('x-idempotency-key') idem?: string) {
+  update(@Param('id') id: number, @Body() updatePlanEstudioDto: UpdatePlanEstudioDto) {
     const jobId = generateJobId('plan_estudio', 'update', { id, ...updatePlanEstudioDto });
     return this.tareas.enqueue(
       'plan_estudio',
       'update',
       { id, ...updatePlanEstudioDto },
-      idem ?? jobId,
+      jobId,
     );
   }
 
@@ -65,13 +65,13 @@ export class PlanEstudiosController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
-  remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
+  remove(@Param('id') id: number) {
     const jobId = generateJobId('plan_estudio', 'remove', { id });
     return this.tareas.enqueue(
       'plan_estudio',
       'remove',
       { id },
-      idem ?? jobId,
+      jobId,
     );
   }
 }

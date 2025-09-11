@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Headers } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { BoletaHorariosService } from './boleta_horarios.service';
 import { CreateBoletaHorarioDto } from './dto/create-boleta_horario.dto';
@@ -23,13 +23,13 @@ export class BoletaHorariosController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
-  async create(@Body() createBoletaHorarioDto: CreateBoletaHorarioDto, @Headers('x-idempotency-key') idem?: string) {
+  async create(@Body() createBoletaHorarioDto: CreateBoletaHorarioDto) {
     const jobId = generateJobId('boleta_horario', 'create', createBoletaHorarioDto);
     return this.tareas.enqueue(
       'boleta_horario',
       'create',
       createBoletaHorarioDto,
-      idem ?? jobId,
+      jobId,
     );
   }
 
@@ -49,13 +49,13 @@ export class BoletaHorariosController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
-  async update(@Param('id') id: number, @Body() updateBoletaHorarioDto: UpdateBoletaHorarioDto, @Headers('x-idempotency-key') idem?: string) {
+  async update(@Param('id') id: number, @Body() updateBoletaHorarioDto: UpdateBoletaHorarioDto) {
     const jobId = generateJobId('boleta_horario', 'update', { id, ...updateBoletaHorarioDto });
     return await this.tareas.enqueue(
       'boleta_horario',
       'update',
       { id, ...updateBoletaHorarioDto },
-      idem ?? jobId,
+      jobId,
     );
   }
 
@@ -65,13 +65,13 @@ export class BoletaHorariosController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
-  async remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
+  async remove(@Param('id') id: number) {
     const jobId = generateJobId('boleta_horario', 'remove', { id });
     return await this.tareas.enqueue(
       'boleta_horario',
       'remove',
       { id },
-      idem ?? jobId,
+      jobId,
     );
   }
 

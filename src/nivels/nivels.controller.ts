@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Headers } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { ApiBearerAuth, ApiHeader, ApiTags } from '@nestjs/swagger';
 import { NivelsService } from './nivels.service';
@@ -23,13 +23,13 @@ export class NivelsController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
-  async create(@Body() createNivelDto: CreateNivelDto, @Headers('x-idempotency-key') idem?: string) {
+  async create(@Body() createNivelDto: CreateNivelDto) {
     const jobId = generateJobId('nivel', 'create', createNivelDto);
     return this.tareas.enqueue(
       'nivel',
       'create',
       createNivelDto,
-      idem ?? jobId,
+      jobId,
     );
   }
 
@@ -49,13 +49,13 @@ export class NivelsController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
-  update(@Param('id') id: number, @Body() updateNivelDto: UpdateNivelDto, @Headers('x-idempotency-key') idem?: string) {
+  update(@Param('id') id: number, @Body() updateNivelDto: UpdateNivelDto) {
     const jobId = generateJobId('nivel', 'update', { id, ...updateNivelDto });
     return this.tareas.enqueue(
       'nivel',
       'update',
       { id, ...updateNivelDto },
-      idem ?? jobId,
+      jobId,
     );
   }
 
@@ -65,13 +65,13 @@ export class NivelsController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
-  remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
+  remove(@Param('id') id: number) {
     const jobId = generateJobId('nivel', 'remove', { id });
     return this.tareas.enqueue(
       'nivel',
       'remove',
       { id },
-      idem ?? jobId,
+      jobId,
     );
   }
 }

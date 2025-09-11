@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Headers } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { EstudiantesService } from './estudiantes.service';
 import { CreateEstudianteDto } from './dto/create-estudiante.dto';
@@ -23,13 +23,13 @@ export class EstudiantesController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
-  async create(@Body() createEstudianteDto: CreateEstudianteDto, @Headers('x-idempotency-key') idem?: string) {
+  async create(@Body() createEstudianteDto: CreateEstudianteDto) {
     const jobId = generateJobId('estudiante', 'create', createEstudianteDto);
     return this.tareas.enqueue(
       'estudiante',
       'create',
       createEstudianteDto,
-      idem ?? jobId,
+      jobId,
     );
   }
 
@@ -49,13 +49,13 @@ export class EstudiantesController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
-  update(@Param('id') id: number, @Body() updateEstudianteDto: UpdateEstudianteDto, @Headers('x-idempotency-key') idem?: string) {
+  update(@Param('id') id: number, @Body() updateEstudianteDto: UpdateEstudianteDto) {
     const jobId = generateJobId('estudiante', 'update', { id, ...updateEstudianteDto });
     return this.tareas.enqueue(
       'estudiante',
       'update',
       { id, ...updateEstudianteDto },
-      idem ?? jobId,
+      jobId,
     );
   }
 
@@ -65,13 +65,13 @@ export class EstudiantesController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
-  remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
+  remove(@Param('id') id: number) {
     const jobId = generateJobId('estudiante', 'remove', { id });
     return this.tareas.enqueue(
       'estudiante',
       'remove',
       { id },
-      idem ?? jobId,
+      jobId,
     );
   }
 

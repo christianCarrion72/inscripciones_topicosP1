@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Headers } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { ApiBearerAuth, ApiHeader, ApiTags } from '@nestjs/swagger';
 import { HorariosService } from './horarios.service';
@@ -23,13 +23,13 @@ export class HorariosController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
-  async create(@Body() createHorarioDto: CreateHorarioDto, @Headers('x-idempotency-key') idem?: string) {
+  async create(@Body() createHorarioDto: CreateHorarioDto) {
     const jobId = generateJobId('horario', 'create', createHorarioDto);
     return this.tareas.enqueue(
       'horario',
       'create',
       createHorarioDto,
-      idem ?? jobId,
+      jobId,
     );
   }
 
@@ -49,13 +49,13 @@ export class HorariosController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
-  update(@Param('id') id: number, @Body() updateHorarioDto: UpdateHorarioDto, @Headers('x-idempotency-key') idem?: string) {
+  update(@Param('id') id: number, @Body() updateHorarioDto: UpdateHorarioDto) {
     const jobId = generateJobId('horario', 'update', { id, ...updateHorarioDto });
     return this.tareas.enqueue(
       'horario',
       'update',
       { id, ...updateHorarioDto },
-      idem ?? jobId,
+      jobId,
     );
   }
 
@@ -65,13 +65,13 @@ export class HorariosController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
-  remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
+  remove(@Param('id') id: number) {
     const jobId = generateJobId('horario', 'remove', { id });
     return this.tareas.enqueue(
       'horario',
       'remove',
       { id },
-      idem ?? jobId,
+      jobId,
     );
   }
 }

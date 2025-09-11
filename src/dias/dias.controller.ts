@@ -20,13 +20,13 @@ export class DiasController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false, // <--- importante
   })
-  async create(@Body() createDiaDto: CreateDiaDto, @Headers('x-idempotency-key') idem?: string) {
+  async create(@Body() createDiaDto: CreateDiaDto) {
     const jobId = generateJobId('dia', 'create', createDiaDto);
     return this.tareas.enqueue(
       'dia',       // entidad
       'create',        // operación CRUD
       createDiaDto,             // datos del DTO
-      idem ?? jobId, // idempotencia
+      jobId, // idempotencia
     );
   }
 
@@ -46,13 +46,13 @@ export class DiasController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false, // <--- importante
   })
-  async update(@Param('id') id: number, @Body() updateDiaDto: UpdateDiaDto, @Headers('x-idempotency-key') idem?: string) {
+  async update(@Param('id') id: number, @Body() updateDiaDto: UpdateDiaDto) {
     const jobId = generateJobId('dia', 'update', { id, ...updateDiaDto });
     return this.tareas.enqueue(
       'dia',
       'update',
       { id, ...updateDiaDto },
-      idem ?? jobId,
+      jobId,
     );
   }
 
@@ -62,13 +62,13 @@ export class DiasController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false, // <--- importante
   })
-  async remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
+  async remove(@Param('id') id: number) {
     const jobId = generateJobId('dia', 'remove', { id });
     return this.tareas.enqueue(
       'dia',
       'remove',
       { id },
-      idem ?? jobId,
+      jobId,
     );
   }
 
