@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
-import { ApiBearerAuth, ApiHeader, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { GrupoMateriasService } from './grupo_materias.service';
 import { CreateGrupoMateriaDto } from './dto/create-grupo_materia.dto';
 import { UpdateGrupoMateriaDto } from './dto/update-grupo_materia.dto';
@@ -25,7 +25,7 @@ export class GrupoMateriasController {
   })
   async create(@Body() createGrupoMateriaDto: CreateGrupoMateriaDto) {
     const jobId = generateJobId('grupo_materia', 'create', createGrupoMateriaDto);
-    return this.tareas.enqueue(
+    return await this.tareas.enqueue(
       'grupo_materia',
       'create',
       createGrupoMateriaDto,
@@ -35,12 +35,12 @@ export class GrupoMateriasController {
 
   @Get()
   async findAll() {
-    return this.tareas.enqueueAndWait('grupo_materia', 'findAll');
+    return await this.tareas.enqueueAndWait('grupo_materia', 'findAll');
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    return this.tareas.enqueueAndWait('grupo_materia', 'findOne', { id });
+    return await this.tareas.enqueueAndWait('grupo_materia', 'findOne', { id });
   }
 
   @Patch(':id')
@@ -49,9 +49,9 @@ export class GrupoMateriasController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
-  update(@Param('id') id: number, @Body() updateGrupoMateriaDto: UpdateGrupoMateriaDto) {
+  async update(@Param('id') id: number, @Body() updateGrupoMateriaDto: UpdateGrupoMateriaDto) {
     const jobId = generateJobId('grupo_materia', 'update', { id, ...updateGrupoMateriaDto });
-    return this.tareas.enqueue(
+    return await this.tareas.enqueue(
       'grupo_materia',
       'update',
       { id, ...updateGrupoMateriaDto },
@@ -65,13 +65,44 @@ export class GrupoMateriasController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
-  remove(@Param('id') id: number) {
+  async remove(@Param('id') id: number) {
     const jobId = generateJobId('grupo_materia', 'remove', { id });
-    return this.tareas.enqueue(
+    return await this.tareas.enqueue(
       'grupo_materia',
       'remove',
       { id },
       jobId,
     );
   }
+
+  // Endpoints síncronos
+  @Post('sync')
+  @ApiOperation({ summary: 'Crear grupo materia (síncrono)' })
+  async createSync(@Body() createGrupoMateriaDto: CreateGrupoMateriaDto) {
+    return await this.grupoMateriasService.create(createGrupoMateriaDto);
+  }
+
+  @Get('sync')
+  @ApiOperation({ summary: 'Obtener todos los grupo materias (síncrono)' })
+  async findAllSync() {
+    return await this.grupoMateriasService.findAll();
+  }
+
+  @Get('sync/:id')
+  @ApiOperation({ summary: 'Obtener un grupo materia por ID (síncrono)' })
+  async findOneSync(@Param('id') id: number) {
+    return await this.grupoMateriasService.findOne(id);
+  }
+
+  @Patch('sync/:id')
+  @ApiOperation({ summary: 'Actualizar grupo materia (síncrono)' })
+  async updateSync(@Param('id') id: number, @Body() updateGrupoMateriaDto: UpdateGrupoMateriaDto) {
+    return await this.grupoMateriasService.update(id, updateGrupoMateriaDto);
+  }
+
+  @Delete('sync/:id')
+  @ApiOperation({ summary: 'Eliminar grupo materia (síncrono)' })
+  async removeSync(@Param('id') id: number) {
+    return await this.grupoMateriasService.remove(id);
+  } 
 }

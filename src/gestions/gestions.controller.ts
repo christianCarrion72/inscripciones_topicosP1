@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
-import { ApiBearerAuth, ApiHeader, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { GestionsService } from './gestions.service';
 import { CreateGestionDto } from './dto/create-gestion.dto';
 import { UpdateGestionDto } from './dto/update-gestion.dto';
@@ -35,12 +35,12 @@ export class GestionsController {
 
   @Get()
   async findAll() {
-    return this.tareas.enqueueAndWait('gestion', 'findAll');
+    return await this.tareas.enqueueAndWait('gestion', 'findAll');
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    return this.tareas.enqueueAndWait('gestion', 'findOne', { id });
+    return await this.tareas.enqueueAndWait('gestion', 'findOne', { id });
   }
 
   @Patch(':id')
@@ -49,9 +49,9 @@ export class GestionsController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
-  update(@Param('id') id: number, @Body() updateGestionDto: UpdateGestionDto) {
+  async update(@Param('id') id: number, @Body() updateGestionDto: UpdateGestionDto) {
     const jobId = generateJobId('gestion', 'update', { id, ...updateGestionDto });
-    return this.tareas.enqueue(
+    return await this.tareas.enqueue(
       'gestion',
       'update',
       { id, ...updateGestionDto },
@@ -65,13 +65,44 @@ export class GestionsController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
-  remove(@Param('id') id: number) {
+  async remove(@Param('id') id: number) {
     const jobId = generateJobId('gestion', 'remove', { id });
-    return this.tareas.enqueue(
+    return await this.tareas.enqueue(
       'gestion',
       'remove',
       { id },
       jobId,
     );
   }
+
+  // Endpoints síncronos
+  @Post('sync')
+  @ApiOperation({ summary: 'Crear gestion (síncrono)' })
+  async createSync(@Body() createGestionDto: CreateGestionDto) {
+    return await this.gestionsService.create(createGestionDto);
+  }
+
+  @Get('sync')
+  @ApiOperation({ summary: 'Obtener todos las gestiones (síncrono)' })
+  async findAllSync() {
+    return await this.gestionsService.findAll();
+  }
+
+  @Get('sync/:id')
+  @ApiOperation({ summary: 'Obtener una gestion por ID (síncrono)' })
+  async findOneSync(@Param('id') id: number) {
+    return await this.gestionsService.findOne(id);
+  }
+
+  @Patch('sync/:id')
+  @ApiOperation({ summary: 'Actualizar gestion (síncrono)' })
+  async updateSync(@Param('id') id: number, @Body() updateGestionDto: UpdateGestionDto) {
+    return await this.gestionsService.update(id, updateGestionDto);
+  }
+
+  @Delete('sync/:id')
+  @ApiOperation({ summary: 'Eliminar gestion (síncrono)' })
+  async removeSync(@Param('id') id: number) {
+    return await this.gestionsService.remove(id);
+  } 
 }

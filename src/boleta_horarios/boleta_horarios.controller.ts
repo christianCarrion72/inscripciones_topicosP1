@@ -25,7 +25,7 @@ export class BoletaHorariosController {
   })
   async create(@Body() createBoletaHorarioDto: CreateBoletaHorarioDto) {
     const jobId = generateJobId('boleta_horario', 'create', createBoletaHorarioDto);
-    return this.tareas.enqueue(
+    return await this.tareas.enqueue(
       'boleta_horario',
       'create',
       createBoletaHorarioDto,
@@ -35,12 +35,12 @@ export class BoletaHorariosController {
 
   @Get()
   async findAll() {
-    return this.tareas.enqueueAndWait('boleta_horario', 'findAll');
+    return await this.tareas.enqueueAndWait('boleta_horario', 'findAll');
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    return this.tareas.enqueueAndWait('boleta_horario', 'findOne', { id });
+    return await this.tareas.enqueueAndWait('boleta_horario', 'findOne', { id });
   }
 
   @Patch(':id')

@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
-import { ApiBearerAuth, ApiHeader, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { NivelsService } from './nivels.service';
 import { CreateNivelDto } from './dto/create-nivel.dto';
 import { UpdateNivelDto } from './dto/update-nivel.dto';
@@ -25,7 +25,7 @@ export class NivelsController {
   })
   async create(@Body() createNivelDto: CreateNivelDto) {
     const jobId = generateJobId('nivel', 'create', createNivelDto);
-    return this.tareas.enqueue(
+    return await this.tareas.enqueue(
       'nivel',
       'create',
       createNivelDto,
@@ -35,12 +35,12 @@ export class NivelsController {
 
   @Get()
   async findAll() {
-    return this.tareas.enqueueAndWait('nivel', 'findAll');
+    return await this.tareas.enqueueAndWait('nivel', 'findAll');
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    return this.tareas.enqueueAndWait('nivel', 'findOne', { id });
+    return await this.tareas.enqueueAndWait('nivel', 'findOne', { id });
   }
 
   @Patch(':id')
@@ -49,9 +49,9 @@ export class NivelsController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
-  update(@Param('id') id: number, @Body() updateNivelDto: UpdateNivelDto) {
+  async update(@Param('id') id: number, @Body() updateNivelDto: UpdateNivelDto) {
     const jobId = generateJobId('nivel', 'update', { id, ...updateNivelDto });
-    return this.tareas.enqueue(
+    return await this.tareas.enqueue(
       'nivel',
       'update',
       { id, ...updateNivelDto },
@@ -65,13 +65,44 @@ export class NivelsController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
-  remove(@Param('id') id: number) {
+  async remove(@Param('id') id: number) {
     const jobId = generateJobId('nivel', 'remove', { id });
-    return this.tareas.enqueue(
+    return await this.tareas.enqueue(
       'nivel',
       'remove',
       { id },
       jobId,
     );
   }
+
+  // Endpoints síncronos
+  @Post('sync')
+  @ApiOperation({ summary: 'Crear nivel (síncrono)' })
+  async createSync(@Body() createNivelDto: CreateNivelDto) {
+    return await this.nivelsService.create(createNivelDto);
+  }
+
+  @Get('sync')
+  @ApiOperation({ summary: 'Obtener todos los niveles (síncrono)' })
+  async findAllSync() {
+    return await this.nivelsService.findAll();
+  }
+
+  @Get('sync/:id')
+  @ApiOperation({ summary: 'Obtener un nivel por ID (síncrono)' })
+  async findOneSync(@Param('id') id: number) {
+    return await this.nivelsService.findOne(id);
+  }
+
+  @Patch('sync/:id')
+  @ApiOperation({ summary: 'Actualizar nivel (síncrono)' })
+  async updateSync(@Param('id') id: number, @Body() updateNivelDto: UpdateNivelDto) {
+    return await this.nivelsService.update(id, updateNivelDto);
+  }
+
+  @Delete('sync/:id')
+  @ApiOperation({ summary: 'Eliminar nivel (síncrono)' })
+  async removeSync(@Param('id') id: number) {
+    return await this.nivelsService.remove(id);
+  } 
 }

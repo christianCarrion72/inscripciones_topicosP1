@@ -25,7 +25,7 @@ export class DiaHorariosController {
   })
   async create(@Body() createDiaHorarioDto: CreateDiaHorarioDto) {
     const jobId = generateJobId('dia_horario', 'create', createDiaHorarioDto);
-    return this.tareas.enqueue(
+    return await this.tareas.enqueue(
       'dia_horario',
       'create',
       createDiaHorarioDto,
@@ -35,12 +35,12 @@ export class DiaHorariosController {
 
   @Get()
   async findAll() {
-    return this.tareas.enqueueAndWait('dia_horario', 'findAll');
+    return await this.tareas.enqueueAndWait('dia_horario', 'findAll');
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    return this.tareas.enqueueAndWait('dia_horario', 'findOne', { id });
+    return await this.tareas.enqueueAndWait('dia_horario', 'findOne', { id });
   }
 
   @Patch(':id')
@@ -49,9 +49,9 @@ export class DiaHorariosController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
-  update(@Param('id') id: number, @Body() updateDiaHorarioDto: UpdateDiaHorarioDto) {
+  async update(@Param('id') id: number, @Body() updateDiaHorarioDto: UpdateDiaHorarioDto) {
     const jobId = generateJobId('dia_horario', 'update', { id, ...updateDiaHorarioDto });
-    return this.tareas.enqueue(
+    return await this.tareas.enqueue(
       'dia_horario',
       'update',
       { id, ...updateDiaHorarioDto },
@@ -65,9 +65,9 @@ export class DiaHorariosController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
-  remove(@Param('id') id: number) {
+  async remove(@Param('id') id: number) {
     const jobId = generateJobId('dia_horario', 'remove', { id });
-    return this.tareas.enqueue(
+    return await this.tareas.enqueue(
       'dia_horario',
       'remove',
       { id },

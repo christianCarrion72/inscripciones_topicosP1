@@ -22,7 +22,7 @@ export class DiasController {
   })
   async create(@Body() createDiaDto: CreateDiaDto) {
     const jobId = generateJobId('dia', 'create', createDiaDto);
-    return this.tareas.enqueue(
+    return await this.tareas.enqueue(
       'dia',       // entidad
       'create',        // operación CRUD
       createDiaDto,             // datos del DTO
@@ -32,12 +32,12 @@ export class DiasController {
 
   @Get()
   async findAll() {
-    return this.tareas.enqueue('dia', 'findAll');
+    return await this.tareas.enqueue('dia', 'findAll');
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    return this.tareas.enqueue('dia', 'findOne', { id });
+    return await this.tareas.enqueue('dia', 'findOne', { id });
   }
 
   @Patch(':id')
@@ -48,7 +48,7 @@ export class DiasController {
   })
   async update(@Param('id') id: number, @Body() updateDiaDto: UpdateDiaDto) {
     const jobId = generateJobId('dia', 'update', { id, ...updateDiaDto });
-    return this.tareas.enqueue(
+    return await this.tareas.enqueue(
       'dia',
       'update',
       { id, ...updateDiaDto },
@@ -64,7 +64,7 @@ export class DiasController {
   })
   async remove(@Param('id') id: number) {
     const jobId = generateJobId('dia', 'remove', { id });
-    return this.tareas.enqueue(
+    return await this.tareas.enqueue(
       'dia',
       'remove',
       { id },

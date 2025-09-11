@@ -80,9 +80,6 @@ export class AulasController {
     );
   }
 
-  //Endpoint de respuesta
-  
-  
   // Endpoints síncronos
   @Post('sync')
   @ApiOperation({ summary: 'Crear aula (síncrono)' })

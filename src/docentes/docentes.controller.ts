@@ -25,7 +25,7 @@ export class DocentesController {
   })
   async create(@Body() createDocenteDto: CreateDocenteDto) {
     const jobId = generateJobId('docente', 'create', createDocenteDto);
-    return this.tareas.enqueue(
+    return await this.tareas.enqueue(
       'docente',
       'create',
       createDocenteDto,
@@ -35,12 +35,12 @@ export class DocentesController {
 
   @Get()
   async findAll() {
-    return this.tareas.enqueueAndWait('docente', 'findAll');
+    return await this.tareas.enqueueAndWait('docente', 'findAll');
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    return this.tareas.enqueueAndWait('docente', 'findOne', { id });
+    return await this.tareas.enqueueAndWait('docente', 'findOne', { id });
   }
 
   @Patch(':id')
@@ -49,9 +49,9 @@ export class DocentesController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
-  update(@Param('id') id: number, @Body() updateDocenteDto: UpdateDocenteDto) {
+  async update(@Param('id') id: number, @Body() updateDocenteDto: UpdateDocenteDto) {
     const jobId = generateJobId('docente', 'update', { id, ...updateDocenteDto });
-    return this.tareas.enqueue(
+    return await this.tareas.enqueue(
       'docente',
       'update',
       { id, ...updateDocenteDto },
@@ -65,9 +65,9 @@ export class DocentesController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
-  remove(@Param('id') id: number) {
+  async remove(@Param('id') id: number) {
     const jobId = generateJobId('docente', 'remove', { id });
-    return this.tareas.enqueue(
+    return await this.tareas.enqueue(
       'docente',
       'remove',
       { id },

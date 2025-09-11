@@ -19,7 +19,7 @@ export class CarrerasController {
   @Post()
   async create(@Body() createCarreraDto: CreateCarreraDto) {
     const jobId = generateJobId('carrera', 'create', createCarreraDto);
-    return this.tareas.enqueue(
+    return await this.tareas.enqueue(
       'carrera',       // entidad
       'create',        // operación CRUD
       createCarreraDto,             // datos del DTO
@@ -29,18 +29,18 @@ export class CarrerasController {
 
   @Get()
   async findAll() {
-    return this.tareas.enqueueAndWait('carrera', 'findAll');
+    return await this.tareas.enqueueAndWait('carrera', 'findAll');
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    return this.tareas.enqueueAndWait('carrera', 'findOne', { id });
+    return await this.tareas.enqueueAndWait('carrera', 'findOne', { id });
   }
 
   @Patch(':id')
-  update(@Param('id') id: number, @Body() updateCarreraDto: UpdateCarreraDto) {
+  async update(@Param('id') id: number, @Body() updateCarreraDto: UpdateCarreraDto) {
     const jobId = generateJobId('carrera', 'update', { id, ...updateCarreraDto });
-    return this.tareas.enqueue(
+    return await this.tareas.enqueue(
       'carrera',
       'update',
       { id, ...updateCarreraDto },
@@ -49,9 +49,9 @@ export class CarrerasController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: number) {
+  async remove(@Param('id') id: number) {
     const jobId = generateJobId('carrera', 'remove', { id });
-    return this.tareas.enqueue(
+    return await this.tareas.enqueue(
       'carrera',
       'remove',
       { id },

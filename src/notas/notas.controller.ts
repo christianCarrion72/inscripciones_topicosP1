@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
-import { ApiBearerAuth, ApiHeader, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { NotasService } from './notas.service';
 import { CreateNotaDto } from './dto/create-nota.dto';
 import { UpdateNotaDto } from './dto/update-nota.dto';
@@ -25,7 +25,7 @@ export class NotasController {
   })
   async create(@Body() createNotaDto: CreateNotaDto) {
     const jobId = generateJobId('nota', 'create', createNotaDto);
-    return this.tareas.enqueue(
+    return await this.tareas.enqueue(
       'nota',
       'create',
       createNotaDto,
@@ -35,12 +35,12 @@ export class NotasController {
 
   @Get()
   async findAll() {
-    return this.tareas.enqueueAndWait('nota', 'findAll');
+    return await this.tareas.enqueueAndWait('nota', 'findAll');
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    return this.tareas.enqueueAndWait('nota', 'findOne', { id });
+    return await this.tareas.enqueueAndWait('nota', 'findOne', { id });
   }
 
   @Patch(':id')
@@ -49,9 +49,9 @@ export class NotasController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
-  update(@Param('id') id: number, @Body() updateNotaDto: UpdateNotaDto) {
+  async update(@Param('id') id: number, @Body() updateNotaDto: UpdateNotaDto) {
     const jobId = generateJobId('nota', 'update', { id, ...updateNotaDto });
-    return this.tareas.enqueue(
+    return await this.tareas.enqueue(
       'nota',
       'update',
       { id, ...updateNotaDto },
@@ -65,13 +65,44 @@ export class NotasController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
-  remove(@Param('id') id: number) {
+  async remove(@Param('id') id: number) {
     const jobId = generateJobId('nota', 'remove', { id });
-    return this.tareas.enqueue(
+    return await this.tareas.enqueue(
       'nota',
       'remove',
       { id },
       jobId,
     );
   }
+
+  // Endpoints síncronos
+  @Post('sync')
+  @ApiOperation({ summary: 'Crear nota (síncrono)' })
+  async createSync(@Body() createNotaDto: CreateNotaDto) {
+    return await this.notasService.create(createNotaDto);
+  }
+
+  @Get('sync')
+  @ApiOperation({ summary: 'Obtener todos las notas (síncrono)' })
+  async findAllSync() {
+    return await this.notasService.findAll();
+  }
+
+  @Get('sync/:id')
+  @ApiOperation({ summary: 'Obtener una nota por ID (síncrono)' })
+  async findOneSync(@Param('id') id: number) {
+    return await this.notasService.findOne(id);
+  }
+
+  @Patch('sync/:id')
+  @ApiOperation({ summary: 'Actualizar nota (síncrono)' })
+  async updateSync(@Param('id') id: number, @Body() updateNotaDto: UpdateNotaDto) {
+    return await this.notasService.update(id, updateNotaDto);
+  }
+
+  @Delete('sync/:id')
+  @ApiOperation({ summary: 'Eliminar nota (síncrono)' })
+  async removeSync(@Param('id') id: number) {
+    return await this.notasService.remove(id);
+  } 
 }
