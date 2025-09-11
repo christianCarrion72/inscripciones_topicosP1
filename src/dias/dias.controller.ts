@@ -5,6 +5,7 @@ import { CreateDiaDto } from './dto/create-dia.dto';
 import { UpdateDiaDto } from './dto/update-dia.dto';
 import { ApiBearerAuth, ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { TareasProducer } from 'src/tareas/tareas.producer';
+import { generateJobId } from 'src/common/utils/idempotency.util';
 
 @ApiTags('dias')
 @ApiBearerAuth()
@@ -20,7 +21,7 @@ export class DiasController {
     required: false, // <--- importante
   })
   async create(@Body() createDiaDto: CreateDiaDto, @Headers('x-idempotency-key') idem?: string) {
-    const jobId = "id";
+    const jobId = generateJobId('dia', 'create', createDiaDto);
     return this.tareas.enqueue(
       'dia',       // entidad
       'create',        // operación CRUD
@@ -46,7 +47,7 @@ export class DiasController {
     required: false, // <--- importante
   })
   async update(@Param('id') id: number, @Body() updateDiaDto: UpdateDiaDto, @Headers('x-idempotency-key') idem?: string) {
-    const jobId = "id";
+    const jobId = generateJobId('dia', 'update', { id, ...updateDiaDto });
     return this.tareas.enqueue(
       'dia',
       'update',
@@ -62,7 +63,7 @@ export class DiasController {
     required: false, // <--- importante
   })
   async remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
-    const jobId = "id";
+    const jobId = generateJobId('dia', 'remove', { id });
     return this.tareas.enqueue(
       'dia',
       'remove',

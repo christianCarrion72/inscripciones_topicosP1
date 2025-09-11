@@ -18,8 +18,8 @@ export class InscripcionsService {
 
   async create(createInscripcionDto: CreateInscripcionDto) {
     const inscripcionData: Partial<Inscripcion> = {
-      fechaInscripcion: createInscripcionDto.fechaInscripcion
-    }
+      fechaInscripcion: new Date(),
+    };
 
     if(createInscripcionDto.idEstudiante){
       const estudiante = await this.estudianteRepository.findOneBy({
@@ -61,8 +61,7 @@ export class InscripcionsService {
     }
     return await this.inscripcionRepository.save({
       ...inscripcion,
-      ...updateInscripcionDto,
-      idEstudiante: estudiante
+      idEstudiante: estudiante ?? inscripcion.idEstudiante,
     });
   }
 

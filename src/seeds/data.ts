@@ -101,8 +101,8 @@ export const seedData = {
   ],
 
   inscripciones: [
-    { estudianteRegistro: 2024001, fechaInscripcion: '2024-02-10' },
-    { estudianteRegistro: 2024002, fechaInscripcion: '2024-02-11' },
+    { estudianteRegistro: 2024001 },
+    { estudianteRegistro: 2024002 },
   ],
 
   detalles: [

@@ -309,7 +309,7 @@ export class DatabaseSeeder {
         (i) => {
           const estudiante = (estudiantes as any[]).find((e: any) => e.registro === i.estudianteRegistro);
           return estudiante 
-            ? ({ idEstudiante: estudiante, fechaInscripcion: new Date(i.fechaInscripcion) } as Partial<Inscripcion>)
+            ? ({ fechaInscripcion: new Date(),idEstudiante: estudiante } as Partial<Inscripcion>)
             : null;
         },
         'Inscripciones'
@@ -317,7 +317,7 @@ export class DatabaseSeeder {
       const inscripciones = await this.seedEntity(
         this.dataSource.getRepository(Inscripcion), 
         inscripcionesMapped as any, 
-        'fechaInscripcion', 
+        'estudianteRegistro', 
         'Inscripciones'
       );
 
