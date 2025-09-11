@@ -3,7 +3,7 @@ import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { BoletaHorariosService } from './boleta_horarios.service';
 import { CreateBoletaHorarioDto } from './dto/create-boleta_horario.dto';
 import { UpdateBoletaHorarioDto } from './dto/update-boleta_horario.dto';
-import { ApiBearerAuth, ApiHeader, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { TareasProducer } from '../tareas/tareas.producer';
 import { generateJobId } from 'src/common/utils/idempotency.util';
 
@@ -49,9 +49,9 @@ export class BoletaHorariosController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
-  update(@Param('id') id: number, @Body() updateBoletaHorarioDto: UpdateBoletaHorarioDto, @Headers('x-idempotency-key') idem?: string) {
+  async update(@Param('id') id: number, @Body() updateBoletaHorarioDto: UpdateBoletaHorarioDto, @Headers('x-idempotency-key') idem?: string) {
     const jobId = generateJobId('boleta_horario', 'update', { id, ...updateBoletaHorarioDto });
-    return this.tareas.enqueue(
+    return await this.tareas.enqueue(
       'boleta_horario',
       'update',
       { id, ...updateBoletaHorarioDto },
@@ -65,13 +65,44 @@ export class BoletaHorariosController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
-  remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
+  async remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
     const jobId = generateJobId('boleta_horario', 'remove', { id });
-    return this.tareas.enqueue(
+    return await this.tareas.enqueue(
       'boleta_horario',
       'remove',
       { id },
       idem ?? jobId,
     );
+  }
+
+  // Endpoints síncronos
+  @Post('sync')
+  @ApiOperation({ summary: 'Crear carrera (síncrono)' })
+  async createSync(@Body() createBoletaHorarioDto: CreateBoletaHorarioDto) {
+    return await this.boletaHorariosService.create(createBoletaHorarioDto);
+  }
+
+  @Get('sync')
+  @ApiOperation({ summary: 'Obtener todas las boletas horarios (síncrono)' })
+  async findAllSync() {
+    return await this.boletaHorariosService.findAll();
+  }
+
+  @Get('sync/:id')
+  @ApiOperation({ summary: 'Obtener un boleta horario por ID (síncrono)' })
+  async findOneSync(@Param('id') id: number) {
+    return await this.boletaHorariosService.findOne(id);
+  }
+
+  @Patch('sync/:id')
+  @ApiOperation({ summary: 'Actualizar boleta horario (síncrono)' })
+  async updateSync(@Param('id') id: number, @Body() updateBoletaHorarioDto: UpdateBoletaHorarioDto) {
+    return await this.boletaHorariosService.update(id, updateBoletaHorarioDto);
+  }
+
+  @Delete('sync/:id')
+  @ApiOperation({ summary: 'Eliminar boleta horario (síncrono)' })
+  async removeSync(@Param('id') id: number) {
+    return await this.boletaHorariosService.remove(id);
   }
 }

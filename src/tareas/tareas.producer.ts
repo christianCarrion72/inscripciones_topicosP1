@@ -38,7 +38,11 @@ export class TareasProducer implements OnModuleInit, OnModuleDestroy {
     };
 
     await this.queue.add(`${entity}.${type}`, task, { jobId: id });
-    return { mensaje: 'Procesando Tarea', jobId: id };
+    return { 
+      mensaje: 'Procesando Tarea', 
+      jobId: id,
+      notificationEndpoint: `/api/tareas/status/${id}` 
+    };
   }
 
   async enqueueAndWait<T>(

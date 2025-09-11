@@ -3,7 +3,7 @@ import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { DiasService } from './dias.service';
 import { CreateDiaDto } from './dto/create-dia.dto';
 import { UpdateDiaDto } from './dto/update-dia.dto';
-import { ApiBearerAuth, ApiHeader, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { TareasProducer } from 'src/tareas/tareas.producer';
 
 @ApiTags('dias')
@@ -70,4 +70,35 @@ export class DiasController {
       idem ?? jobId,
     );
   }
+
+  // Endpoints síncronos
+  @Post('sync')
+  @ApiOperation({ summary: 'Crear dia (síncrono)' })
+  async createSync(@Body() createDiaDto: CreateDiaDto) {
+    return await this.diasService.create(createDiaDto);
+  }
+
+  @Get('sync')
+  @ApiOperation({ summary: 'Obtener todas los dias (síncrono)' })
+  async findAllSync() {
+    return await this.diasService.findAll();
+  }
+
+  @Get('sync/:id')
+  @ApiOperation({ summary: 'Obtener un dia por ID (síncrono)' })
+  async findOneSync(@Param('id') id: number) {
+    return await this.diasService.findOne(id);
+  }
+
+  @Patch('sync/:id')
+  @ApiOperation({ summary: 'Actualizar dia (síncrono)' })
+  async updateSync(@Param('id') id: number, @Body() updateDiaDto: UpdateDiaDto) {
+    return await this.diasService.update(id, updateDiaDto);
+  }
+
+  @Delete('sync/:id')
+  @ApiOperation({ summary: 'Eliminar dia (síncrono)' })
+  async removeSync(@Param('id') id: number) {
+    return await this.diasService.remove(id);
+  }  
 }

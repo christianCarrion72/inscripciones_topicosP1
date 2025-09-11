@@ -3,7 +3,7 @@ import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { EstudiantesService } from './estudiantes.service';
 import { CreateEstudianteDto } from './dto/create-estudiante.dto';
 import { UpdateEstudianteDto } from './dto/update-estudiante.dto';
-import { ApiBearerAuth, ApiHeader, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { TareasProducer } from '../tareas/tareas.producer';
 import { generateJobId } from 'src/common/utils/idempotency.util';
 
@@ -74,4 +74,35 @@ export class EstudiantesController {
       idem ?? jobId,
     );
   }
+
+  // Endpoints síncronos
+  @Post('sync')
+  @ApiOperation({ summary: 'Crear estudiante (síncrono)' })
+  async createSync(@Body() createEstudianteDto: CreateEstudianteDto) {
+    return await this.estudiantesService.create(createEstudianteDto);
+  }
+
+  @Get('sync')
+  @ApiOperation({ summary: 'Obtener todos los estudiantes (síncrono)' })
+  async findAllSync() {
+    return await this.estudiantesService.findAll();
+  }
+
+  @Get('sync/:id')
+  @ApiOperation({ summary: 'Obtener un estudiante por ID (síncrono)' })
+  async findOneSync(@Param('id') id: number) {
+    return await this.estudiantesService.findOne(id);
+  }
+
+  @Patch('sync/:id')
+  @ApiOperation({ summary: 'Actualizar estudiante (síncrono)' })
+  async updateSync(@Param('id') id: number, @Body() updateEstudianteDto: UpdateEstudianteDto) {
+    return await this.estudiantesService.update(id, updateEstudianteDto);
+  }
+
+  @Delete('sync/:id')
+  @ApiOperation({ summary: 'Eliminar estudiante (síncrono)' })
+  async removeSync(@Param('id') id: number) {
+    return await this.estudiantesService.remove(id);
+  } 
 }

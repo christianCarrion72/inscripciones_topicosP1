@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Headers }
 import { AulasService } from './aulas.service';
 import { CreateAulaDto } from './dto/create-aula.dto';
 import { UpdateAulaDto } from './dto/update-aula.dto';
-import { ApiBearerAuth, ApiHeader, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { TareasProducer } from '../tareas/tareas.producer';
 import { generateJobId } from 'src/common/utils/idempotency.util';
@@ -23,9 +23,10 @@ export class AulasController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
+  @ApiOperation({ summary: 'Crear aula (asíncrono)' })
   async create(@Body() createAulaDto: CreateAulaDto, @Headers('x-idempotency-key') idem?: string) {
     const jobId = generateJobId('aula', 'create', createAulaDto);
-    return this.tareas.enqueue(
+    return await this.tareas.enqueue(
       'aula',
       'create',
       createAulaDto,
@@ -34,13 +35,15 @@ export class AulasController {
   }
 
   @Get()
+  @ApiOperation({ summary: 'Obtener todas las aulas (asíncrono)' })
   async findAll() {
-    return this.tareas.enqueueAndWait('aula', 'findAll');
+    return await this.tareas.enqueueAndWait('aula', 'findAll');
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Obtener un aula por ID (asíncrono)' })
   async findOne(@Param('id') id: number) {
-    return this.tareas.enqueueAndWait('aula', 'findOne', { id });
+    return await this.tareas.enqueueAndWait('aula', 'findOne', { id });
   }
 
   @Patch(':id')
@@ -49,9 +52,10 @@ export class AulasController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
-  update(@Param('id') id: number, @Body() updateAulaDto: UpdateAulaDto, @Headers('x-idempotency-key') idem?: string) {
+  @ApiOperation({ summary: 'Actualizar aula (asíncrono)' })
+  async update(@Param('id') id: number, @Body() updateAulaDto: UpdateAulaDto, @Headers('x-idempotency-key') idem?: string) {
     const jobId = generateJobId('aula', 'update', { id, ...updateAulaDto });
-    return this.tareas.enqueue(
+    return await this.tareas.enqueue(
       'aula',
       'update',
       { id, ...updateAulaDto },
@@ -65,13 +69,45 @@ export class AulasController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
-  remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
+  @ApiOperation({ summary: 'Eliminar aula (asíncrono)' })
+  async remove(@Param('id') id: number, @Headers('x-idempotency-key') idem?: string) {
     const jobId = generateJobId('aula', 'remove', { id });
-    return this.tareas.enqueue(
+    return await this.tareas.enqueue(
       'aula',
       'remove',
       { id },
       idem ?? jobId,
     );
+  }
+  
+  // Endpoints síncronos
+  @Post('sync')
+  @ApiOperation({ summary: 'Crear aula (síncrono)' })
+  async createSync(@Body() createAulaDto: CreateAulaDto) {
+    return await this.aulasService.create(createAulaDto);
+  }
+
+  @Get('sync')
+  @ApiOperation({ summary: 'Obtener todas las aulas (síncrono)' })
+  async findAllSync() {
+    return await this.aulasService.findAll();
+  }
+
+  @Get('sync/:id')
+  @ApiOperation({ summary: 'Obtener un aula por ID (síncrono)' })
+  async findOneSync(@Param('id') id: number) {
+    return await this.aulasService.findOne(id);
+  }
+
+  @Patch('sync/:id')
+  @ApiOperation({ summary: 'Actualizar aula (síncrono)' })
+  async updateSync(@Param('id') id: number, @Body() updateAulaDto: UpdateAulaDto) {
+    return await this.aulasService.update(id, updateAulaDto);
+  }
+
+  @Delete('sync/:id')
+  @ApiOperation({ summary: 'Eliminar aula (síncrono)' })
+  async removeSync(@Param('id') id: number) {
+    return await this.aulasService.remove(id);
   }
 }

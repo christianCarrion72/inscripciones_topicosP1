@@ -3,7 +3,7 @@ import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { DiaHorariosService } from './dia_horarios.service';
 import { CreateDiaHorarioDto } from './dto/create-dia_horario.dto';
 import { UpdateDiaHorarioDto } from './dto/update-dia_horario.dto';
-import { ApiBearerAuth, ApiHeader, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { TareasProducer } from '../tareas/tareas.producer';
 import { generateJobId } from 'src/common/utils/idempotency.util';
 
@@ -74,4 +74,35 @@ export class DiaHorariosController {
       idem ?? jobId,
     );
   }
+  
+  // Endpoints síncronos
+  @Post('sync')
+  @ApiOperation({ summary: 'Crear dia horario (síncrono)' })
+  async createSync(@Body() createDiaHorarioDto: CreateDiaHorarioDto) {
+    return await this.diaHorariosService.create(createDiaHorarioDto);
+  }
+
+  @Get('sync')
+  @ApiOperation({ summary: 'Obtener todas los dias horarios (síncrono)' })
+  async findAllSync() {
+    return await this.diaHorariosService.findAll();
+  }
+
+  @Get('sync/:id')
+  @ApiOperation({ summary: 'Obtener un dia horario por ID (síncrono)' })
+  async findOneSync(@Param('id') id: number) {
+    return await this.diaHorariosService.findOne(id);
+  }
+
+  @Patch('sync/:id')
+  @ApiOperation({ summary: 'Actualizar dia horario (síncrono)' })
+  async updateSync(@Param('id') id: number, @Body() updateDiaHorarioDto: UpdateDiaHorarioDto) {
+    return await this.diaHorariosService.update(id, updateDiaHorarioDto);
+  }
+
+  @Delete('sync/:id')
+  @ApiOperation({ summary: 'Eliminar dia horario (síncrono)' })
+  async removeSync(@Param('id') id: number) {
+    return await this.diaHorariosService.remove(id);
+  }  
 }

@@ -8,6 +8,7 @@ import { TareasQueueService } from './tareas-queue.service';
 import { TareasQueueController } from './tareas-queue.controller';
 import { TareasTestService } from './tareas-test.service';
 import { TareasTestController } from './tareas-test.controller';
+//import { TareasStatusController } from './tareas-status.controller';
 import { CarrerasModule } from '../carreras/carreras.module';
 import { DiasModule } from '../dias/dias.module';
 import { AulasModule } from '../aulas/aulas.module';
