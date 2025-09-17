@@ -79,35 +79,4 @@ export class AulasController {
       jobId,
     );
   }
-
-  // Endpoints síncronos
-  @Post('sync')
-  @ApiOperation({ summary: 'Crear aula (síncrono)' })
-  async createSync(@Body() createAulaDto: CreateAulaDto) {
-    return await this.aulasService.create(createAulaDto);
-  }
-
-  @Get('sync')
-  @ApiOperation({ summary: 'Obtener todas las aulas (síncrono)' })
-  async findAllSync() {
-    return await this.aulasService.findAll();
-  }
-
-  @Get('sync/:id')
-  @ApiOperation({ summary: 'Obtener un aula por ID (síncrono)' })
-  async findOneSync(@Param('id') id: number) {
-    return await this.aulasService.findOne(id);
-  }
-
-  @Patch('sync/:id')
-  @ApiOperation({ summary: 'Actualizar aula (síncrono)' })
-  async updateSync(@Param('id') id: number, @Body() updateAulaDto: UpdateAulaDto) {
-    return await this.aulasService.update(id, updateAulaDto);
-  }
-
-  @Delete('sync/:id')
-  @ApiOperation({ summary: 'Eliminar aula (síncrono)' })
-  async removeSync(@Param('id') id: number) {
-    return await this.aulasService.remove(id);
-  }
 }

@@ -74,35 +74,4 @@ export class EstudiantesController {
       jobId,
     );
   }
-
-  // Endpoints síncronos
-  @Post('sync')
-  @ApiOperation({ summary: 'Crear estudiante (síncrono)' })
-  async createSync(@Body() createEstudianteDto: CreateEstudianteDto) {
-    return await this.estudiantesService.create(createEstudianteDto);
-  }
-
-  @Get('sync')
-  @ApiOperation({ summary: 'Obtener todos los estudiantes (síncrono)' })
-  async findAllSync() {
-    return await this.estudiantesService.findAll();
-  }
-
-  @Get('sync/:id')
-  @ApiOperation({ summary: 'Obtener un estudiante por ID (síncrono)' })
-  async findOneSync(@Param('id') id: number) {
-    return await this.estudiantesService.findOne(id);
-  }
-
-  @Patch('sync/:id')
-  @ApiOperation({ summary: 'Actualizar estudiante (síncrono)' })
-  async updateSync(@Param('id') id: number, @Body() updateEstudianteDto: UpdateEstudianteDto) {
-    return await this.estudiantesService.update(id, updateEstudianteDto);
-  }
-
-  @Delete('sync/:id')
-  @ApiOperation({ summary: 'Eliminar estudiante (síncrono)' })
-  async removeSync(@Param('id') id: number) {
-    return await this.estudiantesService.remove(id);
-  } 
 }

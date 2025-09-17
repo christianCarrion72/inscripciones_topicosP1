@@ -7,6 +7,8 @@ import { AuthModule } from 'src/auth/auth.module';
 import { GrupoMateriasModule } from 'src/grupo_materias/grupo_materias.module';
 import { HorariosModule } from 'src/horarios/horarios.module';
 import { TareasModule } from 'src/tareas/tareas.module';
+import { SyncBoletaHorariosService } from './sync-boleta_horarios.service';
+import { SyncBoletaHorariosController } from './sync-boleta_horarios.controller';
 
 @Module({
   imports: [
@@ -16,8 +18,8 @@ import { TareasModule } from 'src/tareas/tareas.module';
     HorariosModule,
     forwardRef(() => TareasModule)
   ],
-  controllers: [BoletaHorariosController],
-  providers: [BoletaHorariosService],
-  exports: [TypeOrmModule, BoletaHorariosService]
+  controllers: [BoletaHorariosController, SyncBoletaHorariosController],
+  providers: [BoletaHorariosService, SyncBoletaHorariosService],
+  exports: [TypeOrmModule, BoletaHorariosService, SyncBoletaHorariosService]
 })
 export class BoletaHorariosModule {}

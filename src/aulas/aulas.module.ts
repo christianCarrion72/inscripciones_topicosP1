@@ -6,6 +6,8 @@ import { Aula } from './entities/aula.entity';
 import { ModulosModule } from 'src/modulos/modulos.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { TareasModule } from 'src/tareas/tareas.module';
+import { SyncAulasService } from './sync-aulas.service';
+import { SyncAulasController } from './sync-aulas.controller';
 
 @Module({
   imports: [
@@ -14,8 +16,8 @@ import { TareasModule } from 'src/tareas/tareas.module';
     ModulosModule,
     forwardRef(() => TareasModule),
   ],
-  controllers: [AulasController],
-  providers: [AulasService],
-  exports: [TypeOrmModule, AulasService]
+  controllers: [AulasController, SyncAulasController],
+  providers: [AulasService, SyncAulasService],
+  exports: [TypeOrmModule, AulasService, SyncAulasService]
 })
 export class AulasModule {}

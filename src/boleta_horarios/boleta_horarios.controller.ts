@@ -74,35 +74,4 @@ export class BoletaHorariosController {
       jobId,
     );
   }
-
-  // Endpoints síncronos
-  @Post('sync')
-  @ApiOperation({ summary: 'Crear carrera (síncrono)' })
-  async createSync(@Body() createBoletaHorarioDto: CreateBoletaHorarioDto) {
-    return await this.boletaHorariosService.create(createBoletaHorarioDto);
-  }
-
-  @Get('sync')
-  @ApiOperation({ summary: 'Obtener todas las boletas horarios (síncrono)' })
-  async findAllSync() {
-    return await this.boletaHorariosService.findAll();
-  }
-
-  @Get('sync/:id')
-  @ApiOperation({ summary: 'Obtener un boleta horario por ID (síncrono)' })
-  async findOneSync(@Param('id') id: number) {
-    return await this.boletaHorariosService.findOne(id);
-  }
-
-  @Patch('sync/:id')
-  @ApiOperation({ summary: 'Actualizar boleta horario (síncrono)' })
-  async updateSync(@Param('id') id: number, @Body() updateBoletaHorarioDto: UpdateBoletaHorarioDto) {
-    return await this.boletaHorariosService.update(id, updateBoletaHorarioDto);
-  }
-
-  @Delete('sync/:id')
-  @ApiOperation({ summary: 'Eliminar boleta horario (síncrono)' })
-  async removeSync(@Param('id') id: number) {
-    return await this.boletaHorariosService.remove(id);
-  }
 }

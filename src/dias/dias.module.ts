@@ -5,6 +5,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Dia } from './entities/dia.entity';
 import { AuthModule } from 'src/auth/auth.module';
 import { TareasModule } from 'src/tareas/tareas.module';
+import { SyncDiasService } from './sync-dias.service';
+import { SyncDiasController } from './sync-dias.controller';
 
 @Module({
   imports: [
@@ -12,8 +14,8 @@ import { TareasModule } from 'src/tareas/tareas.module';
     forwardRef(() => AuthModule),
     forwardRef(() => TareasModule),
   ],
-  controllers: [DiasController],
-  providers: [DiasService],
-  exports: [TypeOrmModule,DiasService]
+  controllers: [DiasController, SyncDiasController],
+  providers: [DiasService, SyncDiasService],
+  exports: [TypeOrmModule, DiasService, SyncDiasService]
 })
 export class DiasModule {}

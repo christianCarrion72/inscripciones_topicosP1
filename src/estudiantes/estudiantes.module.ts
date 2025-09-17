@@ -6,6 +6,8 @@ import { Estudiante } from './entities/estudiante.entity';
 import { PlanEstudiosModule } from 'src/plan_estudios/plan_estudios.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { TareasModule } from 'src/tareas/tareas.module';
+import { SyncEstudiantesService } from './sync-estudiantes.service';
+import { SyncEstudiantesController } from './sync-estudiantes.controller';
 
 @Module({
   imports: [
@@ -14,8 +16,8 @@ import { TareasModule } from 'src/tareas/tareas.module';
     forwardRef(() => AuthModule),
     forwardRef(() => TareasModule)
   ],
-  controllers: [EstudiantesController],
-  providers: [EstudiantesService],
-  exports: [TypeOrmModule, EstudiantesService]
+  controllers: [EstudiantesController, SyncEstudiantesController],
+  providers: [EstudiantesService, SyncEstudiantesService],
+  exports: [TypeOrmModule, EstudiantesService, SyncEstudiantesService]
 })
 export class EstudiantesModule {}
