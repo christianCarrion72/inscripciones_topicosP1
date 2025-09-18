@@ -18,6 +18,11 @@ export class DocentesController {
   ) {}
 
   @Post()
+  @ApiHeader({
+    name: 'x-callback-url',
+    description: 'CallBack-URL opcional para recibir respuestas',
+    required: false,
+  })
   create(@Body() createDocenteDto: CreateDocenteDto, @Headers('x-callback-url') callbackUrl?: string) {
     const jobId = generateJobId('docente', 'create', createDocenteDto);
     return this.tareas.enqueue(
@@ -30,16 +35,31 @@ export class DocentesController {
   }
 
   @Get()
+  @ApiHeader({
+    name: 'x-callback-url',
+    description: 'CallBack-URL opcional para recibir respuestas',
+    required: false,
+  })
   findAll(@Headers('x-callback-url') callbackUrl?: string) {
     return this.tareas.enqueue('docente', 'findAll',{}, callbackUrl);
   }
 
   @Get(':id')
+  @ApiHeader({
+    name: 'x-callback-url',
+    description: 'CallBack-URL opcional para recibir respuestas',
+    required: false,
+  })
   findOne(@Param('id') id: number, @Headers('x-callback-url') callbackUrl?: string) {
     return this.tareas.enqueue('docente', 'findOne', { id }, callbackUrl);
   }
 
   @Patch(':id')
+  @ApiHeader({
+    name: 'x-callback-url',
+    description: 'CallBack-URL opcional para recibir respuestas',
+    required: false,
+  })
   update(@Param('id') id: number, @Body() updateDocenteDto: UpdateDocenteDto, @Headers('x-callback-url') callbackUrl?: string) {
     const jobId = generateJobId('docente', 'update', { id, ...updateDocenteDto });
     return this.tareas.enqueue(
@@ -52,6 +72,11 @@ export class DocentesController {
   }
 
   @Delete(':id')
+  @ApiHeader({
+    name: 'x-callback-url',
+    description: 'CallBack-URL opcional para recibir respuestas',
+    required: false,
+  })
   remove(@Param('id') id: number, @Headers('x-callback-url') callbackUrl?: string) {
     const jobId = generateJobId('docente', 'remove', { id });
     return this.tareas.enqueue(

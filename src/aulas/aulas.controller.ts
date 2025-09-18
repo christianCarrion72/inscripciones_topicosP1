@@ -18,7 +18,11 @@ export class AulasController {
   ) {}
 
   @Post()
-  @ApiOperation({ summary: 'Crear aula (asíncrono)' })
+  @ApiHeader({
+    name: 'x-callback-url',
+    description: 'CallBack-URL opcional para recibir respuestas',
+    required: false,
+  })
   create(@Body() createAulaDto: CreateAulaDto, @Headers('x-callback-url') callbackUrl?: string) {
     const jobId = generateJobId('aula', 'create', createAulaDto);
   
@@ -32,19 +36,31 @@ export class AulasController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Obtener todas las aulas (asíncrono)' })
+  @ApiHeader({
+    name: 'x-callback-url',
+    description: 'CallBack-URL opcional para recibir respuestas',
+    required: false,
+  })
   findAll(@Headers('x-callback-url') callbackUrl?: string) {
     return this.tareas.enqueue('aula', 'findAll',{}, callbackUrl);
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Obtener un aula por ID (asíncrono)' })
+  @ApiHeader({
+    name: 'x-callback-url',
+    description: 'CallBack-URL opcional para recibir respuestas',
+    required: false,
+  })
   findOne(@Param('id') id: number,@Headers('x-callback-url') callbackUrl?: string) {
     return this.tareas.enqueue('aula', 'findOne', { id }, callbackUrl);
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Actualizar aula (asíncrono)' })
+  @ApiHeader({
+    name: 'x-callback-url',
+    description: 'CallBack-URL opcional para recibir respuestas',
+    required: false,
+  })
   update(@Param('id',) id: number, @Body() updateAulaDto: UpdateAulaDto,@Headers('x-callback-url') callbackUrl?: string) {
     const jobId = generateJobId('aula', 'update', { id, ...updateAulaDto });
     return this.tareas.enqueue(
@@ -58,8 +74,8 @@ export class AulasController {
 
   @Delete(':id')
   @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
+    name: 'x-callback-url',
+    description: 'CallBack-URL opcional para recibir respuestas',
     required: false,
   })
   @ApiOperation({ summary: 'Eliminar aula (asíncrono)' })

@@ -18,6 +18,11 @@ export class BoletaHorariosController {
   ) {}
 
   @Post()
+  @ApiHeader({
+    name: 'x-callback-url',
+    description: 'CallBack-URL opcional para recibir respuestas',
+    required: false,
+  })
   create(@Body() createBoletaHorarioDto: CreateBoletaHorarioDto, @Headers('x-callback-url') callbackUrl?: string) {
     const jobId = generateJobId('boleta_horario', 'create', createBoletaHorarioDto);
     return this.tareas.enqueue(
@@ -30,16 +35,31 @@ export class BoletaHorariosController {
   }
 
   @Get()
+  @ApiHeader({
+    name: 'x-callback-url',
+    description: 'CallBack-URL opcional para recibir respuestas',
+    required: false,
+  })
   findAll(@Headers('x-callback-url') callbackUrl?: string) {
     return this.tareas.enqueue('boleta_horario', 'findAll',{}, callbackUrl);
   }
 
   @Get(':id')
+  @ApiHeader({
+    name: 'x-callback-url',
+    description: 'CallBack-URL opcional para recibir respuestas',
+    required: false,
+  })
   findOne(@Param('id') id: number, @Headers('x-callback-url') callbackUrl?: string) {
     return this.tareas.enqueue('boleta_horario', 'findOne', { id }, callbackUrl);
   }
 
   @Patch(':id')
+  @ApiHeader({
+    name: 'x-callback-url',
+    description: 'CallBack-URL opcional para recibir respuestas',
+    required: false,
+  })
   update(@Param('id') id: number, @Body() updateBoletaHorarioDto: UpdateBoletaHorarioDto, @Headers('x-callback-url') callbackUrl?: string) {
     const jobId = generateJobId('boleta_horario', 'update', { id, ...updateBoletaHorarioDto });
     return this.tareas.enqueue(
@@ -53,8 +73,8 @@ export class BoletaHorariosController {
 
   @Delete(':id')
   @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
+    name: 'x-callback-url',
+    description: 'CallBack-URL opcional para recibir respuestas',
     required: false,
   })
   remove(@Param('id') id: number, @Headers('x-callback-url') callbackUrl?: string) {

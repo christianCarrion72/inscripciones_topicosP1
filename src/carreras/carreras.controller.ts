@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Headers }
 import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { CreateCarreraDto } from './dto/create-carrera.dto';
 import { UpdateCarreraDto } from './dto/update-carrera.dto';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { TareasProducer } from '../tareas/tareas.producer';
 import { generateJobId } from 'src/common/utils/idempotency.util';
 
@@ -16,6 +16,11 @@ export class CarrerasController {
   ) {}
 
   @Post()
+  @ApiHeader({
+    name: 'x-callback-url',
+    description: 'CallBack-URL opcional para recibir respuestas',
+    required: false,
+  })
   @ApiOperation({ summary: 'Crear carrera (asíncrono)' })
   create(@Body() createCarreraDto: CreateCarreraDto, @Headers('x-callback-url') callbackUrl?: string) {
     const jobId = generateJobId('carrera', 'create', createCarreraDto);
@@ -29,19 +34,31 @@ export class CarrerasController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Obtener todas las carreras (asíncrono)' })
+  @ApiHeader({
+    name: 'x-callback-url',
+    description: 'CallBack-URL opcional para recibir respuestas',
+    required: false,
+  })
   findAll(@Headers('x-callback-url') callbackUrl?: string) {
     return this.tareas.enqueue('carrera', 'findAll', {}, callbackUrl);
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Obtener una carrera por ID (asíncrono)' })
+  @ApiHeader({
+    name: 'x-callback-url',
+    description: 'CallBack-URL opcional para recibir respuestas',
+    required: false,
+  })
   findOne(@Param('id') id: number, @Headers('x-callback-url') callbackUrl?: string) {
     return this.tareas.enqueue('carrera', 'findOne', { id }, callbackUrl);
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Actualizar carrera (asíncrono)' })
+  @ApiHeader({
+    name: 'x-callback-url',
+    description: 'CallBack-URL opcional para recibir respuestas',
+    required: false,
+  })
   update(@Param('id') id: number, @Body() updateCarreraDto: UpdateCarreraDto, @Headers('x-callback-url') callbackUrl?: string) {
     const jobId = generateJobId('carrera', 'update', { id, ...updateCarreraDto });
     return this.tareas.enqueue(
@@ -54,7 +71,11 @@ export class CarrerasController {
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Eliminar carrera (asíncrono)' })
+  @ApiHeader({
+    name: 'x-callback-url',
+    description: 'CallBack-URL opcional para recibir respuestas',
+    required: false,
+  })
   remove(@Param('id') id: number, @Headers('x-callback-url') callbackUrl?: string) {
     const jobId = generateJobId('carrera', 'remove', { id });
     return this.tareas.enqueue(
