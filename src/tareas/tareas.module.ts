@@ -50,7 +50,7 @@ import { PeriodosService } from 'src/periodos/periodos.service';
 import { PlanEstudiosService } from 'src/plan_estudios/plan_estudios.service';
 import { PrerequisitosService } from 'src/prerequisitos/prerequisitos.service';
 import { TareasEvents } from './tareas.events';
-import { TareasGateway } from './tareas.gatway';
+import { TareasService } from './tareas.service';
 
 @Module({
   imports: [
@@ -97,7 +97,7 @@ import { TareasGateway } from './tareas.gatway';
     TareasQueueService,
     TareasTestService,
     TareasEvents,
-    TareasGateway,
+    TareasService,
     {
       provide: 'ENTITY_SERVICES',
       useFactory: (

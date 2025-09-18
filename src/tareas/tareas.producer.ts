@@ -27,13 +27,16 @@ export class TareasProducer implements OnModuleInit, OnModuleDestroy {
     entity: string,
     type: OperationType,
     data?: T,
+    callback?: string,
     jobId?: string,
   ) {
     const id = jobId ?? randomUUID();
+    const callbackUrl = callback ?? undefined;
 
     const task: TaskData<T> = {
       entity,
       type,
+      callbackUrl,
       data,
     };
 
