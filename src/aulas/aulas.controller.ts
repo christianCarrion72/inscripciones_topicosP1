@@ -18,11 +18,6 @@ export class AulasController {
   ) {}
 
   @Post()
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false,
-  })
   @ApiOperation({ summary: 'Crear aula (asíncrono)' })
   create(@Body() createAulaDto: CreateAulaDto, @Headers('x-callback-url') callbackUrl?: string) {
     const jobId = generateJobId('aula', 'create', createAulaDto);
@@ -49,11 +44,6 @@ export class AulasController {
   }
 
   @Patch(':id')
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false,
-  })
   @ApiOperation({ summary: 'Actualizar aula (asíncrono)' })
   update(@Param('id',) id: number, @Body() updateAulaDto: UpdateAulaDto,@Headers('x-callback-url') callbackUrl?: string) {
     const jobId = generateJobId('aula', 'update', { id, ...updateAulaDto });

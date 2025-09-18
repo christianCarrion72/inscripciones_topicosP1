@@ -15,59 +15,47 @@ export class DiasController {
   constructor(private readonly diasService: DiasService, private readonly tareas: TareasProducer) {}
 
   @Post()
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false, // <--- importante
-  })
-  create(@Body() createDiaDto: CreateDiaDto) {
+  create(@Body() createDiaDto: CreateDiaDto, @Headers('x-callback-url') callbackUrl?: string) {
     const jobId = generateJobId('dia', 'create', createDiaDto);
     return this.tareas.enqueue(
       'dia',       // entidad
       'create',        // operación CRUD
       createDiaDto,             // datos del DTO
+      callbackUrl,
       jobId, // idempotencia
     );
   }
 
   @Get()
-  findAll() {
-    return this.tareas.enqueue('dia', 'findAll');
+  findAll(@Headers('x-callback-url') callbackUrl?: string) {
+    return this.tareas.enqueue('dia', 'findAll', {}, callbackUrl);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number) {
-    return this.tareas.enqueue('dia', 'findOne', { id });
+  findOne(@Param('id') id: number, @Headers('x-callback-url') callbackUrl?: string) {
+    return this.tareas.enqueue('dia', 'findOne', { id }, callbackUrl);
   }
 
   @Patch(':id')
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false, // <--- importante
-  })
-  update(@Param('id') id: number, @Body() updateDiaDto: UpdateDiaDto) {
+  update(@Param('id') id: number, @Body() updateDiaDto: UpdateDiaDto, @Headers('x-callback-url') callbackUrl?: string) {
     const jobId = generateJobId('dia', 'update', { id, ...updateDiaDto });
     return this.tareas.enqueue(
       'dia',
       'update',
       { id, ...updateDiaDto },
+      callbackUrl,
       jobId,
     );
   }
 
   @Delete(':id')
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false, // <--- importante
-  })
-  remove(@Param('id') id: number) {
+  remove(@Param('id') id: number, @Headers('x-callback-url') callbackUrl?: string) {
     const jobId = generateJobId('dia', 'remove', { id });
     return this.tareas.enqueue(
       'dia',
       'remove',
       { id },
+      callbackUrl,
       jobId,
     );
   }

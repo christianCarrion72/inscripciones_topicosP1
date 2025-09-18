@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Headers } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { BoletaHorariosService } from './boleta_horarios.service';
 import { CreateBoletaHorarioDto } from './dto/create-boleta_horario.dto';
@@ -18,43 +18,35 @@ export class BoletaHorariosController {
   ) {}
 
   @Post()
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false,
-  })
-  create(@Body() createBoletaHorarioDto: CreateBoletaHorarioDto) {
+  create(@Body() createBoletaHorarioDto: CreateBoletaHorarioDto, @Headers('x-callback-url') callbackUrl?: string) {
     const jobId = generateJobId('boleta_horario', 'create', createBoletaHorarioDto);
     return this.tareas.enqueue(
       'boleta_horario',
       'create',
       createBoletaHorarioDto,
+      callbackUrl,
       jobId,
     );
   }
 
   @Get()
-  findAll() {
-    return this.tareas.enqueue('boleta_horario', 'findAll');
+  findAll(@Headers('x-callback-url') callbackUrl?: string) {
+    return this.tareas.enqueue('boleta_horario', 'findAll',{}, callbackUrl);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number) {
-    return this.tareas.enqueue('boleta_horario', 'findOne', { id });
+  findOne(@Param('id') id: number, @Headers('x-callback-url') callbackUrl?: string) {
+    return this.tareas.enqueue('boleta_horario', 'findOne', { id }, callbackUrl);
   }
 
   @Patch(':id')
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false,
-  })
-  update(@Param('id') id: number, @Body() updateBoletaHorarioDto: UpdateBoletaHorarioDto) {
+  update(@Param('id') id: number, @Body() updateBoletaHorarioDto: UpdateBoletaHorarioDto, @Headers('x-callback-url') callbackUrl?: string) {
     const jobId = generateJobId('boleta_horario', 'update', { id, ...updateBoletaHorarioDto });
     return this.tareas.enqueue(
       'boleta_horario',
       'update',
       { id, ...updateBoletaHorarioDto },
+      callbackUrl,
       jobId,
     );
   }
@@ -65,12 +57,13 @@ export class BoletaHorariosController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
-  remove(@Param('id') id: number) {
+  remove(@Param('id') id: number, @Headers('x-callback-url') callbackUrl?: string) {
     const jobId = generateJobId('boleta_horario', 'remove', { id });
     return this.tareas.enqueue(
       'boleta_horario',
       'remove',
       { id },
+      callbackUrl,
       jobId,
     );
   }

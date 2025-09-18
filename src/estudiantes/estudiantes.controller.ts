@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Headers } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { EstudiantesService } from './estudiantes.service';
 import { CreateEstudianteDto } from './dto/create-estudiante.dto';
@@ -18,59 +18,47 @@ export class EstudiantesController {
   ) {}
 
   @Post()
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false,
-  })
-  create(@Body() createEstudianteDto: CreateEstudianteDto) {
+  create(@Body() createEstudianteDto: CreateEstudianteDto, @Headers('x-callback-url') callbackUrl?: string) {
     const jobId = generateJobId('estudiante', 'create', createEstudianteDto);
     return this.tareas.enqueue(
       'estudiante',
       'create',
       createEstudianteDto,
+      callbackUrl,
       jobId,
     );
   }
 
   @Get()
-  findAll() {
-    return this.tareas.enqueue('estudiante', 'findAll');
+  findAll(@Headers('x-callback-url') callbackUrl?: string) {
+    return this.tareas.enqueue('estudiante', 'findAll',{}, callbackUrl);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number) {
-    return this.tareas.enqueue('estudiante', 'findOne', { id });
+  findOne(@Param('id') id: number, @Headers('x-callback-url') callbackUrl?: string) {
+    return this.tareas.enqueue('estudiante', 'findOne', { id }, callbackUrl);
   }
 
   @Patch(':id')
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false,
-  })
-  update(@Param('id') id: number, @Body() updateEstudianteDto: UpdateEstudianteDto) {
+  update(@Param('id') id: number, @Body() updateEstudianteDto: UpdateEstudianteDto, @Headers('x-callback-url') callbackUrl?: string) {
     const jobId = generateJobId('estudiante', 'update', { id, ...updateEstudianteDto });
     return this.tareas.enqueue(
       'estudiante',
       'update',
       { id, ...updateEstudianteDto },
+      callbackUrl,
       jobId,
     );
   }
 
   @Delete(':id')
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false,
-  })
-  remove(@Param('id') id: number) {
+  remove(@Param('id') id: number, @Headers('x-callback-url') callbackUrl?: string) {
     const jobId = generateJobId('estudiante', 'remove', { id });
     return this.tareas.enqueue(
       'estudiante',
       'remove',
       { id },
+      callbackUrl,
       jobId,
     );
   }
