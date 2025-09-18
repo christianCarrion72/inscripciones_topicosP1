@@ -7,6 +7,7 @@ import { createBullBoard } from '@bull-board/api';
 import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
 import { ExpressAdapter } from '@bull-board/express';
 import { Queue } from 'bullmq';
+import { RequestCounterMiddleware } from './req-contador/request-counter.middleware';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -55,6 +56,9 @@ async function bootstrap() {
   });
 
   app.use('/admin/queues', serverAdapter.getRouter());
+
+  // Middleware para contar las solicitudes
+  app.use(new RequestCounterMiddleware().use);
 
   const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
   await app.listen(port);

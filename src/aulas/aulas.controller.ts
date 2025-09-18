@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Headers } from '@nestjs/common';
 import { AulasService } from './aulas.service';
 import { CreateAulaDto } from './dto/create-aula.dto';
 import { UpdateAulaDto } from './dto/update-aula.dto';
@@ -24,26 +24,28 @@ export class AulasController {
     required: false,
   })
   @ApiOperation({ summary: 'Crear aula (asíncrono)' })
-  create(@Body() createAulaDto: CreateAulaDto) {
+  create(@Body() createAulaDto: CreateAulaDto, @Headers('x-callback-url') callbackUrl?: string) {
     const jobId = generateJobId('aula', 'create', createAulaDto);
+  
     return this.tareas.enqueue(
-      'aula',
-      'create',
-      createAulaDto,
-      jobId,
+      'aula',           // entity
+      'create',         // type
+      createAulaDto,    // data
+      callbackUrl,      // callbackUrl
+      jobId             // jobId
     );
   }
 
   @Get()
   @ApiOperation({ summary: 'Obtener todas las aulas (asíncrono)' })
-  findAll() {
-    return this.tareas.enqueue('aula', 'findAll');
+  findAll(@Headers('x-callback-url') callbackUrl?: string) {
+    return this.tareas.enqueue('aula', 'findAll',{}, callbackUrl);
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Obtener un aula por ID (asíncrono)' })
-  findOne(@Param('id') id: number) {
-    return this.tareas.enqueue('aula', 'findOne', { id });
+  findOne(@Param('id') id: number,@Headers('x-callback-url') callbackUrl?: string) {
+    return this.tareas.enqueue('aula', 'findOne', { id }, callbackUrl);
   }
 
   @Patch(':id')
@@ -53,12 +55,13 @@ export class AulasController {
     required: false,
   })
   @ApiOperation({ summary: 'Actualizar aula (asíncrono)' })
-  update(@Param('id') id: number, @Body() updateAulaDto: UpdateAulaDto) {
+  update(@Param('id',) id: number, @Body() updateAulaDto: UpdateAulaDto,@Headers('x-callback-url') callbackUrl?: string) {
     const jobId = generateJobId('aula', 'update', { id, ...updateAulaDto });
     return this.tareas.enqueue(
       'aula',
       'update',
       { id, ...updateAulaDto },
+      callbackUrl,
       jobId,
     );
   }
@@ -70,12 +73,13 @@ export class AulasController {
     required: false,
   })
   @ApiOperation({ summary: 'Eliminar aula (asíncrono)' })
-  remove(@Param('id') id: number) {
+  remove(@Param('id') id: number,@Headers('x-callback-url') callbackUrl?: string) {
     const jobId = generateJobId('aula', 'remove', { id });
     return this.tareas.enqueue(
       'aula',
       'remove',
       { id },
+      callbackUrl,
       jobId,
     );
   }

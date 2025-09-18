@@ -25,6 +25,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { SeedsModule } from './seeds/seeds.module';
 import { BullModule } from '@nestjs/bullmq';
+import { StatsController } from './req-contador/stats.controller';
 
 @Module({
   imports: [
@@ -86,7 +87,7 @@ import { BullModule } from '@nestjs/bullmq';
     AuthModule,
     SeedsModule,
   ],
-  controllers: [],
+  controllers: [StatsController],
   providers: [],
 })
 export class AppModule {}
