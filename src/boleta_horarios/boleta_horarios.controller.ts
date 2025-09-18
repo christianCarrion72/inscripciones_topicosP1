@@ -23,9 +23,9 @@ export class BoletaHorariosController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
-  async create(@Body() createBoletaHorarioDto: CreateBoletaHorarioDto) {
+  create(@Body() createBoletaHorarioDto: CreateBoletaHorarioDto) {
     const jobId = generateJobId('boleta_horario', 'create', createBoletaHorarioDto);
-    return await this.tareas.enqueue(
+    return this.tareas.enqueue(
       'boleta_horario',
       'create',
       createBoletaHorarioDto,
@@ -34,13 +34,13 @@ export class BoletaHorariosController {
   }
 
   @Get()
-  async findAll() {
-    return await this.tareas.enqueueAndWait('boleta_horario', 'findAll');
+  findAll() {
+    return this.tareas.enqueue('boleta_horario', 'findAll');
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: number) {
-    return await this.tareas.enqueueAndWait('boleta_horario', 'findOne', { id });
+  findOne(@Param('id') id: number) {
+    return this.tareas.enqueue('boleta_horario', 'findOne', { id });
   }
 
   @Patch(':id')
@@ -49,9 +49,9 @@ export class BoletaHorariosController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
-  async update(@Param('id') id: number, @Body() updateBoletaHorarioDto: UpdateBoletaHorarioDto) {
+  update(@Param('id') id: number, @Body() updateBoletaHorarioDto: UpdateBoletaHorarioDto) {
     const jobId = generateJobId('boleta_horario', 'update', { id, ...updateBoletaHorarioDto });
-    return await this.tareas.enqueue(
+    return this.tareas.enqueue(
       'boleta_horario',
       'update',
       { id, ...updateBoletaHorarioDto },
@@ -65,9 +65,9 @@ export class BoletaHorariosController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false,
   })
-  async remove(@Param('id') id: number) {
+  remove(@Param('id') id: number) {
     const jobId = generateJobId('boleta_horario', 'remove', { id });
-    return await this.tareas.enqueue(
+    return this.tareas.enqueue(
       'boleta_horario',
       'remove',
       { id },

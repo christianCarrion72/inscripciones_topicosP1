@@ -55,7 +55,7 @@ export class TareasProducer implements OnModuleInit, OnModuleDestroy {
     timeout?: number,
     jobId?: string,
   ): Promise<any> {
-    const timeoutMs = timeout ?? 10000;
+    const timeoutMs = timeout ?? 15000;
     const id = jobId ?? randomUUID();
     const name = `${entity}.${type}`;
     

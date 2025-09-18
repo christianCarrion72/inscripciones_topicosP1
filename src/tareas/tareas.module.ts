@@ -54,22 +54,23 @@ import { TareasService } from './tareas.service';
 
 @Module({
   imports: [
-    ConfigModule, BullModule.registerQueue({ 
+    ConfigModule,
+    BullModule.registerQueue({
       name: QUEUE,
       connection: {
         host: process.env.REDIS_HOST ?? '127.0.0.1',
-        port: +(process.env.REDIS_PORT ?? 6379),
+        port: Number(process.env.REDIS_PORT ?? 6379),
+        family: 4,                // IPv4
+        connectTimeout: 10_000,
+        keepAlive: 1,
       },
       defaultJobOptions: {
-        removeOnComplete: 100, // Mantener los últimos 100 trabajos completados
-        removeOnFail: 50, // Mantener los últimos 50 trabajos fallidos
-        attempts: 3, // Reintentar hasta 3 veces
-        backoff: {
-          type: 'exponential', // Backoff exponencial
-          delay: 2000, // Empezar con 2 segundos
-        },
+        removeOnComplete: 100,
+        removeOnFail: 50,
+        attempts: 1,
+        backoff: { type: 'exponential', delay: 2000 },
       },
-     }), 
+    }), 
     forwardRef(() => CarrerasModule),
     forwardRef(() => DiasModule),
     forwardRef(() => AulasModule),

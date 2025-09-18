@@ -24,9 +24,9 @@ export class AulasController {
     required: false,
   })
   @ApiOperation({ summary: 'Crear aula (asíncrono)' })
-  async create(@Body() createAulaDto: CreateAulaDto) {
+  create(@Body() createAulaDto: CreateAulaDto) {
     const jobId = generateJobId('aula', 'create', createAulaDto);
-    return await this.tareas.enqueue(
+    return this.tareas.enqueue(
       'aula',
       'create',
       createAulaDto,
@@ -36,14 +36,14 @@ export class AulasController {
 
   @Get()
   @ApiOperation({ summary: 'Obtener todas las aulas (asíncrono)' })
-  async findAll() {
-    return await this.tareas.enqueueAndWait('aula', 'findAll');
+  findAll() {
+    return this.tareas.enqueue('aula', 'findAll');
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Obtener un aula por ID (asíncrono)' })
-  async findOne(@Param('id') id: number) {
-    return await this.tareas.enqueueAndWait('aula', 'findOne', { id });
+  findOne(@Param('id') id: number) {
+    return this.tareas.enqueue('aula', 'findOne', { id });
   }
 
   @Patch(':id')
@@ -53,9 +53,9 @@ export class AulasController {
     required: false,
   })
   @ApiOperation({ summary: 'Actualizar aula (asíncrono)' })
-  async update(@Param('id') id: number, @Body() updateAulaDto: UpdateAulaDto) {
+  update(@Param('id') id: number, @Body() updateAulaDto: UpdateAulaDto) {
     const jobId = generateJobId('aula', 'update', { id, ...updateAulaDto });
-    return await this.tareas.enqueue(
+    return this.tareas.enqueue(
       'aula',
       'update',
       { id, ...updateAulaDto },
@@ -70,9 +70,9 @@ export class AulasController {
     required: false,
   })
   @ApiOperation({ summary: 'Eliminar aula (asíncrono)' })
-  async remove(@Param('id') id: number) {
+  remove(@Param('id') id: number) {
     const jobId = generateJobId('aula', 'remove', { id });
-    return await this.tareas.enqueue(
+    return this.tareas.enqueue(
       'aula',
       'remove',
       { id },

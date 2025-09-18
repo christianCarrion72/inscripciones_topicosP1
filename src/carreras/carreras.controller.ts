@@ -17,9 +17,9 @@ export class CarrerasController {
 
   @Post()
   @ApiOperation({ summary: 'Crear carrera (asíncrono)' })
-  async create(@Body() createCarreraDto: CreateCarreraDto) {
+  create(@Body() createCarreraDto: CreateCarreraDto) {
     const jobId = generateJobId('carrera', 'create', createCarreraDto);
-    return await this.tareas.enqueue(
+    return this.tareas.enqueue(
       'carrera',
       'create',
       createCarreraDto,
@@ -29,21 +29,21 @@ export class CarrerasController {
 
   @Get()
   @ApiOperation({ summary: 'Obtener todas las carreras (asíncrono)' })
-  async findAll() {
-    return await this.tareas.enqueueAndWait('carrera', 'findAll');
+  findAll() {
+    return this.tareas.enqueue('carrera', 'findAll');
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Obtener una carrera por ID (asíncrono)' })
-  async findOne(@Param('id') id: number) {
-    return await this.tareas.enqueueAndWait('carrera', 'findOne', { id });
+  findOne(@Param('id') id: number) {
+    return this.tareas.enqueue('carrera', 'findOne', { id });
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Actualizar carrera (asíncrono)' })
-  async update(@Param('id') id: number, @Body() updateCarreraDto: UpdateCarreraDto) {
+  update(@Param('id') id: number, @Body() updateCarreraDto: UpdateCarreraDto) {
     const jobId = generateJobId('carrera', 'update', { id, ...updateCarreraDto });
-    return await this.tareas.enqueue(
+    return this.tareas.enqueue(
       'carrera',
       'update',
       { id, ...updateCarreraDto },
@@ -53,9 +53,9 @@ export class CarrerasController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Eliminar carrera (asíncrono)' })
-  async remove(@Param('id') id: number) {
+  remove(@Param('id') id: number) {
     const jobId = generateJobId('carrera', 'remove', { id });
-    return await this.tareas.enqueue(
+    return this.tareas.enqueue(
       'carrera',
       'remove',
       { id },

@@ -20,9 +20,9 @@ export class DiasController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false, // <--- importante
   })
-  async create(@Body() createDiaDto: CreateDiaDto) {
+  create(@Body() createDiaDto: CreateDiaDto) {
     const jobId = generateJobId('dia', 'create', createDiaDto);
-    return await this.tareas.enqueue(
+    return this.tareas.enqueue(
       'dia',       // entidad
       'create',        // operación CRUD
       createDiaDto,             // datos del DTO
@@ -31,13 +31,13 @@ export class DiasController {
   }
 
   @Get()
-  async findAll() {
-    return await this.tareas.enqueue('dia', 'findAll');
+  findAll() {
+    return this.tareas.enqueue('dia', 'findAll');
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: number) {
-    return await this.tareas.enqueue('dia', 'findOne', { id });
+  findOne(@Param('id') id: number) {
+    return this.tareas.enqueue('dia', 'findOne', { id });
   }
 
   @Patch(':id')
@@ -46,9 +46,9 @@ export class DiasController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false, // <--- importante
   })
-  async update(@Param('id') id: number, @Body() updateDiaDto: UpdateDiaDto) {
+  update(@Param('id') id: number, @Body() updateDiaDto: UpdateDiaDto) {
     const jobId = generateJobId('dia', 'update', { id, ...updateDiaDto });
-    return await this.tareas.enqueue(
+    return this.tareas.enqueue(
       'dia',
       'update',
       { id, ...updateDiaDto },
@@ -62,9 +62,9 @@ export class DiasController {
     description: 'Idempotency key opcional para evitar duplicados',
     required: false, // <--- importante
   })
-  async remove(@Param('id') id: number) {
+  remove(@Param('id') id: number) {
     const jobId = generateJobId('dia', 'remove', { id });
-    return await this.tareas.enqueue(
+    return this.tareas.enqueue(
       'dia',
       'remove',
       { id },

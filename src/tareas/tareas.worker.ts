@@ -3,8 +3,15 @@ import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Job } from 'bullmq';
 import { Logger, Inject } from '@nestjs/common';
 import { TaskData } from './tareas.types';
+import { QUEUE } from './tareas.constants';
 
-@Processor('tareas')
+@Processor(QUEUE, { 
+  concurrency: 10,              
+  limiter: {
+    max: 50,                   
+    duration: 1000,
+  },
+})
 export class TareasWorker extends WorkerHost {
   private readonly logger = new Logger(TareasWorker.name);
 
