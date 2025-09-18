@@ -4,7 +4,7 @@ import { RequestCounterMiddleware } from './request-counter.middleware';
 import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('peticiones')
-@Controller('api/stats')
+@Controller('stats')
 export class StatsController {
   @Get('requests')
   getRequestsCount() {

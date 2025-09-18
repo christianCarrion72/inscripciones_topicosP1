@@ -7,7 +7,10 @@ export class RequestCounterMiddleware implements NestMiddleware {
   private static counter = 0; // Contador estático para que sea global
 
   use(req: Request, res: Response, next: NextFunction) {
-    RequestCounterMiddleware.counter++;
+    // Ignorar el endpoint de stats
+    if (!req.path.startsWith('/api/stats')) {
+      RequestCounterMiddleware.counter++;
+    }
     next();
   }
 
