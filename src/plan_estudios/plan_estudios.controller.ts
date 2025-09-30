@@ -35,12 +35,12 @@ export class PlanEstudiosController {
 
   @Get()
   async findAll() {
-    return await this.tareas.enqueueAndWait('plan_estudio', 'findAll');
+    return await this.tareas.enqueue('plan_estudio', 'findAll');
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    return await this.tareas.enqueueAndWait('plan_estudio', 'findOne', { id });
+    return await this.tareas.enqueue('plan_estudio', 'findOne', { id });
   }
 
   @Patch(':id')

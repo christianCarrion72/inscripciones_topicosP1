@@ -35,12 +35,12 @@ export class GestionsController {
 
   @Get()
   async findAll() {
-    return await this.tareas.enqueueAndWait('gestion', 'findAll');
+    return await this.tareas.enqueue('gestion', 'findAll');
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    return await this.tareas.enqueueAndWait('gestion', 'findOne', { id });
+    return await this.tareas.enqueue('gestion', 'findOne', { id });
   }
 
   @Patch(':id')

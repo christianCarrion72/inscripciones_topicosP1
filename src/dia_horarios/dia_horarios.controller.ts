@@ -35,12 +35,12 @@ export class DiaHorariosController {
 
   @Get()
   async findAll() {
-    return await this.tareas.enqueueAndWait('dia_horario', 'findAll');
+    return await this.tareas.enqueue('dia_horario', 'findAll');
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    return await this.tareas.enqueueAndWait('dia_horario', 'findOne', { id });
+    return await this.tareas.enqueue('dia_horario', 'findOne', { id });
   }
 
   @Patch(':id')

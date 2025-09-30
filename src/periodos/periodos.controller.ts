@@ -35,12 +35,12 @@ export class PeriodosController {
 
   @Get()
   async findAll() {
-    return await this.tareas.enqueueAndWait('periodo', 'findAll');
+    return await this.tareas.enqueue('periodo', 'findAll');
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    return await this.tareas.enqueueAndWait('periodo', 'findOne', { id });
+    return await this.tareas.enqueue('periodo', 'findOne', { id });
   }
 
   @Patch(':id')

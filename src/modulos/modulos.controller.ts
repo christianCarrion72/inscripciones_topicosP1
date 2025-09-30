@@ -35,12 +35,12 @@ export class ModulosController {
 
   @Get()
   async findAll() {
-    return await this.tareas.enqueueAndWait('modulo', 'findAll');
+    return await this.tareas.enqueue('modulo', 'findAll');
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    return await this.tareas.enqueueAndWait('modulo', 'findOne', { id });
+    return await this.tareas.enqueue('modulo', 'findOne', { id });
   }
 
   @Patch(':id')

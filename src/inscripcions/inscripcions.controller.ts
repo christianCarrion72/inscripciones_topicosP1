@@ -35,12 +35,12 @@ export class InscripcionsController {
 
   @Get()
   async findAll() {
-    return await this.tareas.enqueueAndWait('inscripcion', 'findAll');
+    return await this.tareas.enqueue('inscripcion', 'findAll');
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    return await this.tareas.enqueueAndWait('inscripcion', 'findOne', { id });
+    return await this.tareas.enqueue('inscripcion', 'findOne', { id });
   }
 
   @Patch(':id')

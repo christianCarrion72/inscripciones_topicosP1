@@ -35,12 +35,12 @@ export class PrerequisitosController {
 
   @Get()
   async findAll() {
-    return await this.tareas.enqueueAndWait('prerequisito', 'findAll');
+    return await this.tareas.enqueue('prerequisito', 'findAll');
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    return await this.tareas.enqueueAndWait('prerequisito', 'findOne', { id });
+    return await this.tareas.enqueue('prerequisito', 'findOne', { id });
   }
 
   @Patch(':id')

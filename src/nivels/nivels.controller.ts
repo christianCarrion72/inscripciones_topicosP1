@@ -35,12 +35,12 @@ export class NivelsController {
 
   @Get()
   async findAll() {
-    return await this.tareas.enqueueAndWait('nivel', 'findAll');
+    return await this.tareas.enqueue('nivel', 'findAll');
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    return await this.tareas.enqueueAndWait('nivel', 'findOne', { id });
+    return await this.tareas.enqueue('nivel', 'findOne', { id });
   }
 
   @Patch(':id')

@@ -35,12 +35,12 @@ export class HorariosController {
 
   @Get()
   async findAll() {
-    return await this.tareas.enqueueAndWait('horario', 'findAll');
+    return await this.tareas.enqueue('horario', 'findAll');
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    return await this.tareas.enqueueAndWait('horario', 'findOne', { id });
+    return await this.tareas.enqueue('horario', 'findOne', { id });
   }
 
   @Patch(':id')

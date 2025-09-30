@@ -35,12 +35,12 @@ export class GruposController {
 
   @Get()
   async findAll() {
-    return await this.tareas.enqueueAndWait('grupo', 'findAll');
+    return await this.tareas.enqueue('grupo', 'findAll');
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    return await this.tareas.enqueueAndWait('grupo', 'findOne', { id });
+    return await this.tareas.enqueue('grupo', 'findOne', { id });
   }
 
   @Patch(':id')

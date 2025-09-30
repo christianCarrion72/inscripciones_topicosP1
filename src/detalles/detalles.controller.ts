@@ -35,12 +35,12 @@ export class DetallesController {
 
   @Get()
   async findAll() {
-    return await this.tareas.enqueueAndWait('detalle', 'findAll');
+    return await this.tareas.enqueue('detalle', 'findAll');
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    return await this.tareas.enqueueAndWait('detalle', 'findOne', { id });
+    return await this.tareas.enqueue('detalle', 'findOne', { id });
   }
 
   @Patch(':id')

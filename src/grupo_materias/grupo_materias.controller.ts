@@ -35,12 +35,12 @@ export class GrupoMateriasController {
 
   @Get()
   async findAll() {
-    return await this.tareas.enqueueAndWait('grupo_materia', 'findAll');
+    return await this.tareas.enqueue('grupo_materia', 'findAll');
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    return await this.tareas.enqueueAndWait('grupo_materia', 'findOne', { id });
+    return await this.tareas.enqueue('grupo_materia', 'findOne', { id });
   }
 
   @Patch(':id')

@@ -35,12 +35,12 @@ export class MateriasController {
 
   @Get()
   async findAll() {
-    return await this.tareas.enqueueAndWait('materia', 'findAll');
+    return await this.tareas.enqueue('materia', 'findAll');
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    return await this.tareas.enqueueAndWait('materia', 'findOne', { id });
+    return await this.tareas.enqueue('materia', 'findOne', { id });
   }
 
   @Patch(':id')

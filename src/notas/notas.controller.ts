@@ -35,12 +35,12 @@ export class NotasController {
 
   @Get()
   async findAll() {
-    return await this.tareas.enqueueAndWait('nota', 'findAll');
+    return await this.tareas.enqueue('nota', 'findAll');
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number) {
-    return await this.tareas.enqueueAndWait('nota', 'findOne', { id });
+    return await this.tareas.enqueue('nota', 'findOne', { id });
   }
 
   @Patch(':id')

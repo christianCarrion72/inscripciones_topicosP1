@@ -1,79 +1,58 @@
-import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
-import { InjectQueue } from '@nestjs/bullmq';
-import { Queue, QueueEvents, Job } from 'bullmq';
-import { randomUUID } from 'crypto';
+// src/tareas/tareas.producer.ts
+import { Injectable } from '@nestjs/common';
+import { QueueManagerService } from './queue-manager.service';
 import { TaskData, OperationType } from './tareas.types';
-import { QUEUE } from './tareas.constants';
+import { randomUUID } from 'crypto';
+import { Queue, QueueEvents } from 'bullmq';
 
 @Injectable()
-export class TareasProducer implements OnModuleInit, OnModuleDestroy {
-  private queueEvents: QueueEvents;
+export class TareasProducer {
+  constructor(private readonly queueManager: QueueManagerService) {}
 
-  constructor(@InjectQueue(QUEUE) private readonly queue: Queue) {}
-
-  async onModuleInit() {
-    // QueueEvents SOLO para waitUntilFinished
-    this.queueEvents = new QueueEvents(QUEUE, {
-      connection: this.queue.opts.connection,
-    });
-    await this.queueEvents.waitUntilReady();
-  }
-
-  async onModuleDestroy() {
-    await this.queueEvents.close();
-  }
-
-  async enqueue<T>(
-    entity: string,
-    type: OperationType,
-    data?: T,
-    callback?: string,
-    jobId?: string,
-  ) {
+  async enqueue(entity: string, type: OperationType, data?: any, callback?: string, jobId?: string) {
     const id = jobId ?? randomUUID();
-    const callbackUrl = callback ?? undefined;
-
-    const task: TaskData<T> = {
-      entity,
-      type,
-      callbackUrl,
-      data,
-    };
-
-    await this.queue.add(`${entity}.${type}`, task, { jobId: id });
-    return { 
-      mensaje: 'Procesando Tarea', 
+    const task: TaskData = { entity, type, data, callbackUrl: callback };
+    // Enqueue balanced (round-robin) by default
+    await this.queueManager.enqueueBalanced(task, { jobId: id });
+    return {
+      mensaje: 'Procesando Tarea',
       jobId: id,
-      notificationEndpoint: `/api/tareas/status/${id}` 
+      notificationEndpoint: `/api/tareas/status/${id}`,
     };
   }
 
-  async enqueueAndWait<T>(
-    entity: string,
-    type: OperationType,
-    data?: T,
-    timeout?: number,
-    jobId?: string,
-  ): Promise<any> {
-    const timeoutMs = timeout ?? 15000;
-    const id = jobId ?? randomUUID();
-    const name = `${entity}.${type}`;
-    
-
-    const task: TaskData<T> = {
-      entity,
-      type,
-      data,
-      timeout: timeoutMs,
+  async enqueueToQueue(queueName: string, entity: string, type: OperationType, data?: any, opts: any = {}) {
+    const id = opts.jobId ?? randomUUID();
+    const task: TaskData = { entity, type, data };
+    const jobName = `${entity}.${type}`;
+    const job = await this.queueManager.enqueueToQueue(queueName, jobName, task, { jobId: id, ...opts });
+    return {
+      mensaje: 'Procesando Tarea',
+      jobId: job.id,
+      queue: queueName,
     };
-
-    const job: Job = await this.queue.add(name, task, { jobId: id },);
-
-    if (!this.queueEvents) {
-      throw new Error('QueueEvents no inicializado');
-    }
-
-    //Espera hasta que el Worker lo complete/falle
-    return job.waitUntilFinished(this.queueEvents, timeoutMs);
   }
+
+  // /** enqueue and wait: waits for completion from the queue the manager chooses */
+  // async enqueueAndWait(entity: string, type: OperationType, data?: any, timeout?: number, jobId?: string) {
+  //   const id = jobId ?? randomUUID();
+  //   const task: TaskData = { entity, type, data, timeout: timeout ?? 15000 };
+  //   const queueName = this.queueManager.getNextQueueName();
+  //   const jobName = `${entity}.${type}`;
+
+  //   // add job with timeout
+  //   const job = await this.queueManager.enqueueToQueue(queueName, jobName, task, {
+  //     jobId: id,
+  //     timeout: task.timeout,
+  //   });
+
+  //   // create QueueEvents for waitUntilFinished (connected to the queue)
+  //   const queueEvents = new QueueEvents(queueName, { connection: (job.queue as unknown as any)?.opts?.connection ?? undefined });
+  //   await queueEvents.waitUntilReady();
+  //   try {
+  //     return await job.waitUntilFinished(queueEvents, task.timeout);
+  //   } finally {
+  //     await queueEvents.close();
+  //   }
+  // }
 }

@@ -3,11 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { BullModule } from '@nestjs/bullmq';
 import { QUEUE } from './tareas.constants';
 import { TareasProducer } from './tareas.producer';
-import { TareasWorker } from './tareas.worker';
-import { TareasQueueService } from './tareas-queue.service';
-import { TareasQueueController } from './tareas-queue.controller';
-import { TareasTestService } from './tareas-test.service';
-import { TareasTestController } from './tareas-test.controller';
+// import { TareasWorker } from './tareas.worker';
 //import { TareasStatusController } from './tareas-status.controller';
 import { CarrerasModule } from '../carreras/carreras.module';
 import { DiasModule } from '../dias/dias.module';
@@ -49,28 +45,15 @@ import { NotasService } from 'src/notas/notas.service';
 import { PeriodosService } from 'src/periodos/periodos.service';
 import { PlanEstudiosService } from 'src/plan_estudios/plan_estudios.service';
 import { PrerequisitosService } from 'src/prerequisitos/prerequisitos.service';
-import { TareasEvents } from './tareas.events';
-import { TareasService } from './tareas.service';
+// import { TareasEvents } from './tareas.events';
+// import { TareasService } from './tareas.service';
+import { JobProcessor } from './job-processor';
+import { QueueManagerService } from './queue-manager.service';
+import { QueueManagerController } from './queue-manager.controller';
 
 @Module({
   imports: [
     ConfigModule,
-    BullModule.registerQueue({
-      name: QUEUE,
-      connection: {
-        host: process.env.REDIS_HOST ?? '127.0.0.1',
-        port: Number(process.env.REDIS_PORT ?? 6379),
-        family: 4,                // IPv4
-        connectTimeout: 10_000,
-        keepAlive: 1,
-      },
-      defaultJobOptions: {
-        removeOnComplete: 100,
-        removeOnFail: 50,
-        attempts: 1,
-        backoff: { type: 'exponential', delay: 2000 },
-      },
-    }), 
     forwardRef(() => CarrerasModule),
     forwardRef(() => DiasModule),
     forwardRef(() => AulasModule),
@@ -93,12 +76,12 @@ import { TareasService } from './tareas.service';
     forwardRef(() => PrerequisitosModule),
     ],
   providers: [
-    TareasWorker,
+    // TareasWorker,
     TareasProducer,
-    TareasQueueService,
-    TareasTestService,
-    TareasEvents,
-    TareasService,
+    // TareasEvents,
+    // TareasService,
+    JobProcessor,
+    QueueManagerService,
     {
       provide: 'ENTITY_SERVICES',
       useFactory: (
@@ -168,7 +151,7 @@ import { TareasService } from './tareas.service';
       ],
     },
   ],
-  controllers: [TareasQueueController, TareasTestController],
-  exports: [TareasProducer, TareasQueueService, TareasTestService, TareasModule],
+  controllers: [QueueManagerController],
+  exports: [TareasProducer, TareasModule, QueueManagerService],
 })
 export class TareasModule {}

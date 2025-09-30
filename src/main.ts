@@ -8,6 +8,7 @@ import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
 import { ExpressAdapter } from '@bull-board/express';
 import { Queue } from 'bullmq';
 import { RequestCounterMiddleware } from './req-contador/request-counter.middleware';
+import { QueueManagerService } from './tareas/queue-manager.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -47,11 +48,15 @@ async function bootstrap() {
   const serverAdapter = new ExpressAdapter();
   serverAdapter.setBasePath('/admin/queues');
 
-  // obtener la cola bullmq
-  const tareasQueue = app.get<Queue>('BullQueue_tareas'); 
+  // obtenemos QueueManagerService
+  const queueManager = app.get(QueueManagerService);
+
+  // recuperamos todas las colas registradas
+  const allQueues = queueManager.getAllQueues(); // implementa getAllQueues() en QueueManagerService
+  const adapters = allQueues.map(queue => new BullMQAdapter(queue));
 
   createBullBoard({
-    queues: [new BullMQAdapter(tareasQueue)],
+    queues: adapters,
     serverAdapter,
   });
 
