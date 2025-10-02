@@ -18,9 +18,9 @@ export class QueueManagerController {
     return this.manager.removeQueue(name, { waitForDrain: true });
   }
 
-  @Post(':name/workers')
-  async addWorker(@Param('name') name: string, @Body() dto: CreateWorkerDto) {
-    return this.manager.addWorker(name, { concurrency: dto.concurrency });
+  @Post(':name/:concurrency/workers')
+  async addWorker(@Param('name') name: string,@Param('concurrency') concurrency: number) {
+    return this.manager.addWorker(name, concurrency);
   }
 
   @Delete(':name/workers/:id')
@@ -30,6 +30,6 @@ export class QueueManagerController {
 
   @Get()
   list() {
-    return this.manager.getAllQueues();
+    return this.manager.listQueues();
   }
 }

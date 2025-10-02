@@ -47,20 +47,24 @@ async function bootstrap() {
 
   const serverAdapter = new ExpressAdapter();
   serverAdapter.setBasePath('/admin/queues');
-
-  // obtenemos QueueManagerService
+  
   const queueManager = app.get(QueueManagerService);
-
-  // recuperamos todas las colas registradas
-  const allQueues = queueManager.getAllQueues(); // implementa getAllQueues() en QueueManagerService
-  const adapters = allQueues.map(queue => new BullMQAdapter(queue));
-
-  createBullBoard({
+  
+  // Inicializamos con las colas existentes (puede estar vacío al principio)
+  let adapters = queueManager.getAllQueues().map(queue => new BullMQAdapter(queue));
+  
+  const { replaceQueues } = createBullBoard({
     queues: adapters,
     serverAdapter,
   });
-
+  
   app.use('/admin/queues', serverAdapter.getRouter());
+  
+  // 🔄 Hook: cada vez que quieras refrescar el dashboard
+  queueManager['onQueuesChanged'] = () => {
+    const adapters = queueManager.getAllQueues().map(queue => new BullMQAdapter(queue));
+    replaceQueues(adapters);
+  };
 
   // Middleware para contar las solicitudes
   app.use(new RequestCounterMiddleware().use);

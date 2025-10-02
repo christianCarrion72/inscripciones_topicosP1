@@ -17,12 +17,6 @@ export class JobProcessor {
     const jobIdStr = String(job.id ?? '');
     this.logger.debug(`🚀 Procesando ${entity}.${type} id=${jobIdStr}`);
 
-    // Simulación de timeout para pruebas (mantenido si quieres)
-    if (jobIdStr.startsWith('test-timeout')) {
-      this.logger.warn(`Simulando timeout para el job ${jobIdStr}`);
-      await new Promise((res) => setTimeout(res, 15_000));
-    }
-
     const service = this.entityServices[entity];
     if (!service) {
       const msg = `Entidad no soportada: ${entity}`;

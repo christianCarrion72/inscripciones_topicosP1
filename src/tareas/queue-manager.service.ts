@@ -25,11 +25,9 @@ interface ManagedWorker {
 @Injectable()
 export class QueueManagerService implements OnModuleDestroy {
   private readonly logger = new Logger(QueueManagerService.name);
+  onQueuesChanged?: () => void;
 
-  // Map: queueName -> Queue
   private queues = new Map<string, Queue>();
-
-  // Map: queueName -> ManagedWorker[]
   private workers = new Map<string, ManagedWorker[]>();
 
   // For simple round-robin dispatcher
@@ -38,7 +36,6 @@ export class QueueManagerService implements OnModuleDestroy {
 
   constructor(private readonly jobProcessor: JobProcessor) {}
 
-  /** Create a queue and attach a default worker (1 worker) */
   async createQueue(name: string, createDefaultWorker = true) {
     if (this.queues.has(name)) throw new Error(`Queue ${name} ya existe`);
     const queue = new Queue(name, { connection: defaultRedisConn });
@@ -46,16 +43,17 @@ export class QueueManagerService implements OnModuleDestroy {
     this.workers.set(name, []);
     this.queueNames.push(name);
 
-    this.logger.log(`🆕 Queue creada: ${name}`);
+    this.onQueuesChanged?.();
+
+    this.logger.log(`Queue creada: ${name}`);
 
     if (createDefaultWorker) {
-      await this.addWorker(name);
+      await this.addWorker(name,10);
     }
 
     return { message: `Queue ${name} creada` };
   }
 
-  /** Remove a queue safely. If waitForDrain true, esperará hasta que no queden pending jobs (up to timeoutMs) */
   async removeQueue(name: string, { waitForDrain = true, timeoutMs = 30_000 } = {}) {
     const queue = this.queues.get(name);
     if (!queue) throw new Error(`Queue ${name} no existe`);
@@ -99,15 +97,14 @@ export class QueueManagerService implements OnModuleDestroy {
     this.workers.delete(name);
     this.queueNames = this.queueNames.filter((q) => q !== name);
 
-    this.logger.log(`🗑️ Queue eliminada: ${name}`);
+    this.onQueuesChanged?.();
+    this.logger.log(`Queue eliminada: ${name}`);
     return { message: `Queue ${name} eliminada` };
   }
 
-  /** Add a worker to a queue. Returns worker id */
-  async addWorker(queueName: string, opts: { concurrency?: number } = {}) {
+  async addWorker(queueName: string, concurrency = 10) {
     const queue = this.queues.get(queueName);
     if (!queue) throw new Error(`Queue ${queueName} no existe`);
-    const concurrency = opts.concurrency ?? 1;
     const id = randomUUID();
 
     const queueEvents = new QueueEvents(queueName, { connection: defaultRedisConn });
@@ -116,7 +113,6 @@ export class QueueManagerService implements OnModuleDestroy {
     const worker = new Worker<TaskData>(
       queueName,
       async (job: Job<TaskData>) => {
-        // usa JobProcessor para procesar
         return this.jobProcessor.process(job);
       },
       {
@@ -135,7 +131,7 @@ export class QueueManagerService implements OnModuleDestroy {
     arr.push(managed);
     this.workers.set(queueName, arr);
 
-    this.logger.log(`➕ Worker ${id} creado para queue ${queueName} (concurrency=${concurrency})`);
+    this.logger.log(`Worker ${id} creado para queue ${queueName} (concurrency=${concurrency})`);
     return { workerId: id };
   }
 
@@ -150,7 +146,7 @@ export class QueueManagerService implements OnModuleDestroy {
     try {
       await managed.worker.close(); // espera a terminar el job activo
       await managed.queueEvents.close();
-      this.logger.log(`🛑 Worker ${workerId} cerrado y removido de ${queueName}`);
+      this.logger.log(`Worker ${workerId} cerrado y removido de ${queueName}`);
     } catch (e) {
       this.logger.warn(`Error cerrando worker ${workerId}: ${String((e as Error).message)}`);
     }
@@ -180,7 +176,6 @@ export class QueueManagerService implements OnModuleDestroy {
     return this.enqueueToQueue(queueName, jobName, data, opts);
   }
 
-  /** Info helpers */
   listQueues() {
     return Array.from(this.queues.keys()).map((name) => ({
       name,

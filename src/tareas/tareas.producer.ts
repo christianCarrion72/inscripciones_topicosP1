@@ -33,26 +33,4 @@ export class TareasProducer {
     };
   }
 
-  // /** enqueue and wait: waits for completion from the queue the manager chooses */
-  // async enqueueAndWait(entity: string, type: OperationType, data?: any, timeout?: number, jobId?: string) {
-  //   const id = jobId ?? randomUUID();
-  //   const task: TaskData = { entity, type, data, timeout: timeout ?? 15000 };
-  //   const queueName = this.queueManager.getNextQueueName();
-  //   const jobName = `${entity}.${type}`;
-
-  //   // add job with timeout
-  //   const job = await this.queueManager.enqueueToQueue(queueName, jobName, task, {
-  //     jobId: id,
-  //     timeout: task.timeout,
-  //   });
-
-  //   // create QueueEvents for waitUntilFinished (connected to the queue)
-  //   const queueEvents = new QueueEvents(queueName, { connection: (job.queue as unknown as any)?.opts?.connection ?? undefined });
-  //   await queueEvents.waitUntilReady();
-  //   try {
-  //     return await job.waitUntilFinished(queueEvents, task.timeout);
-  //   } finally {
-  //     await queueEvents.close();
-  //   }
-  // }
 }
