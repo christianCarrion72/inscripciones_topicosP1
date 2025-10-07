@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Logger } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { ApiBearerAuth, ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { InscripcionsService } from './inscripcions.service';
@@ -12,6 +12,7 @@ import { generateJobId } from 'src/common/utils/idempotency.util';
 @UseGuards(AuthGuard)
 @Controller('inscripcions')
 export class InscripcionsController {
+  private readonly logger = new Logger(InscripcionsController.name);
   constructor(
     private readonly inscripcionsService: InscripcionsService,
     private readonly tareas: TareasProducer
@@ -62,6 +63,7 @@ export class InscripcionsController {
  
   @Post('request-seat')
   async requestSeat(@Body() createInscripcionDto: CreateInscripcionDto) {
+    this.logger.debug('Error reservando cupos', createInscripcionDto);
     const jobId = generateJobId('inscripcion', 'requestSeat', createInscripcionDto);
     return await this.tareas.enqueue(
       'inscripcion',

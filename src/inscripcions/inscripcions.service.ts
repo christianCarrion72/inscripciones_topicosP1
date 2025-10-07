@@ -103,7 +103,10 @@ export class InscripcionsService {
             if(gruposReservados.length>0){
               await grupoRepo.increment({id: In(gruposReservados)}, 'cupos', 1);
             }
-            throw new BadRequestException('El grupo ${grupoId} no tiene cupos');
+            return {
+              status: 'REJECTED',
+              reason: 'Sin cupos'
+            };
           }
 
           gruposReservados.push(grupoId);
