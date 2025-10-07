@@ -18,11 +18,6 @@ export class InscripcionsController {
   ) {}
 
   @Post()
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false,
-  })
   async create(@Body() createInscripcionDto: CreateInscripcionDto) {
     const jobId = generateJobId('inscripcion', 'create', createInscripcionDto);
     return await this.tareas.enqueue(
@@ -44,11 +39,6 @@ export class InscripcionsController {
   }
 
   @Patch(':id')
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false,
-  })
   async update(@Param('id') id: number, @Body() updateInscripcionDto: UpdateInscripcionDto) {
     const jobId = generateJobId('inscripcion', 'update', { id, ...updateInscripcionDto });
     return await this.tareas.enqueue(
@@ -60,11 +50,6 @@ export class InscripcionsController {
   }
 
   @Delete(':id')
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false,
-  })
   async remove(@Param('id') id: number) {
     const jobId = generateJobId('inscripcion', 'remove', { id });
     return await this.tareas.enqueue(
@@ -74,35 +59,15 @@ export class InscripcionsController {
       jobId,
     );
   }
-
-  // Endpoints síncronos
-  @Post('sync')
-  @ApiOperation({ summary: 'Crear inscripcion (síncrono)' })
-  async createSync(@Body() createInscripcionDto: CreateInscripcionDto) {
-    return await this.inscripcionsService.create(createInscripcionDto);
+ 
+  @Post('request-seat')
+  async requestSeat(@Body() createInscripcionDto: CreateInscripcionDto) {
+    const jobId = generateJobId('inscripcion', 'requestSeat', createInscripcionDto);
+    return await this.tareas.enqueue(
+      'inscripcion',
+      'requestSeat',
+      createInscripcionDto,
+      jobId,
+    );
   }
-
-  @Get('sync')
-  @ApiOperation({ summary: 'Obtener todas las inscripcions (síncrono)' })
-  async findAllSync() {
-    return await this.inscripcionsService.findAll();
-  }
-
-  @Get('sync/:id')
-  @ApiOperation({ summary: 'Obtener una inscripcion por ID (síncrono)' })
-  async findOneSync(@Param('id') id: number) {
-    return await this.inscripcionsService.findOne(id);
-  }
-
-  @Patch('sync/:id')
-  @ApiOperation({ summary: 'Actualizar inscripcion (síncrono)' })
-  async updateSync(@Param('id') id: number, @Body() updateInscripcionDto: UpdateInscripcionDto) {
-    return await this.inscripcionsService.update(id, updateInscripcionDto);
-  }
-
-  @Delete('sync/:id')
-  @ApiOperation({ summary: 'Eliminar inscripcion (síncrono)' })
-  async removeSync(@Param('id') id: number) {
-    return await this.inscripcionsService.remove(id);
-  } 
 }

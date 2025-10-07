@@ -50,6 +50,8 @@ export class JobProcessor {
         return [data];
       case 'findAll':
         return [];
+      case 'requestSeat':
+        return [data];
       default:
         return [];
     }
