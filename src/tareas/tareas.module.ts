@@ -51,10 +51,12 @@ import { JobProcessor } from './job-processor';
 import { QueueManagerService } from './queue-manager.service';
 import { QueueManagerController } from './queue-manager.controller';
 import { TareasStatusController } from './tarea.controller';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   imports: [
     ConfigModule,
+    forwardRef(() => AuthModule),
     forwardRef(() => CarrerasModule),
     forwardRef(() => DiasModule),
     forwardRef(() => AulasModule),
