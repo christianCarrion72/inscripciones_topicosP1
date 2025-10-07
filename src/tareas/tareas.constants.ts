@@ -1,1 +1,1 @@
-export const QUEUE = 'tareas' as const;
+export const QUEUE = 'inscripciones' as const;

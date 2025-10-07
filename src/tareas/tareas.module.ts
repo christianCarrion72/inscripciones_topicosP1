@@ -50,6 +50,7 @@ import { PrerequisitosService } from 'src/prerequisitos/prerequisitos.service';
 import { JobProcessor } from './job-processor';
 import { QueueManagerService } from './queue-manager.service';
 import { QueueManagerController } from './queue-manager.controller';
+import { TareasStatusController } from './tarea.controller';
 
 @Module({
   imports: [
@@ -151,7 +152,7 @@ import { QueueManagerController } from './queue-manager.controller';
       ],
     },
   ],
-  controllers: [QueueManagerController],
+  controllers: [QueueManagerController,TareasStatusController],
   exports: [TareasProducer, TareasModule, QueueManagerService],
 })
 export class TareasModule {}

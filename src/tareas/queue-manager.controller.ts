@@ -1,9 +1,14 @@
 // src/tareas/queue-manager.controller.ts
-import { Controller, Post, Delete, Param, Body, Get } from '@nestjs/common';
+import { Controller, Post, Delete, Param, Body, Get, UseGuards } from '@nestjs/common';
 import { QueueManagerService } from './queue-manager.service';
 import { CreateQueueDto } from './dto/create.queue.dto';
 import { CreateWorkerDto } from './dto/create-worker.dto';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from 'src/auth/guard/auth.guard';
 
+@ApiBearerAuth()
+@UseGuards(AuthGuard)
+@ApiTags('queues')
 @Controller('queues')
 export class QueueManagerController {
   constructor(private readonly manager: QueueManagerService) {}
