@@ -15,7 +15,7 @@ export class JobProcessor {
   async process(job: Job<TaskData>): Promise<any> {
     const { entity, type, data } = job.data;
     const jobIdStr = String(job.id ?? '');
-    this.logger.debug(`🚀 Procesando ${entity}.${type} id=${jobIdStr}`);
+    //this.logger.debug(`🚀 Procesando ${entity}.${type} id=${jobIdStr}`);
 
     const service = this.entityServices[entity];
     if (!service) {

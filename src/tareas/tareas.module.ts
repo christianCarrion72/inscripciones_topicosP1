@@ -45,13 +45,13 @@ import { NotasService } from 'src/notas/notas.service';
 import { PeriodosService } from 'src/periodos/periodos.service';
 import { PlanEstudiosService } from 'src/plan_estudios/plan_estudios.service';
 import { PrerequisitosService } from 'src/prerequisitos/prerequisitos.service';
-// import { TareasEvents } from './tareas.events';
-// import { TareasService } from './tareas.service';
+import { TareasService } from './tareas.service';
 import { JobProcessor } from './job-processor';
 import { QueueManagerService } from './queue-manager.service';
 import { QueueManagerController } from './queue-manager.controller';
 import { TareasStatusController } from './tarea.controller';
 import { AuthModule } from 'src/auth/auth.module';
+import { TareasEventsManager } from './tareas.events';
 
 @Module({
   imports: [
@@ -81,8 +81,8 @@ import { AuthModule } from 'src/auth/auth.module';
   providers: [
     // TareasWorker,
     TareasProducer,
-    // TareasEvents,
-    // TareasService,
+    TareasEventsManager,
+    TareasService,
     JobProcessor,
     QueueManagerService,
     {

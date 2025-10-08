@@ -4,6 +4,7 @@ import { Queue, Worker, QueueEvents, Job } from 'bullmq';
 import { randomUUID } from 'crypto';
 import { JobProcessor } from './job-processor';
 import { TaskData } from './tareas.types';
+import { TareasEventsManager } from './tareas.events';
 
 const REDIS_HOST = process.env.REDIS_HOST ?? '127.0.0.1';
 const REDIS_PORT = Number(process.env.REDIS_PORT ?? 6379);
@@ -34,7 +35,7 @@ export class QueueManagerService implements OnModuleDestroy {
   private queueNames: string[] = [];
   private lastIndex = -1;
 
-  constructor(private readonly jobProcessor: JobProcessor) {}
+  constructor(private readonly jobProcessor: JobProcessor,private readonly eventsManager: TareasEventsManager,) {}
 
   async createQueue(name: string, createDefaultWorker = true) {
     if (this.queues.has(name)) throw new Error(`Queue ${name} ya existe`);
@@ -43,6 +44,7 @@ export class QueueManagerService implements OnModuleDestroy {
     this.workers.set(name, []);
     this.queueNames.push(name);
 
+    await this.eventsManager.registerQueueEvents(name, queue);
     this.onQueuesChanged?.();
 
     this.logger.log(`Queue creada: ${name}`);
@@ -92,6 +94,7 @@ export class QueueManagerService implements OnModuleDestroy {
     }));
 
     // 4) Cerrar y eliminar la cola
+    await this.eventsManager.unregisterQueueEvents(name);
     await queue.close();
     this.queues.delete(name);
     this.workers.delete(name);
@@ -189,6 +192,7 @@ export class QueueManagerService implements OnModuleDestroy {
 
   async onModuleDestroy() {
     // Cerrar todo al shutdown
+    await this.eventsManager.closeAll();
     for (const name of Array.from(this.queues.keys())) {
       try {
         await this.removeQueue(name, { waitForDrain: false });
