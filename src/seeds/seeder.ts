@@ -382,13 +382,28 @@ export class DatabaseSeeder {
           },
           'Prerequisitos'
         );
-        
-        prerequisitos = await this.seedEntity(
-          this.dataSource.getRepository(Prerequisito), 
-          prerequisitosMapped as any, 
-          'id',
-          'Prerequisitos'
-        );
+
+        const repo = this.dataSource.getRepository(Prerequisito);
+        const inserted: any[] = [];
+
+        for (const item of prerequisitosMapped) {
+          const exists = await repo.findOne({
+            where: {
+              idMateria: { id: (item.idMateria as any).id },
+              idPrerequisito: { id: (item.idPrerequisito as any).id },
+            },
+            relations: ['idMateria', 'idPrerequisito'],
+          });
+
+          if (!exists) {
+            const created = repo.create(item);
+            const saved = await repo.save(created);
+            inserted.push(saved);
+          } else {
+            inserted.push(exists);
+          }
+        }
+
       }
 
       // linea de consola

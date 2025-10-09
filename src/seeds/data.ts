@@ -7,17 +7,17 @@ export const seedData = {
   ],
 
   planesEstudio: [
-    { nombre: 'Plan 2020', carreraCodigo: 'SIS' },
+    { nombre: 'Plan 2025', carreraCodigo: 'SIS' },
     { nombre: 'Plan 2018', carreraCodigo: 'IND' },
     { nombre: 'Plan 2022', carreraCodigo: 'CIV' },
     { nombre: 'Plan 2019', carreraCodigo: 'ADM' },
   ],
 
   niveles: [
-    { nombre: 'Primer Nivel', planNombre: 'Plan 2020' },
-    { nombre: 'Segundo Nivel', planNombre: 'Plan 2020' },
-    { nombre: 'Tercer Nivel', planNombre: 'Plan 2020' },
-    { nombre: 'Cuarto Nivel', planNombre: 'Plan 2020' },
+    { nombre: 'Primer Nivel', planNombre: 'Plan 2025' },
+    { nombre: 'Segundo Nivel', planNombre: 'Plan 2025' },
+    { nombre: 'Tercer Nivel', planNombre: 'Plan 2025' },
+    { nombre: 'Cuarto Nivel', planNombre: 'Plan 2025' },
   ],
 
   modulos: [
@@ -51,10 +51,21 @@ export const seedData = {
   ],
 
   materias: [
-    { nombre: 'Programación I', codigo: 'SIS-101', nivelNombre: 'Primer Nivel', planNombre: 'Plan 2020' },
-    { nombre: 'Matemática I', codigo: 'SIS-102', nivelNombre: 'Primer Nivel', planNombre: 'Plan 2020' },
-    { nombre: 'Programación II', codigo: 'SIS-201', nivelNombre: 'Segundo Nivel', planNombre: 'Plan 2020' },
-    { nombre: 'Base de Datos I', codigo: 'SIS-202', nivelNombre: 'Segundo Nivel', planNombre: 'Plan 2020' },
+    // Nivel 1
+    { nombre: 'Introducción a la Programación', codigo: 'SIS-101', nivelNombre: 'Primer Nivel', planNombre: 'Plan 2025' },
+    { nombre: 'Lógica y Matemática Discreta', codigo: 'SIS-102', nivelNombre: 'Primer Nivel', planNombre: 'Plan 2025' },
+
+    // Nivel 2
+    { nombre: 'Programación Orientada a Objetos', codigo: 'SIS-201', nivelNombre: 'Segundo Nivel', planNombre: 'Plan 2025' },
+    { nombre: 'Estructuras de Datos', codigo: 'SIS-202', nivelNombre: 'Segundo Nivel', planNombre: 'Plan 2025' },
+
+    // Nivel 3
+    { nombre: 'Bases de Datos I', codigo: 'SIS-301', nivelNombre: 'Tercer Nivel', planNombre: 'Plan 2025' },
+    { nombre: 'Ingeniería de Software I', codigo: 'SIS-302', nivelNombre: 'Tercer Nivel', planNombre: 'Plan 2025' },
+
+    // Nivel 4
+    { nombre: 'Sistemas Operativos', codigo: 'SIS-401', nivelNombre: 'Cuarto Nivel', planNombre: 'Plan 2025' },
+    { nombre: 'Redes de Computadoras', codigo: 'SIS-402', nivelNombre: 'Cuarto Nivel', planNombre: 'Plan 2025' },
   ],
 
   docentes: [
@@ -64,9 +75,9 @@ export const seedData = {
   ],
 
   estudiantes: [
-    { nombre: 'Ana', ci: 9876543, registro: 2024001, telefono: 70010001, direccion: 'Zona A', tituloBachiller: 123, planNombre: 'Plan 2020' },
-    { nombre: 'Pedro', ci: 5678901, registro: 2024002, telefono: 70010002, direccion: 'Zona B', tituloBachiller: 124, planNombre: 'Plan 2020' },
-    { nombre: 'Laura', ci: 3456789, registro: 2024003, telefono: 70010003, direccion: 'Zona C', tituloBachiller: 125, planNombre: 'Plan 2018' },
+    { nombre: 'Ana', ci: 9876543, registro: 2024001, telefono: 70010001, direccion: 'Zona A', tituloBachiller: 123, planNombre: 'Plan 2025' },
+    { nombre: 'Pedro', ci: 5678901, registro: 2024002, telefono: 70010002, direccion: 'Zona B', tituloBachiller: 124, planNombre: 'Plan 2025' },
+    { nombre: 'Laura', ci: 3456789, registro: 2024003, telefono: 70010003, direccion: 'Zona C', tituloBachiller: 125, planNombre: 'Plan 2025' },
   ],
 
   gestiones: [
@@ -75,8 +86,8 @@ export const seedData = {
   ],
 
   periodos: [
-    { numero: 1, gestionNumero: 2024 },
-    { numero: 2, gestionNumero: 2024 },
+    { numero: 1, gestionNumero: 2025 },
+    { numero: 2, gestionNumero: 2025 },
   ],
 
   grupos: [
@@ -116,10 +127,17 @@ export const seedData = {
   ],
 
   prerequisitos: [
-    // Programación II requiere Programación I
+    // Nivel 2 depende del Nivel 1
     { materiaCodigo: 'SIS-201', prerequisitoCodigo: 'SIS-101' },
-    // Base de Datos I requiere Programación II 
-    { materiaCodigo: 'SIS-202', prerequisitoCodigo: 'SIS-201' },
+    { materiaCodigo: 'SIS-202', prerequisitoCodigo: 'SIS-102' },
+
+    // Nivel 3 depende del Nivel 2
+    { materiaCodigo: 'SIS-301', prerequisitoCodigo: 'SIS-201' },
+    { materiaCodigo: 'SIS-302', prerequisitoCodigo: 'SIS-202' },
+
+    // Nivel 4 depende del Nivel 3
+    { materiaCodigo: 'SIS-401', prerequisitoCodigo: 'SIS-301' },
+    { materiaCodigo: 'SIS-402', prerequisitoCodigo: 'SIS-302' },
   ],
 };
 

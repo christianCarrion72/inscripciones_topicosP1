@@ -11,7 +11,7 @@ import { TareasModule } from 'src/tareas/tareas.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Nota]), 
-    EstudiantesModule,
+    forwardRef(() => EstudiantesModule),
     GrupoMateriasModule,
     forwardRef(() => AuthModule),
     forwardRef(() => TareasModule)
