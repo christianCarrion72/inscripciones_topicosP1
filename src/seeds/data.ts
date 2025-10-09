@@ -164,10 +164,35 @@ export const seedData = {
     { sigla: 'B' },
   ],
 
+  // 👇 Cada materia tiene 2 grupos (A y B) con docentes alternados
   grupoMaterias: [
-    { cupos: 30, materiaCodigo: 'SIS-101', idDocente: { id: 1 }, grupoSigla: 'A' },
-    { cupos: 25, materiaCodigo: 'SIS-102', idDocente: { id: 2 }, grupoSigla: 'A' },
-    { cupos: 35, materiaCodigo: 'SIS-201', idDocente: { id: 3 }, grupoSigla: 'B' },
+    // Nivel 1
+    { cupos: 20, materiaCodigo: 'SIS-101', idDocente: { id: 1 }, grupoSigla: 'A' },
+    { cupos: 20, materiaCodigo: 'SIS-101', idDocente: { id: 2 }, grupoSigla: 'B' },
+
+    { cupos: 30, materiaCodigo: 'SIS-102', idDocente: { id: 2 }, grupoSigla: 'A' },
+    { cupos: 30, materiaCodigo: 'SIS-102', idDocente: { id: 3 }, grupoSigla: 'B' },
+
+    // Nivel 2
+    { cupos: 35, materiaCodigo: 'SIS-201', idDocente: { id: 3 }, grupoSigla: 'A' },
+    { cupos: 35, materiaCodigo: 'SIS-201', idDocente: { id: 1 }, grupoSigla: 'B' },
+
+    { cupos: 40, materiaCodigo: 'SIS-202', idDocente: { id: 1 }, grupoSigla: 'A' },
+    { cupos: 40, materiaCodigo: 'SIS-202', idDocente: { id: 2 }, grupoSigla: 'B' },
+
+    // Nivel 3
+    { cupos: 45, materiaCodigo: 'SIS-301', idDocente: { id: 2 }, grupoSigla: 'A' },
+    { cupos: 45, materiaCodigo: 'SIS-301', idDocente: { id: 3 }, grupoSigla: 'B' },
+
+    { cupos: 50, materiaCodigo: 'SIS-302', idDocente: { id: 3 }, grupoSigla: 'A' },
+    { cupos: 50, materiaCodigo: 'SIS-302', idDocente: { id: 1 }, grupoSigla: 'B' },
+
+    // Nivel 4
+    { cupos: 55, materiaCodigo: 'SIS-401', idDocente: { id: 1 }, grupoSigla: 'A' },
+    { cupos: 55, materiaCodigo: 'SIS-401', idDocente: { id: 2 }, grupoSigla: 'B' },
+
+    { cupos: 60, materiaCodigo: 'SIS-402', idDocente: { id: 2 }, grupoSigla: 'A' },
+    { cupos: 60, materiaCodigo: 'SIS-402', idDocente: { id: 3 }, grupoSigla: 'B' },
   ],
 
   diaHorarios: [
@@ -177,22 +202,23 @@ export const seedData = {
 
   boletaHorarios: [
     { horarioHoraInicio: '07:00', grupoMateria: { materiaCodigo: 'SIS-101', grupoSigla: 'A' } },
-    { horarioHoraInicio: '08:30', grupoMateria: { materiaCodigo: 'SIS-102', grupoSigla: 'A' } },
+    { horarioHoraInicio: '08:30', grupoMateria: { materiaCodigo: 'SIS-101', grupoSigla: 'B' } },
+    { horarioHoraInicio: '10:15', grupoMateria: { materiaCodigo: 'SIS-102', grupoSigla: 'A' } },
+    { horarioHoraInicio: '11:45', grupoMateria: { materiaCodigo: 'SIS-102', grupoSigla: 'B' } },
   ],
 
   inscripciones: [
     { idEstudiante: { id: 1 } },
-    { idEstudiante: { id: 2 } },
   ],
 
   detalles: [
     { inscripcionRegistro: 219062851, grupoMateria: { materiaCodigo: 'SIS-101', grupoSigla: 'A' } },
-    { inscripcionRegistro: 219062852, grupoMateria: { materiaCodigo: 'SIS-102', grupoSigla: 'A' } },
+    { inscripcionRegistro: 219062852, grupoMateria: { materiaCodigo: 'SIS-102', grupoSigla: 'B' } },
   ],
 
   notas: [
     { idEstudiante: { id: 1 }, grupoMateria: { materiaCodigo: 'SIS-101', grupoSigla: 'A' }, nota: 85 },
-    { idEstudiante: { id: 2 }, grupoMateria: { materiaCodigo: 'SIS-102', grupoSigla: 'A' }, nota: 90 },
+    { idEstudiante: { id: 2 }, grupoMateria: { materiaCodigo: 'SIS-102', grupoSigla: 'B' }, nota: 90 },
   ],
 
   prerequisitos: [

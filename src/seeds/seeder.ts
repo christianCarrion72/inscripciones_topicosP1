@@ -261,25 +261,42 @@ export class DatabaseSeeder {
       console.log('\n📋 Fase 4: Entidades relacionales');
 
       // GrupoMaterias
+
+      const repoGrupoMat = this.dataSource.getRepository(GrupoMateria);
       const grupoMateriasMapped = this.mapWithValidation(
         seedData.grupoMaterias,
         (gm) => {
           const materia = (materias as any[]).find((m: any) => m.codigo === gm.materiaCodigo);
           const docente = (docentes as any[]).find((d: any) => d.id === gm.idDocente.id);
           const grupo = (grupos as any[]).find((g: any) => g.sigla === gm.grupoSigla);
-          
-          return (materia && docente && grupo) 
+          return (materia && docente && grupo)
             ? ({ cupos: gm.cupos, idMateria: materia, idDocente: docente, idGrupo: grupo } as Partial<GrupoMateria>)
             : null;
         },
         'GrupoMaterias'
       );
-      const grupoMaterias = await this.seedEntity(
-        this.dataSource.getRepository(GrupoMateria), 
-        grupoMateriasMapped as any, 
-        'cupos',
-        'GrupoMaterias'
-      );
+
+      const grupoMaterias: GrupoMateria[] = [];
+
+      for (const item of grupoMateriasMapped) {
+        const exists = await repoGrupoMat.findOne({
+          where: {
+            idMateria: { id: (item.idMateria as any).id },
+            idGrupo: { id: (item.idGrupo as any).id },
+          },
+          relations: ['idMateria', 'idGrupo'],
+        });
+
+        if (!exists) {
+          const created = repoGrupoMat.create(item);
+          const saved = await repoGrupoMat.save(created);
+          grupoMaterias.push(saved);
+        } else {
+          grupoMaterias.push(exists);
+        }
+      }
+
+      console.log(`✅ GrupoMaterias: ${grupoMaterias.length} registrados`);
 
       // DiaHorarios
       const diaHorariosMapped = this.mapWithValidation(

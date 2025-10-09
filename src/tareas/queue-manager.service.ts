@@ -35,7 +35,10 @@ export class QueueManagerService implements OnModuleDestroy {
   private queueNames: string[] = [];
   private lastIndex = -1;
 
-  constructor(private readonly jobProcessor: JobProcessor,private readonly eventsManager: TareasEventsManager,) {}
+  constructor(private readonly jobProcessor: JobProcessor,private readonly eventsManager: TareasEventsManager,) { 
+    this.createQueue('default', true); 
+    this.createQueue('inscripciones', true);
+  }
 
   async createQueue(name: string, createDefaultWorker = true) {
     if (this.queues.has(name)) throw new Error(`Queue ${name} ya existe`);

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Logger } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Logger, Headers } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { ApiBearerAuth, ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { InscripcionsService } from './inscripcions.service';
@@ -6,6 +6,8 @@ import { CreateInscripcionDto } from './dto/create-inscripcion.dto';
 import { UpdateInscripcionDto } from './dto/update-inscripcion.dto';
 import { TareasProducer } from '../tareas/tareas.producer';
 import { generateJobId } from 'src/common/utils/idempotency.util';
+import { ActiveUserInterface } from 'src/common/interfaces/active-user.interface';
+import { ActiveUser } from 'src/common/decorators/active-user.decorator';
 
 @ApiTags('inscripcions')
 @ApiBearerAuth()
@@ -62,13 +64,14 @@ export class InscripcionsController {
   }
  
   @Post('request-seat')
-  async requestSeat(@Body() createInscripcionDto: CreateInscripcionDto) {
-    this.logger.debug('Error reservando cupos', createInscripcionDto);
+  async requestSeat(@Body() createInscripcionDto: CreateInscripcionDto,@ActiveUser() user: ActiveUserInterface, @Headers('x-callback-url') callbackUrl?: string) {
+    createInscripcionDto.idEstudiante = user.id;
     const jobId = generateJobId('inscripcion', 'requestSeat', createInscripcionDto);
     return await this.tareas.enqueue(
       'inscripcion',
       'requestSeat',
       createInscripcionDto,
+      callbackUrl,
       jobId,
     );
   }

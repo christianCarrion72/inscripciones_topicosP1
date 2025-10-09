@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Headers } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { ApiBearerAuth, ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { GrupoMateriasService } from './grupo_materias.service';
@@ -19,8 +19,8 @@ export class GrupoMateriasController {
 
   @Post()
   @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
+    name: 'x-callback-url',
+    description: 'CallBack-URL opcional para recibir respuestas',
     required: false,
   })
   async create(@Body() createGrupoMateriaDto: CreateGrupoMateriaDto) {
@@ -34,8 +34,13 @@ export class GrupoMateriasController {
   }
 
   @Get()
-  async findAll() {
-    return await this.tareas.enqueue('grupo_materia', 'findAll');
+  @ApiHeader({
+    name: 'x-callback-url',
+    description: 'CallBack-URL opcional para recibir respuestas',
+    required: false,
+  })
+  async findAll(@Headers('x-callback-url') callbackUrl?: string) {
+    return await this.tareas.enqueue('grupo_materia', 'findAll',{},callbackUrl);
   }
 
   @Get(':id')

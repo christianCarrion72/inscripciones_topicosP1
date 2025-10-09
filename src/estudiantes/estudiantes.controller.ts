@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Headers } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Headers, Logger } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { RolesGuard } from 'src/auth/guard/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
@@ -8,6 +8,8 @@ import { UpdateEstudianteDto } from './dto/update-estudiante.dto';
 import { ApiBearerAuth, ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { TareasProducer } from '../tareas/tareas.producer';
 import { generateJobId } from 'src/common/utils/idempotency.util';
+import { ActiveUser } from 'src/common/decorators/active-user.decorator';
+import { ActiveUserInterface } from 'src/common/interfaces/active-user.interface';
 
 @ApiTags('estudiantes')
 @ApiBearerAuth()
@@ -15,6 +17,7 @@ import { generateJobId } from 'src/common/utils/idempotency.util';
 @Roles('admin')
 @Controller('estudiantes')
 export class EstudiantesController {
+  private readonly logger = new Logger(EstudiantesController.name);
   constructor(
     private readonly estudiantesService: EstudiantesService,
     private readonly tareas: TareasProducer
@@ -35,6 +38,22 @@ export class EstudiantesController {
       callbackUrl,
       jobId,
     );
+  }
+
+  @Roles('estudiante')
+  @Get('materias-disponibles')
+  @ApiOperation({ 
+    summary: 'Obtener materias disponibles para inscripción del estudiante',
+    description: 'Devuelve las materias que el estudiante puede inscribir basándose en prerrequisitos completados'
+  })
+  @ApiHeader({
+    name: 'x-callback-url',
+    description: 'CallBack-URL opcional para recibir respuestas',
+    required: false,
+  })
+  getMateriasDisponibles(@ActiveUser() user: ActiveUserInterface, @Headers('x-callback-url') callbackUrl?: string) {
+    this.logger.debug(`Usuario activo: ${JSON.stringify(user)}`);
+    return this.tareas.enqueue('estudiante', 'getMateriasDisponibles', { id: user.id }, callbackUrl);
   }
 
   @Get()
@@ -89,20 +108,5 @@ export class EstudiantesController {
       callbackUrl,
       jobId,
     );
-  }
-
-  @Roles('estudiante')
-  @Get(':id/materias-disponibles')
-  @ApiOperation({ 
-    summary: 'Obtener materias disponibles para inscripción del estudiante',
-    description: 'Devuelve las materias que el estudiante puede inscribir basándose en prerrequisitos completados'
-  })
-  @ApiHeader({
-    name: 'x-callback-url',
-    description: 'CallBack-URL opcional para recibir respuestas',
-    required: false,
-  })
-  getMateriasDisponibles(@Param('id') id: number, @Headers('x-callback-url') callbackUrl?: string) {
-    return this.tareas.enqueue('estudiante', 'getMateriasDisponibles', { id }, callbackUrl);
   }
 }
