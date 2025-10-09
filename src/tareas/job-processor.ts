@@ -52,6 +52,8 @@ export class JobProcessor {
         return [];
       case 'requestSeat':
         return [data];
+      case 'getMateriasDisponibles':
+        return [data.id];
       default:
         return [];
     }

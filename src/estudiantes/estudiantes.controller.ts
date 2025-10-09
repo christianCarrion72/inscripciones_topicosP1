@@ -90,4 +90,18 @@ export class EstudiantesController {
       jobId,
     );
   }
+
+  @Get(':id/materias-disponibles')
+  @ApiOperation({ 
+    summary: 'Obtener materias disponibles para inscripción del estudiante',
+    description: 'Devuelve las materias que el estudiante puede inscribir basándose en prerrequisitos completados'
+  })
+  @ApiHeader({
+    name: 'x-callback-url',
+    description: 'CallBack-URL opcional para recibir respuestas',
+    required: false,
+  })
+  getMateriasDisponibles(@Param('id') id: number, @Headers('x-callback-url') callbackUrl?: string) {
+    return this.tareas.enqueue('estudiante', 'getMateriasDisponibles', { id }, callbackUrl);
+  }
 }

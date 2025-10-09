@@ -8,10 +8,17 @@ import { AuthModule } from 'src/auth/auth.module';
 import { TareasModule } from 'src/tareas/tareas.module';
 import { SyncEstudiantesService } from './sync-estudiantes.service';
 import { SyncEstudiantesController } from './sync-estudiantes.controller';
+import { MateriasModule } from 'src/materias/materias.module';
+import { NotasModule } from 'src/notas/notas.module';
+import { PrerequisitosModule } from 'src/prerequisitos/prerequisitos.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Estudiante]),
+    PlanEstudiosModule,
+    MateriasModule,
+    forwardRef(() => NotasModule),
+    PrerequisitosModule,
     forwardRef(() => AuthModule),
     forwardRef(() => PlanEstudiosModule),
     forwardRef(() => TareasModule)
