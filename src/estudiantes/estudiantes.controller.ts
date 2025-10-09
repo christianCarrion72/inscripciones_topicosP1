@@ -91,6 +91,7 @@ export class EstudiantesController {
     );
   }
 
+  @Roles('estudiante')
   @Get(':id/materias-disponibles')
   @ApiOperation({ 
     summary: 'Obtener materias disponibles para inscripción del estudiante',

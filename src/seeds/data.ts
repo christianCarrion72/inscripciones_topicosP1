@@ -2,49 +2,15 @@ import * as bcryptjs from 'bcryptjs';
 
 export const seedData = {
   users: [
-    {
-      id: 1,
-      email: 'admin@example.com',
-      contraseña: bcryptjs.hashSync('123456789', 10),
-      rol: 'admin'
-    },
-    {
-      id: 2,
-      email: 'estudiante1@example.com',
-      contraseña: bcryptjs.hashSync('123456789', 10),
-      rol: 'estudiante'
-    },
-    {
-      id: 3,
-      email: 'estudiante2@example.com',
-      contraseña: bcryptjs.hashSync('123456789', 10),
-      rol: 'estudiante'
-    },
-    {
-      id: 4,
-      email: 'estudiante3@example.com',
-      contraseña: bcryptjs.hashSync('123456789', 10),
-      rol: 'estudiante'
-    },
-    {
-      id: 5,
-      email: 'docente1@example.com',
-      contraseña: bcryptjs.hashSync('123456789', 10),
-      rol: 'docente'
-    },
-    {
-      id: 6,
-      email: 'docente2@example.com',
-      contraseña: bcryptjs.hashSync('123456789', 10),
-      rol: 'docente'
-    },
-    {
-      id: 7,
-      email: 'docente3@example.com',
-      contraseña: bcryptjs.hashSync('123456789', 10),
-      rol: 'docente'
-    }
+    { id: 1, email: 'admin@example.com', contraseña: bcryptjs.hashSync('123456789', 10), rol: 'admin' },
+    { id: 2, email: 'estudiante1@example.com', contraseña: bcryptjs.hashSync('123456789', 10), rol: 'estudiante' },
+    { id: 3, email: 'estudiante2@example.com', contraseña: bcryptjs.hashSync('123456789', 10), rol: 'estudiante' },
+    { id: 4, email: 'estudiante3@example.com', contraseña: bcryptjs.hashSync('123456789', 10), rol: 'estudiante' },
+    { id: 5, email: 'docente1@example.com', contraseña: bcryptjs.hashSync('123456789', 10), rol: 'docente' },
+    { id: 6, email: 'docente2@example.com', contraseña: bcryptjs.hashSync('123456789', 10), rol: 'docente' },
+    { id: 7, email: 'docente3@example.com', contraseña: bcryptjs.hashSync('123456789', 10), rol: 'docente' },
   ],
+
   carreras: [
     { nombre: 'Ingeniería de Sistemas', codigo: 'SIS' },
     { nombre: 'Ingeniería Industrial', codigo: 'IND' },
@@ -123,7 +89,7 @@ export const seedData = {
       telefono: 71000001,
       direccion: 'Av. Paraguá #123',
       especialidad: 'Ingeniería de Software',
-      user: { id: 5 }
+      user: { id: 5 },
     },
     {
       id: 2,
@@ -133,7 +99,7 @@ export const seedData = {
       telefono: 71000002,
       direccion: 'Av. Banzer #456',
       especialidad: 'Inteligencia Artificial',
-      user: { id: 6 }
+      user: { id: 6 },
     },
     {
       id: 3,
@@ -143,38 +109,44 @@ export const seedData = {
       telefono: 71000003,
       direccion: 'Av. Pirai #789',
       especialidad: 'Redes y Telecomunicaciones',
-      user: { id: 7 }
-    }
+      user: { id: 7 },
+    },
   ],
 
   estudiantes: [
     {
+      id: 1,
       nombre: 'Juan Pérez',
       ci: 12345678,
       registro: 219062851,
       telefono: 70000001,
       direccion: 'Av. Busch #123',
       tituloBachiller: 123,
-      user: { id: 2 }
+      planNombre: 'Plan 2025',
+      user: { id: 2 },
     },
     {
+      id: 2,
       nombre: 'María García',
       ci: 23456789,
       registro: 219062852,
       telefono: 70000002,
       direccion: 'Av. Cañoto #456',
       tituloBachiller: 124,
-      user: { id: 3 }
+      planNombre: 'Plan 2025',
+      user: { id: 3 },
     },
     {
+      id: 3,
       nombre: 'Carlos López',
       ci: 34567890,
       registro: 219062853,
       telefono: 70000003,
       direccion: 'Av. Irala #789',
       tituloBachiller: 125,
-      user: { id: 4 }
-    }
+      planNombre: 'Plan 2025',
+      user: { id: 4 },
+    },
   ],
 
   gestiones: [
@@ -214,8 +186,8 @@ export const seedData = {
   ],
 
   detalles: [
-    { inscripcionRegistro: 2024001, grupoMateria: { materiaCodigo: 'SIS-101', grupoSigla: 'A' } },
-    { inscripcionRegistro: 2024002, grupoMateria: { materiaCodigo: 'SIS-102', grupoSigla: 'A' } },
+    { inscripcionRegistro: 219062851, grupoMateria: { materiaCodigo: 'SIS-101', grupoSigla: 'A' } },
+    { inscripcionRegistro: 219062852, grupoMateria: { materiaCodigo: 'SIS-102', grupoSigla: 'A' } },
   ],
 
   notas: [
@@ -224,18 +196,11 @@ export const seedData = {
   ],
 
   prerequisitos: [
-    // Nivel 2 depende del Nivel 1
     { materiaCodigo: 'SIS-201', prerequisitoCodigo: 'SIS-101' },
     { materiaCodigo: 'SIS-202', prerequisitoCodigo: 'SIS-102' },
-
-    // Nivel 3 depende del Nivel 2
     { materiaCodigo: 'SIS-301', prerequisitoCodigo: 'SIS-201' },
     { materiaCodigo: 'SIS-302', prerequisitoCodigo: 'SIS-202' },
-
-    // Nivel 4 depende del Nivel 3
     { materiaCodigo: 'SIS-401', prerequisitoCodigo: 'SIS-301' },
     { materiaCodigo: 'SIS-402', prerequisitoCodigo: 'SIS-302' },
   ],
 };
-
-

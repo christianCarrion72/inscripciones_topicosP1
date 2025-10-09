@@ -220,13 +220,20 @@ export class DatabaseSeeder {
       const estudiantesMapped = this.mapWithValidation(
         seedData.estudiantes,
         (e) => {
+          const plan = (planes as any[]).find((p: any) => p.nombre === e.planNombre);
+          if (!plan) return null;
           const user = (users as any[]).find((u: any) => u.id === e.user.id);
           if (!user) return null;
-          const { user: _, ...estudianteData } = e;
-          return { ...estudianteData, user } as Partial<Estudiante>;
+          const { planNombre, user: _, ...rest } = e;
+          return { 
+            ...rest, 
+            idPlan: plan, 
+            user 
+          } as Partial<Estudiante>;
         },
         'Estudiantes'
       );
+      
       const estudiantes = await this.seedEntity(
         this.dataSource.getRepository(Estudiante), 
         estudiantesMapped as any, 
@@ -330,7 +337,7 @@ export class DatabaseSeeder {
       const inscripciones = await this.seedEntity(
         this.dataSource.getRepository(Inscripcion), 
         inscripcionesMapped as any, 
-        'id', 
+        'idEstudiante', 
         'Inscripciones'
       );
 
@@ -376,7 +383,7 @@ export class DatabaseSeeder {
       const notas = await this.seedEntity(
         this.dataSource.getRepository(Nota), 
         notasMapped as any, 
-        'id',
+        'idEstudiante',
         'Notas'
       );
 

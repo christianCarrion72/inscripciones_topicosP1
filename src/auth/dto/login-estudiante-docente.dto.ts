@@ -12,7 +12,7 @@ export class LoginEstudianteDocenteDto {
 
     @ApiProperty({
         description: 'Contraseña del usuario',
-        example: '123456'
+        example: '123456789'
     })
     @IsNotEmpty()
     contraseña: string;
