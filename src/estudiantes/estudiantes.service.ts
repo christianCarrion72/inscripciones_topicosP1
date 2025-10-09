@@ -108,9 +108,6 @@ export class EstudiantesService {
     });
     return estudiantes.find(e => e.registro === registro);
   }
-}
-
-
   async getMateriasDisponibles(id: number) {
     // Verificar que el estudiante existe
     const estudiante = await this.estudianteRepository.findOne({
