@@ -1,6 +1,13 @@
-import { IsInt, IsPositive, IsString, Min, MinLength } from "class-validator";
+import { IsEmail, IsInt, IsPositive, IsString, Min, MinLength } from "class-validator";
 
 export class CreateDocenteDto {
+    @IsEmail()
+    email: string;
+
+    @IsString()
+    @MinLength(6)
+    contraseña: string;
+    
     @IsInt()
     @IsPositive()
     ci: number;

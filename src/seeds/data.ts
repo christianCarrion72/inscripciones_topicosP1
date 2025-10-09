@@ -1,4 +1,50 @@
+import * as bcryptjs from 'bcryptjs';
+
 export const seedData = {
+  users: [
+    {
+      id: 1,
+      email: 'admin@example.com',
+      contraseña: bcryptjs.hashSync('123456789', 10),
+      rol: 'admin'
+    },
+    {
+      id: 2,
+      email: 'estudiante1@example.com',
+      contraseña: bcryptjs.hashSync('123456789', 10),
+      rol: 'estudiante'
+    },
+    {
+      id: 3,
+      email: 'estudiante2@example.com',
+      contraseña: bcryptjs.hashSync('123456789', 10),
+      rol: 'estudiante'
+    },
+    {
+      id: 4,
+      email: 'estudiante3@example.com',
+      contraseña: bcryptjs.hashSync('123456789', 10),
+      rol: 'estudiante'
+    },
+    {
+      id: 5,
+      email: 'docente1@example.com',
+      contraseña: bcryptjs.hashSync('123456789', 10),
+      rol: 'docente'
+    },
+    {
+      id: 6,
+      email: 'docente2@example.com',
+      contraseña: bcryptjs.hashSync('123456789', 10),
+      rol: 'docente'
+    },
+    {
+      id: 7,
+      email: 'docente3@example.com',
+      contraseña: bcryptjs.hashSync('123456789', 10),
+      rol: 'docente'
+    }
+  ],
   carreras: [
     { nombre: 'Ingeniería de Sistemas', codigo: 'SIS' },
     { nombre: 'Ingeniería Industrial', codigo: 'IND' },
@@ -7,10 +53,10 @@ export const seedData = {
   ],
 
   planesEstudio: [
-    { nombre: 'Plan 2020', carreraCodigo: 'SIS' },
-    { nombre: 'Plan 2018', carreraCodigo: 'IND' },
-    { nombre: 'Plan 2022', carreraCodigo: 'CIV' },
-    { nombre: 'Plan 2019', carreraCodigo: 'ADM' },
+    { id: 1, nombre: 'Plan 2020', carreraCodigo: 'SIS' },
+    { id: 2, nombre: 'Plan 2018', carreraCodigo: 'IND' },
+    { id: 3, nombre: 'Plan 2022', carreraCodigo: 'CIV' },
+    { id: 4, nombre: 'Plan 2019', carreraCodigo: 'ADM' },
   ],
 
   niveles: [
@@ -58,15 +104,66 @@ export const seedData = {
   ],
 
   docentes: [
-    { ci: 1234567, nombre: 'Juan', direccion: 'Calle 1', registro: 111, especialidad: 'Sistemas', telefono: 70000001 },
-    { ci: 2345678, nombre: 'María', direccion: 'Calle 2', registro: 222, especialidad: 'Industrial', telefono: 70000002 },
-    { ci: 3456789, nombre: 'Carlos', direccion: 'Calle 3', registro: 333, especialidad: 'Civil', telefono: 70000003 },
+    {
+      id: 1,
+      ci: 123456,
+      nombre: 'Dr. Roberto Méndez',
+      registro: 123456,
+      telefono: 71000001,
+      direccion: 'Av. Paraguá #123',
+      especialidad: 'Ingeniería de Software',
+      user: { id: 5 }
+    },
+    {
+      id: 2,
+      ci: 234567,
+      nombre: 'Dra. Ana Sánchez',
+      registro: 234567,
+      telefono: 71000002,
+      direccion: 'Av. Banzer #456',
+      especialidad: 'Inteligencia Artificial',
+      user: { id: 6 }
+    },
+    {
+      id: 3,
+      ci: 345678,
+      nombre: 'Dr. Luis Torres',
+      registro: 345678,
+      telefono: 71000003,
+      direccion: 'Av. Pirai #789',
+      especialidad: 'Redes y Telecomunicaciones',
+      user: { id: 7 }
+    }
   ],
 
   estudiantes: [
-    { nombre: 'Ana', ci: 9876543, registro: 2024001, telefono: 70010001, direccion: 'Zona A', tituloBachiller: 123, planNombre: 'Plan 2020' },
-    { nombre: 'Pedro', ci: 5678901, registro: 2024002, telefono: 70010002, direccion: 'Zona B', tituloBachiller: 124, planNombre: 'Plan 2020' },
-    { nombre: 'Laura', ci: 3456789, registro: 2024003, telefono: 70010003, direccion: 'Zona C', tituloBachiller: 125, planNombre: 'Plan 2018' },
+    {
+      nombre: 'Juan Pérez',
+      ci: 12345678,
+      registro: 219062851,
+      telefono: 70000001,
+      direccion: 'Av. Busch #123',
+      tituloBachiller: 123,
+      user: { id: 2 }
+    },
+    {
+      nombre: 'María García',
+      ci: 23456789,
+      registro: 219062852,
+      telefono: 70000002,
+      direccion: 'Av. Cañoto #456',
+      tituloBachiller: 124,
+      user: { id: 3 }
+    },
+    {
+      nombre: 'Carlos López',
+      ci: 34567890,
+      registro: 219062853,
+      telefono: 70000003,
+      direccion: 'Av. Irala #789',
+      tituloBachiller: 125,
+      user: { id: 4 }
+    }
   ],
 
   gestiones: [
@@ -85,9 +182,9 @@ export const seedData = {
   ],
 
   grupoMaterias: [
-    { cupos: 30, materiaCodigo: 'SIS-101', docenteCi: 1234567, grupoSigla: 'A' },
-    { cupos: 25, materiaCodigo: 'SIS-102', docenteCi: 2345678, grupoSigla: 'A' },
-    { cupos: 35, materiaCodigo: 'SIS-201', docenteCi: 3456789, grupoSigla: 'B' },
+    { cupos: 30, materiaCodigo: 'SIS-101', idDocente: { id: 1 }, grupoSigla: 'A' },
+    { cupos: 25, materiaCodigo: 'SIS-102', idDocente: { id: 2 }, grupoSigla: 'A' },
+    { cupos: 35, materiaCodigo: 'SIS-201', idDocente: { id: 3 }, grupoSigla: 'B' },
   ],
 
   diaHorarios: [
@@ -101,8 +198,8 @@ export const seedData = {
   ],
 
   inscripciones: [
-    { estudianteRegistro: 2024001 },
-    { estudianteRegistro: 2024002 },
+    { idEstudiante: { id: 1 } },
+    { idEstudiante: { id: 2 } },
   ],
 
   detalles: [
@@ -111,8 +208,8 @@ export const seedData = {
   ],
 
   notas: [
-    { estudianteRegistro: 2024001, grupoMateria: { materiaCodigo: 'SIS-101', grupoSigla: 'A' }, nota: 85 },
-    { estudianteRegistro: 2024002, grupoMateria: { materiaCodigo: 'SIS-102', grupoSigla: 'A' }, nota: 90 },
+    { idEstudiante: { id: 1 }, grupoMateria: { materiaCodigo: 'SIS-101', grupoSigla: 'A' }, nota: 85 },
+    { idEstudiante: { id: 2 }, grupoMateria: { materiaCodigo: 'SIS-102', grupoSigla: 'A' }, nota: 90 },
   ],
 
   prerequisitos: [

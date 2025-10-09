@@ -1,10 +1,12 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/common';
 import { CreateEstudianteDto } from './dto/create-estudiante.dto';
 import { UpdateEstudianteDto } from './dto/update-estudiante.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Estudiante } from './entities/estudiante.entity';
 import { Repository } from 'typeorm';
 import { PlanEstudio } from 'src/plan_estudios/entities/plan_estudio.entity';
+import { AuthService } from 'src/auth/auth.service';
+import * as bcryptjs from 'bcryptjs';
 
 @Injectable()
 export class EstudiantesService {
@@ -12,6 +14,9 @@ export class EstudiantesService {
   constructor(
     @InjectRepository(Estudiante)
     private readonly estudianteRepository: Repository<Estudiante>,
+
+    @Inject(forwardRef(() => AuthService))
+    private readonly authService: AuthService,
 
     @InjectRepository(PlanEstudio)
     private readonly planEstudioRepository: Repository<PlanEstudio>,
@@ -37,6 +42,15 @@ export class EstudiantesService {
       estudianteData.idPlan = plan_estudio;
     }
 
+    // Crear usuario con rol estudiante
+    const user = await this.authService.register({
+      email: createEstudianteDto.email,
+      contraseña: createEstudianteDto.contraseña,
+      rol: 'estudiante'
+    });
+
+    // Crear estudiante y asociarlo al usuario
+    estudianteData.user = user;
     return await this.estudianteRepository.save(estudianteData);
   }
 
@@ -73,5 +87,13 @@ export class EstudiantesService {
 
   async remove(id: number) {
     return await this.estudianteRepository.softDelete(id);
+  }
+
+  async findOneByRegistro(registro: number) {
+    const estudiantes = await this.estudianteRepository.find({
+        where: {},
+        relations: ['user']
+    });
+    return estudiantes.find(e => e.registro === registro);
   }
 }

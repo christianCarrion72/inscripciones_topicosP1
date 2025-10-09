@@ -1,5 +1,6 @@
 import { GrupoMateria } from "src/grupo_materias/entities/grupo_materia.entity";
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, OneToMany, UpdateDateColumn } from "typeorm";
+import { User } from "src/users/entities/user.entity";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, OneToMany, OneToOne, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Docente {
@@ -24,6 +25,10 @@ export class Docente {
 
     @Column()
     telefono: number;
+
+    @OneToOne(() => User, (user) => user.docente)
+    @JoinColumn()
+    user: User;
 
     @OneToMany(() => GrupoMateria, (grupo_materia) => grupo_materia.idDocente)
     grupo_materias: GrupoMateria[];

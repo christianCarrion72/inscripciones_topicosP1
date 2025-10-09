@@ -1,4 +1,6 @@
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, UpdateDateColumn } from "typeorm";
+import { Docente } from "src/docentes/entities/docente.entity";
+import { Estudiante } from "src/estudiantes/entities/estudiante.entity";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, OneToOne, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class User {
@@ -12,8 +14,18 @@ export class User {
     @Column({nullable: false})
     contraseña: string;
 
-    @Column({ default: 'user' })
+    @Column({ 
+        type: 'enum',
+        enum: ['admin', 'docente', 'estudiante'],
+        default: 'estudiante'
+    })
     rol: string;
+
+    @OneToOne(() => Estudiante, { nullable: true })
+    estudiante: Estudiante;
+
+    @OneToOne(() => Docente, { nullable: true })
+    docente: Docente;
 
     @CreateDateColumn()
     createdAt: Date;

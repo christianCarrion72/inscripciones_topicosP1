@@ -3,23 +3,23 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { UsersModule } from 'src/users/users.module';
 import { JwtModule } from '@nestjs/jwt';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { jwtConstants } from './constants/jwt.constant';
+import { EstudiantesModule } from 'src/estudiantes/estudiantes.module';
+import { DocentesModule } from 'src/docentes/docentes.module';
 
 @Module({
   imports: [
-    forwardRef(() => UsersModule), 
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT'),
-        global: true,
-        signOptions: { expiresIn: '1d' },
-      }),
-      inject: [ConfigService],
+    forwardRef(() => UsersModule),
+    forwardRef(() => EstudiantesModule),
+    forwardRef(() => DocentesModule),
+    JwtModule.register({
+      global: true,
+      secret: jwtConstants.secret,
+      signOptions: { expiresIn: '1d' },
     }),
-    ],
+  ],
   controllers: [AuthController],
   providers: [AuthService],
-  exports: [AuthService, JwtModule]
+  exports: [AuthService]
 })
 export class AuthModule {}

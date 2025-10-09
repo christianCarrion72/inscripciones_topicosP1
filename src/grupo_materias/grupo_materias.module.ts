@@ -9,6 +9,7 @@ import { GestionsModule } from 'src/gestions/gestions.module';
 import { DocentesModule } from 'src/docentes/docentes.module';
 import { GruposModule } from 'src/grupos/grupos.module';
 import { TareasModule } from 'src/tareas/tareas.module';
+import { InscripcionsModule } from 'src/inscripcions/inscripcions.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { TareasModule } from 'src/tareas/tareas.module';
     GestionsModule, 
     DocentesModule,
     GruposModule,
+    forwardRef(() => InscripcionsModule),
     forwardRef(() => TareasModule)
   ],
   controllers: [GrupoMateriasController],

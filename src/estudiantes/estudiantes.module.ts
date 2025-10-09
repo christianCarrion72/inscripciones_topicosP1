@@ -12,8 +12,8 @@ import { SyncEstudiantesController } from './sync-estudiantes.controller';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Estudiante]),
-    PlanEstudiosModule, 
     forwardRef(() => AuthModule),
+    forwardRef(() => PlanEstudiosModule),
     forwardRef(() => TareasModule)
   ],
   controllers: [EstudiantesController, SyncEstudiantesController],

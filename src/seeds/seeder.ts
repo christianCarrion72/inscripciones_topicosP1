@@ -1,6 +1,7 @@
 import { DataSource, Repository } from 'typeorm';
 import { seedData } from './data';
 
+import { User } from 'src/users/entities/user.entity';
 import { Carrera } from 'src/carreras/entities/carrera.entity';
 import { PlanEstudio } from 'src/plan_estudios/entities/plan_estudio.entity';
 import { Nivel } from 'src/nivels/entities/nivel.entity';
@@ -35,12 +36,10 @@ export class DatabaseSeeder {
     entityName: string,
   ): Promise<T[]> {
     if (!data?.length) {
-      // linea de consola
       console.log(`⚠️  No hay datos para ${entityName}`);
       return [] as T[];
     }
 
-    // linea de consola
     console.log(`📦 Seeding ${entityName}... (${data.length} items)`);
     const entities: T[] = [];
     let created = 0;
@@ -62,11 +61,9 @@ export class DatabaseSeeder {
         }
       }
 
-      // linea de consola
       console.log(`✅ ${entityName}: ${created} creados, ${existing} existentes`);
       return entities;
     } catch (error: any) {
-      // linea de consola
       console.error(`❌ Error seeding ${entityName}:`, error);
       throw new Error(`Failed to seed ${entityName}: ${error.message}`);
     }
@@ -84,7 +81,6 @@ export class DatabaseSeeder {
     const failed = data.length - mapped.length;
     
     if (failed > 0) {
-      // linea de consola
       console.warn(`⚠️  ${entityName}: ${failed} items no pudieron ser mapeados`);
     }
     
@@ -92,12 +88,19 @@ export class DatabaseSeeder {
   }
 
   async seed(): Promise<void> {
-    // linea de consola
     console.log('🚀 Iniciando proceso de seeding...');
     
     try {
+      // 0. USUARIOS (PRIMERO - antes de docentes y estudiantes)
+      console.log('\n📋 Fase 0: Usuarios');
+      const users = await this.seedEntity(
+        this.dataSource.getRepository(User),
+        seedData.users,
+        'email',
+        'Users'
+      );
+
       // 1. Entidades base (sin dependencias)
-      // linea de consola
       console.log('\n📋 Fase 1: Entidades base');
       
       const [carreras, modulos, dias, gestiones, grupos] = await Promise.all([
@@ -109,7 +112,6 @@ export class DatabaseSeeder {
       ]);
 
       // 2. Entidades con una dependencia
-      // linea de consola
       console.log('\n📋 Fase 2: Entidades con dependencias simples');
 
       // Planes de Estudio
@@ -193,22 +195,35 @@ export class DatabaseSeeder {
         'Periodos'
       );
 
-      // 3. Entidades con múltiples dependencias
-      // linea de consola
-      console.log('\n📋 Fase 3: Entidades independientes');
+      // 3. Entidades con usuarios (docentes y estudiantes)
+      console.log('\n📋 Fase 3: Docentes y Estudiantes');
 
-      const [docentes] = await Promise.all([
-        this.seedEntity(this.dataSource.getRepository(Docente), seedData.docentes, 'ci', 'Docentes'),
-      ]);
+      // Docentes - mapear con usuarios
+      const docentesMapped = this.mapWithValidation(
+        seedData.docentes,
+        (d) => {
+          const user = (users as any[]).find((u: any) => u.id === d.user.id);
+          if (!user) return null;
+          const { user: _, ...docenteData } = d;
+          return { ...docenteData, user } as Partial<Docente>;
+        },
+        'Docentes'
+      );
+      const docentes = await this.seedEntity(
+        this.dataSource.getRepository(Docente),
+        docentesMapped as any,
+        'ci',
+        'Docentes'
+      );
 
-      // Estudiantes
+      // Estudiantes - mapear con usuarios
       const estudiantesMapped = this.mapWithValidation(
         seedData.estudiantes,
         (e) => {
-          const plan = (planes as any[]).find((p: any) => p.nombre === e.planNombre);
-          if (!plan) return null;
-          const { planNombre, ...rest } = e;
-          return { ...rest, idPlan: plan } as Partial<Estudiante>;
+          const user = (users as any[]).find((u: any) => u.id === e.user.id);
+          if (!user) return null;
+          const { user: _, ...estudianteData } = e;
+          return { ...estudianteData, user } as Partial<Estudiante>;
         },
         'Estudiantes'
       );
@@ -236,7 +251,6 @@ export class DatabaseSeeder {
       );
 
       // 4. Entidades relacionales complejas
-      // linea de consola
       console.log('\n📋 Fase 4: Entidades relacionales');
 
       // GrupoMaterias
@@ -244,7 +258,7 @@ export class DatabaseSeeder {
         seedData.grupoMaterias,
         (gm) => {
           const materia = (materias as any[]).find((m: any) => m.codigo === gm.materiaCodigo);
-          const docente = (docentes as any[]).find((d: any) => d.ci === gm.docenteCi);
+          const docente = (docentes as any[]).find((d: any) => d.id === gm.idDocente.id);
           const grupo = (grupos as any[]).find((g: any) => g.sigla === gm.grupoSigla);
           
           return (materia && docente && grupo) 
@@ -300,16 +314,15 @@ export class DatabaseSeeder {
       );
 
       // 5. Entidades finales (inscripciones, notas, etc.)
-      // linea de consola
       console.log('\n📋 Fase 5: Entidades finales');
 
       // Inscripciones
       const inscripcionesMapped = this.mapWithValidation(
         seedData.inscripciones,
         (i) => {
-          const estudiante = (estudiantes as any[]).find((e: any) => e.registro === i.estudianteRegistro);
+          const estudiante = (estudiantes as any[]).find((e: any) => e.id === i.idEstudiante.id);
           return estudiante 
-            ? ({ fechaInscripcion: new Date(),idEstudiante: estudiante } as Partial<Inscripcion>)
+            ? ({ fechaInscripcion: new Date(), idEstudiante: estudiante } as Partial<Inscripcion>)
             : null;
         },
         'Inscripciones'
@@ -317,7 +330,7 @@ export class DatabaseSeeder {
       const inscripciones = await this.seedEntity(
         this.dataSource.getRepository(Inscripcion), 
         inscripcionesMapped as any, 
-        'estudianteRegistro', 
+        'id', 
         'Inscripciones'
       );
 
@@ -326,21 +339,21 @@ export class DatabaseSeeder {
         seedData.detalles,
         (d) => {
           const ins = (inscripciones as any[]).find((i: any) => 
-            i.idEstudiante?.registro === d.inscripcionRegistro
+            i.id === d.inscripcionRegistro || i.idEstudiante?.registro === d.inscripcionRegistro
           );
           const gm = (grupoMaterias as any[]).find((x: any) =>
             x.idMateria?.codigo === d.grupoMateria.materiaCodigo && 
             x.idGrupo?.sigla === d.grupoMateria.grupoSigla
           );
           
-          return (ins && gm) ? ({ idInscripcion: ins.id, idGrupoMat: gm.id } as Partial<Detalle>) : null;
+          return (ins && gm) ? ({ idInscripcion: ins, idGrupoMat: gm } as Partial<Detalle>) : null;
         },
         'Detalles'
       );
       const detalles = await this.seedEntity(
         this.dataSource.getRepository(Detalle), 
         detallesMapped as any, 
-        'idInscripcion',
+        'id',
         'Detalles'
       );
 
@@ -348,7 +361,7 @@ export class DatabaseSeeder {
       const notasMapped = this.mapWithValidation(
         seedData.notas,
         (n) => {
-          const estudiante = (estudiantes as any[]).find((e: any) => e.registro === n.estudianteRegistro);
+          const estudiante = (estudiantes as any[]).find((e: any) => e.id === n.idEstudiante.id);
           const gm = (grupoMaterias as any[]).find((x: any) =>
             x.idMateria?.codigo === n.grupoMateria.materiaCodigo && 
             x.idGrupo?.sigla === n.grupoMateria.grupoSigla
@@ -363,7 +376,7 @@ export class DatabaseSeeder {
       const notas = await this.seedEntity(
         this.dataSource.getRepository(Nota), 
         notasMapped as any, 
-        'idEstudiante',
+        'id',
         'Notas'
       );
 
@@ -391,12 +404,11 @@ export class DatabaseSeeder {
         );
       }
 
-      // linea de consola
       console.log('\n✅ Proceso de seeding completado exitosamente');
       
       // Resumen final
-      // linea de consola
       console.log('\n📊 Resumen:');
+      console.log(`   Users:           ${users.length}`);
       console.log(`   Carreras:        ${carreras.length}`);
       console.log(`   PlanesEstudio:   ${planes.length}`);
       console.log(`   Niveles:         ${niveles.length}`);
@@ -418,11 +430,8 @@ export class DatabaseSeeder {
       console.log(`   Notas:           ${notas.length}`);
       console.log(`   Prerequisitos:   ${prerequisitos.length}`);
     } catch (error) {
-      // linea de consola
       console.error('❌ Error durante el seeding:', error);
       throw error;
     }
   }
 }
-
-

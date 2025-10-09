@@ -11,8 +11,8 @@ import { PlanEstudiosModule } from 'src/plan_estudios/plan_estudios.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Materia]),
-    NivelsModule,
-    PlanEstudiosModule,
+    forwardRef(() => NivelsModule),
+    forwardRef(() => PlanEstudiosModule),
     forwardRef(() => AuthModule),
     forwardRef(() => TareasModule)
   ],

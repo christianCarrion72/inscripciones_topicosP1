@@ -11,8 +11,8 @@ import { GrupoMateriasModule } from 'src/grupo_materias/grupo_materias.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Inscripcion]), 
-    EstudiantesModule,
-    GrupoMateriasModule, 
+    forwardRef(() => EstudiantesModule),
+    forwardRef(() => GrupoMateriasModule), 
     forwardRef(() => AuthModule),
     forwardRef(() => TareasModule)
   ],

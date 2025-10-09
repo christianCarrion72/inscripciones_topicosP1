@@ -1,7 +1,8 @@
 import { Inscripcion } from "src/inscripcions/entities/inscripcion.entity";
 import { Nota } from "src/notas/entities/nota.entity";
 import { PlanEstudio } from "src/plan_estudios/entities/plan_estudio.entity";
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToOne, OneToMany, UpdateDateColumn } from "typeorm";
+import { User } from "src/users/entities/user.entity";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Estudiante {
@@ -26,6 +27,10 @@ export class Estudiante {
 
     @Column()
     tituloBachiller: number;
+
+    @OneToOne(() => User, (user) => user.estudiante)
+    @JoinColumn()
+    user: User;
 
     @ManyToOne(() =>PlanEstudio, (plan_estudio) => plan_estudio.id,{
         eager: true,
