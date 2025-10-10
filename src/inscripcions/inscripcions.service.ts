@@ -103,9 +103,10 @@ export class InscripcionsService {
             if(gruposReservados.length>0){
               await grupoRepo.increment({id: In(gruposReservados)}, 'cupos', 1);
             }
+            const grupo = await grupoRepo.findOneBy({id: grupoId});
             return {
               status: 'REJECTED',
-              reason: 'Sin cupos'
+              reason: `Sin cupos el grupo: ${grupo?.idGrupo.sigla}`
             };
           }
 

@@ -16,11 +16,11 @@ export class TareasProducer {
     if( entity === 'inscripcion')
       await this.queueManager.enqueueToQueue('inscripciones','inscripcion',task, { jobId: id });
     else
-      await this.queueManager.enqueueBalanced(task, { jobId: id });
+      await this.queueManager.enqueueToQueue('default','default',task, { jobId: id });
     return {
       mensaje: 'Procesando Tarea',
       jobId: id,
-      notificationEndpoint: `/api/tareas/status/${id}`,
+      notificationEndpoint: `/tareas/status/${id}`,
     };
   }
 
@@ -32,7 +32,7 @@ export class TareasProducer {
     return {
       mensaje: 'Procesando Tarea',
       jobId: job.id,
-      queue: queueName,
+      notificationEndpoint: `/tareas/status/${id}`,
     };
   }
 
