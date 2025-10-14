@@ -18,6 +18,7 @@ import { ActiveUserInterface } from 'src/common/interfaces/active-user.interface
 @Controller('estudiantes')
 export class EstudiantesController {
   private readonly logger = new Logger(EstudiantesController.name);
+  
   constructor(
     private readonly estudiantesService: EstudiantesService,
     private readonly tareas: TareasProducer
@@ -40,20 +41,46 @@ export class EstudiantesController {
     );
   }
 
+  /**
+   * Endpoint optimizado: Lee directamente desde caché (Redis)
+   * Sin cola, respuesta instantánea
+   */
   @Roles('estudiante')
   @Get('materias-disponibles')
   @ApiOperation({ 
-    summary: 'Obtener materias disponibles para inscripción del estudiante',
-    description: 'Devuelve las materias que el estudiante puede inscribir basándose en prerrequisitos completados'
+    summary: 'Obtener materias disponibles para inscripción del estudiante (OPTIMIZADO)',
+    description: 'Devuelve las materias disponibles desde caché. Respuesta instantánea sin cola.'
   })
-  @ApiHeader({
-    name: 'x-callback-url',
-    description: 'CallBack-URL opcional para recibir respuestas',
-    required: false,
+  async getMateriasDisponibles(@ActiveUser() user: ActiveUserInterface) {
+    this.logger.debug(`Obteniendo materias disponibles desde caché para estudiante: ${user.id}`);
+    return await this.estudiantesService.getMateriasDisponibles(user.id);
+  }
+
+  /**
+   * Endpoint para regenerar manualmente el caché de un estudiante
+   */
+  @Roles('admin')
+  @Post(':id/regenerar-cache')
+  @ApiOperation({ 
+    summary: 'Regenerar caché de materias disponibles',
+    description: 'Fuerza la regeneración del caché para un estudiante específico'
   })
-  getMateriasDisponibles(@ActiveUser() user: ActiveUserInterface, @Headers('x-callback-url') callbackUrl?: string) {
-    this.logger.debug(`Usuario activo: ${JSON.stringify(user)}`);
-    return this.tareas.enqueue('estudiante', 'getMateriasDisponibles', { id: user.id }, callbackUrl);
+  async regenerarCache(@Param('id') id: number) {
+    await this.estudiantesService.invalidateCacheForEstudiante(id);
+    return await this.estudiantesService.getMateriasDisponibles(id);
+  }
+
+  /**
+   * Endpoint para regenerar el caché de todos los estudiantes
+   */
+  @Roles('estudiante')
+  @Post('regenerar-cache-todos')
+  @ApiOperation({ 
+    summary: 'Regenerar caché de todos los estudiantes',
+    description: 'Regenera el caché de materias disponibles para todos los estudiantes'
+  })
+  async regenerarCacheTodos() {
+    return await this.estudiantesService.regenerateAllCache();
   }
 
   @Get()

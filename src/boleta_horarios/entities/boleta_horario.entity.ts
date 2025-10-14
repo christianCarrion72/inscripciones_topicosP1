@@ -11,7 +11,7 @@ export class BoletaHorario {
     @ManyToOne(() => Horario, (horario) => horario.id, {eager: true, nullable: true})
     idHorario: Horario;
 
-    @ManyToOne(() => GrupoMateria, (grupo_materia) => grupo_materia.id)
+    @ManyToOne(() => GrupoMateria, (grupo_materia) => grupo_materia.id, {eager: true, nullable: true})
     idGrupoMateria: GrupoMateria;
 
     @CreateDateColumn()
