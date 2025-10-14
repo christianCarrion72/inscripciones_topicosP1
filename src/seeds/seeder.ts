@@ -27,7 +27,7 @@ export class DatabaseSeeder {
   constructor(private readonly dataSource: DataSource) {}
 
   /**
-   * Seed genérico con manejo de errores y logging
+   * Seed genérico con manejo de IDs explícitos
    */
   private async seedEntity<T = any>(
     repository: Repository<any>,
@@ -44,408 +44,324 @@ export class DatabaseSeeder {
     const entities: T[] = [];
     let created = 0;
     let existing = 0;
+    let failed = 0;
 
     try {
       for (const item of data) {
-        const whereCondition = { [uniqueField]: (item as any)[uniqueField] } as any;
-        const existingEntity = await repository.findOne({ where: whereCondition } as any);
-        
-        if (existingEntity) {
-          entities.push(existingEntity);
-          existing++;
-        } else {
-          const newEntity = repository.create(item as any);
-          const savedEntity = await repository.save(newEntity as any);
-          entities.push(savedEntity);
+        try {
+          // Intentar insertar directamente
+          await repository
+            .createQueryBuilder()
+            .insert()
+            .into(repository.metadata.target)
+            .values(item)
+            .orIgnore()
+            .execute();
+          
           created++;
+        } catch (error: any) {
+          // Si falla, verificar si ya existe
+          const whereCondition = { [uniqueField]: (item as any)[uniqueField] } as any;
+          const existingEntity = await repository.findOne({ where: whereCondition } as any);
+          
+          if (existingEntity) {
+            existing++;
+          } else {
+            failed++;
+            console.log(`   ⚠️  Error insertando ${entityName} con ${uniqueField}=${item[uniqueField]}:`, error.message);
+          }
         }
       }
 
-      console.log(`✅ ${entityName}: ${created} creados, ${existing} existentes`);
+      // Recuperar todas las entidades insertadas
+      const allEntities = await repository.find();
+      entities.push(...allEntities);
+
+      console.log(`✅ ${entityName}: ${created} creados, ${existing} existentes${failed > 0 ? `, ${failed} fallidos` : ''}`);
       return entities;
     } catch (error: any) {
       console.error(`❌ Error seeding ${entityName}:`, error);
+      console.error('   Detalle:', error.message);
       throw new Error(`Failed to seed ${entityName}: ${error.message}`);
     }
   }
 
   /**
-   * Mapeo con validación
+   * Seed especial para entidades con claves compuestas
+   * No verifica existencia, solo inserta todos los registros
    */
-  private mapWithValidation<T>(
+  private async seedEntityComposite<T = any>(
+    repository: Repository<any>,
     data: any[],
-    mapper: (item: any) => T | null,
+    whereFields: string[],
     entityName: string,
-  ): T[] {
-    const mapped = data.map(mapper).filter(Boolean) as T[];
-    const failed = data.length - mapped.length;
-    
-    if (failed > 0) {
-      console.warn(`⚠️  ${entityName}: ${failed} items no pudieron ser mapeados`);
+  ): Promise<T[]> {
+    if (!data?.length) {
+      console.log(`⚠️  No hay datos para ${entityName}`);
+      return [] as T[];
     }
-    
-    return mapped;
+
+    console.log(`📦 Seeding ${entityName}... (${data.length} items)`);
+    const entities: T[] = [];
+    let created = 0;
+
+    try {
+      for (const item of data) {
+        try {
+          // Insertar usando query builder
+          await repository
+            .createQueryBuilder()
+            .insert()
+            .into(repository.metadata.target)
+            .values(item)
+            .orIgnore()
+            .execute();
+          
+          created++;
+        } catch (err: any) {
+          console.log(`   ⚠️  Error insertando item:`, err.message);
+        }
+      }
+
+      // Recuperar todas las entidades
+      const allEntities = await repository.find();
+      entities.push(...allEntities);
+
+      console.log(`✅ ${entityName}: ${created} procesados, total en DB: ${entities.length}`);
+      return entities;
+    } catch (error: any) {
+      console.error(`❌ Error seeding ${entityName}:`, error);
+      console.error('   Detalle:', error.message);
+      throw new Error(`Failed to seed ${entityName}: ${error.message}`);
+    }
+  }
+
+  /**
+   * Depuración: Mostrar IDs insertados
+   */
+  private async debugTableIds(tableName: string): Promise<void> {
+    try {
+      const result = await this.dataSource.query(
+        `SELECT id FROM "${tableName}" ORDER BY id`
+      );
+      const ids = result.map((r: any) => r.id);
+      console.log(`   🔍 IDs en ${tableName}: [${ids.join(', ')}]`);
+    } catch (error) {
+      console.log(`   ⚠️  No se pudo verificar IDs de ${tableName}`);
+    }
   }
 
   async seed(): Promise<void> {
     console.log('🚀 Iniciando proceso de seeding...');
     
     try {
-      // 0. USUARIOS (PRIMERO - antes de docentes y estudiantes)
-      console.log('\n📋 Fase 0: Usuarios');
-      const users = await this.seedEntity(
-        this.dataSource.getRepository(User),
-        seedData.users,
-        'email',
-        'Users'
-      );
+      // ========================================
+      // LIMPIEZA INICIAL (Opcional pero recomendado)
+      // ========================================
+      console.log('\n🧹 Limpiando tablas en orden inverso...');
+      
+      const tablesToClean = [
+        'prerequisito',
+        'nota',
+        'detalle',
+        'inscripcion',
+        'boleta_horario',
+        'dia_horario',
+        'grupo_materia',
+        'periodo',
+        'estudiante',
+        'docente',
+        'materia',
+        'horario',
+        'aula',
+        'nivel',
+        'plan_estudio',
+        'grupo',
+        'gestion',
+        'dia',
+        'modulo',
+        'carrera',
+        'user',
+      ];
 
-      // 1. Entidades base (sin dependencias)
+      for (const table of tablesToClean) {
+        try {
+          await this.dataSource.query(`DELETE FROM "${table}"`);
+          await this.dataSource.query(`ALTER SEQUENCE IF EXISTS "${table}_id_seq" RESTART WITH 1`);
+        } catch (error) {
+          console.log(`   ⚠️  No se pudo limpiar ${table}`);
+        }
+      }
+      
+      console.log('✅ Limpieza completada');
+
+      // ========================================
+      // FASE 1: ENTIDADES BASE (sin dependencias)
+      // ========================================
       console.log('\n📋 Fase 1: Entidades base');
       
-      const [carreras, modulos, dias, gestiones, grupos] = await Promise.all([
-        this.seedEntity(this.dataSource.getRepository(Carrera), seedData.carreras, 'codigo', 'Carreras'),
-        this.seedEntity(this.dataSource.getRepository(Modulo), seedData.modulos, 'codigo', 'Modulos'),
-        this.seedEntity(this.dataSource.getRepository(Dia), seedData.dias, 'nombre', 'Dias'),
-        this.seedEntity(this.dataSource.getRepository(Gestion), seedData.gestiones, 'numero', 'Gestiones'),
-        this.seedEntity(this.dataSource.getRepository(Grupo), seedData.grupos, 'sigla', 'Grupos'),
+      const [users, carreras, modulos, dias, gestiones, grupos] = await Promise.all([
+        this.seedEntity(this.dataSource.getRepository(User), seedData.users, 'id', 'Users'),
+        this.seedEntity(this.dataSource.getRepository(Carrera), seedData.carreras, 'id', 'Carreras'),
+        this.seedEntity(this.dataSource.getRepository(Modulo), seedData.modulos, 'id', 'Modulos'),
+        this.seedEntity(this.dataSource.getRepository(Dia), seedData.dias, 'id', 'Dias'),
+        this.seedEntity(this.dataSource.getRepository(Gestion), seedData.gestiones, 'id', 'Gestiones'),
+        this.seedEntity(this.dataSource.getRepository(Grupo), seedData.grupos, 'id', 'Grupos'),
       ]);
 
-      // 2. Entidades con una dependencia
+      // ========================================
+      // FASE 2: ENTIDADES CON DEPENDENCIAS SIMPLES
+      // ========================================
       console.log('\n📋 Fase 2: Entidades con dependencias simples');
 
-      // Planes de Estudio
-      const planesMapped = this.mapWithValidation(
-        seedData.planesEstudio,
-        (p) => {
-          const carrera = (carreras as any[]).find((c: any) => c.codigo === p.carreraCodigo);
-          return carrera ? ({ nombre: p.nombre, idCarrera: carrera } as Partial<PlanEstudio>) : null;
-        },
-        'Planes de Estudio'
-      );
+      // Planes de Estudio (dependen de Carreras)
       const planes = await this.seedEntity(
         this.dataSource.getRepository(PlanEstudio), 
-        planesMapped as any, 
-        'nombre', 
+        seedData.planesEstudio, 
+        'id', 
         'Planes de Estudio'
       );
 
-      // Niveles
-      const nivelesMapped = this.mapWithValidation(
-        seedData.niveles,
-        (n) => {
-          const plan = (planes as any[]).find((p: any) => p.nombre === n.planNombre);
-          return plan ? ({ nombre: n.nombre, idPlan: plan } as Partial<Nivel>) : null;
-        },
-        'Niveles'
-      );
+      // Niveles (dependen de Planes)
       const niveles = await this.seedEntity(
         this.dataSource.getRepository(Nivel),
-        nivelesMapped as any,
-        'nombre',
+        seedData.niveles,
+        'id',
         'Niveles'
       );
 
-      // Aulas
-      const aulasMapped = this.mapWithValidation(
-        seedData.aulas,
-        (a) => {
-          const modulo = (modulos as any[]).find((m: any) => m.codigo === a.moduloCodigo);
-          return modulo ? ({ numero: a.numero, idModulo: modulo } as Partial<Aula>) : null;
-        },
-        'Aulas'
-      );
+      // Aulas (dependen de Modulos)
       const aulas = await this.seedEntity(
         this.dataSource.getRepository(Aula), 
-        aulasMapped as any, 
-        'numero', 
+        seedData.aulas, 
+        'id', 
         'Aulas'
       );
 
-      // Materias
-      const materiasMapped = this.mapWithValidation(
-        seedData.materias,
-        (m) => {
-          const nivel = (niveles as any[]).find((n: any) => n.nombre === m.nivelNombre);
-          const plan = (planes as any[]).find((p: any) => p.nombre === m.planNombre);
-          return (nivel && plan) ? ({ nombre: m.nombre, codigo: m.codigo, idNivel: nivel, idPlan: plan } as Partial<Materia>) : null;
-        },
-        'Materias'
-      );
-      const materias = await this.seedEntity(
-        this.dataSource.getRepository(Materia), 
-        materiasMapped as any, 
-        'codigo', 
-        'Materias'
-      );
-
-      // Periodos
-      const periodosMapped = this.mapWithValidation(
-        seedData.periodos,
-        (p) => {
-          const gestion = (gestiones as any[]).find((g: any) => g.numero === p.gestionNumero);
-          return gestion ? ({ numero: p.numero, idGestion: gestion } as Partial<Periodo>) : null;
-        },
-        'Periodos'
-      );
-      const periodos = await this.seedEntity(
-        this.dataSource.getRepository(Periodo), 
-        periodosMapped as any, 
-        'numero', 
-        'Periodos'
-      );
-
-      // 3. Entidades con usuarios (docentes y estudiantes)
-      console.log('\n📋 Fase 3: Docentes y Estudiantes');
-
-      // Docentes - mapear con usuarios
-      const docentesMapped = this.mapWithValidation(
-        seedData.docentes,
-        (d) => {
-          const user = (users as any[]).find((u: any) => u.id === d.user.id);
-          if (!user) return null;
-          const { user: _, ...docenteData } = d;
-          return { ...docenteData, user } as Partial<Docente>;
-        },
-        'Docentes'
-      );
-      const docentes = await this.seedEntity(
-        this.dataSource.getRepository(Docente),
-        docentesMapped as any,
-        'ci',
-        'Docentes'
-      );
-
-      // Estudiantes - mapear con usuarios
-      const estudiantesMapped = this.mapWithValidation(
-        seedData.estudiantes,
-        (e) => {
-          const plan = (planes as any[]).find((p: any) => p.nombre === e.planNombre);
-          if (!plan) return null;
-          const user = (users as any[]).find((u: any) => u.id === e.user.id);
-          if (!user) return null;
-          const { planNombre, user: _, ...rest } = e;
-          return { 
-            ...rest, 
-            idPlan: plan, 
-            user 
-          } as Partial<Estudiante>;
-        },
-        'Estudiantes'
-      );
-      
-      const estudiantes = await this.seedEntity(
-        this.dataSource.getRepository(Estudiante), 
-        estudiantesMapped as any, 
-        'registro', 
-        'Estudiantes'
-      );
-
-      // Horarios
-      const horariosMapped = this.mapWithValidation(
-        seedData.horarios,
-        (h) => {
-          const aula = (aulas as any[]).find((a: any) => a.numero === h.aulaNumero);
-          return aula ? ({ horaInicio: h.horaInicio, horaFin: h.horaFin, idAula: aula } as Partial<Horario>) : null;
-        },
-        'Horarios'
-      );
+      // Horarios (dependen de Aulas)
       const horarios = await this.seedEntity(
         this.dataSource.getRepository(Horario), 
-        horariosMapped as any, 
-        'horaInicio', 
+        seedData.horarios, 
+        'id', 
         'Horarios'
       );
 
-      // 4. Entidades relacionales complejas
+      // Materias (dependen de Niveles y Planes)
+      const materias = await this.seedEntity(
+        this.dataSource.getRepository(Materia), 
+        seedData.materias, 
+        'id', 
+        'Materias'
+      );
+
+      // Periodos (dependen de Gestiones)
+      const periodos = await this.seedEntity(
+        this.dataSource.getRepository(Periodo), 
+        seedData.periodos, 
+        'id', 
+        'Periodos'
+      );
+
+      // ========================================
+      // FASE 3: DOCENTES Y ESTUDIANTES
+      // ========================================
+      console.log('\n📋 Fase 3: Docentes y Estudiantes');
+
+      // Docentes (dependen de Users)
+      const docentes = await this.seedEntity(
+        this.dataSource.getRepository(Docente),
+        seedData.docentes,
+        'id',
+        'Docentes'
+      );
+
+      // Estudiantes (dependen de Users y Planes)
+      const estudiantes = await this.seedEntity(
+        this.dataSource.getRepository(Estudiante), 
+        seedData.estudiantes, 
+        'id', 
+        'Estudiantes'
+      );
+
+      // ========================================
+      // FASE 4: ENTIDADES RELACIONALES COMPLEJAS
+      // ========================================
       console.log('\n📋 Fase 4: Entidades relacionales');
 
-      // GrupoMaterias
-
-      const repoGrupoMat = this.dataSource.getRepository(GrupoMateria);
-      const grupoMateriasMapped = this.mapWithValidation(
+      // GrupoMaterias (dependen de Materias, Docentes, Grupos)
+      const grupoMaterias = await this.seedEntityComposite(
+        this.dataSource.getRepository(GrupoMateria),
         seedData.grupoMaterias,
-        (gm) => {
-          const materia = (materias as any[]).find((m: any) => m.codigo === gm.materiaCodigo);
-          const docente = (docentes as any[]).find((d: any) => d.id === gm.idDocente.id);
-          const grupo = (grupos as any[]).find((g: any) => g.sigla === gm.grupoSigla);
-          return (materia && docente && grupo)
-            ? ({ cupos: gm.cupos, idMateria: materia, idDocente: docente, idGrupo: grupo } as Partial<GrupoMateria>)
-            : null;
-        },
+        ['idMateria', 'idGrupo'],
         'GrupoMaterias'
       );
+      
+      // DEBUG: Verificar IDs de GrupoMaterias
+      await this.debugTableIds('grupo_materia');
 
-      const grupoMaterias: GrupoMateria[] = [];
-
-      for (const item of grupoMateriasMapped) {
-        const exists = await repoGrupoMat.findOne({
-          where: {
-            idMateria: { id: (item.idMateria as any).id },
-            idGrupo: { id: (item.idGrupo as any).id },
-          },
-          relations: ['idMateria', 'idGrupo'],
-        });
-
-        if (!exists) {
-          const created = repoGrupoMat.create(item);
-          const saved = await repoGrupoMat.save(created);
-          grupoMaterias.push(saved);
-        } else {
-          grupoMaterias.push(exists);
-        }
-      }
-
-      console.log(`✅ GrupoMaterias: ${grupoMaterias.length} registrados`);
-
-      // DiaHorarios
-      const diaHorariosMapped = this.mapWithValidation(
-        seedData.diaHorarios,
-        (dh) => {
-          const dia = (dias as any[]).find((d: any) => d.nombre === dh.diaNombre);
-          const horario = (horarios as any[]).find((h: any) => h.horaInicio === dh.horarioHoraInicio);
-          
-          return (dia && horario) ? ({ idDia: dia, idHorario: horario } as Partial<DiaHorario>) : null;
-        },
-        'DiaHorarios'
-      );
-      const diaHorarios = await this.seedEntity(
+      // DiaHorarios (dependen de Dias y Horarios)
+      const diaHorarios = await this.seedEntityComposite(
         this.dataSource.getRepository(DiaHorario), 
-        diaHorariosMapped as any, 
-        'id', 
+        seedData.diaHorarios,
+        ['idDia', 'idHorario'],
         'DiaHorarios'
       );
 
-      // BoletaHorarios
-      const boletaHorariosMapped = this.mapWithValidation(
-        seedData.boletaHorarios,
-        (bh) => {
-          const horario = (horarios as any[]).find((h: any) => h.horaInicio === bh.horarioHoraInicio);
-          const gm = (grupoMaterias as any[]).find((x: any) =>
-            x.idMateria?.codigo === bh.grupoMateria.materiaCodigo && 
-            x.idGrupo?.sigla === bh.grupoMateria.grupoSigla
-          );
-          
-          return (horario && gm) ? ({ idHorario: horario, idGrupoMateria: gm } as Partial<BoletaHorario>) : null;
-        },
-        'BoletaHorarios'
-      );
+      // BoletaHorarios (dependen de Horarios y GrupoMaterias)
       const boletaHorarios = await this.seedEntity(
         this.dataSource.getRepository(BoletaHorario), 
-        boletaHorariosMapped as any, 
+        seedData.boletaHorarios, 
         'id',
         'BoletaHorarios'
       );
 
-      // 5. Entidades finales (inscripciones, notas, etc.)
-      console.log('\n📋 Fase 5: Entidades finales');
+      // ========================================
+      // FASE 5: INSCRIPCIONES Y DERIVADOS
+      // ========================================
+      console.log('\n📋 Fase 5: Inscripciones y derivados');
 
-      // Inscripciones
-      const inscripcionesMapped = this.mapWithValidation(
-        seedData.inscripciones,
-        (i) => {
-          const estudiante = (estudiantes as any[]).find((e: any) => e.id === i.idEstudiante.id);
-          return estudiante 
-            ? ({ fechaInscripcion: new Date(), idEstudiante: estudiante } as Partial<Inscripcion>)
-            : null;
-        },
-        'Inscripciones'
-      );
+      // Inscripciones (dependen de Estudiantes)
       const inscripciones = await this.seedEntity(
         this.dataSource.getRepository(Inscripcion), 
-        inscripcionesMapped as any, 
-        'idEstudiante', 
+        seedData.inscripciones, 
+        'id', 
         'Inscripciones'
       );
 
-      // Detalles
-      const detallesMapped = this.mapWithValidation(
-        seedData.detalles,
-        (d) => {
-          const ins = (inscripciones as any[]).find((i: any) => 
-            i.id === d.inscripcionRegistro || i.idEstudiante?.registro === d.inscripcionRegistro
-          );
-          const gm = (grupoMaterias as any[]).find((x: any) =>
-            x.idMateria?.codigo === d.grupoMateria.materiaCodigo && 
-            x.idGrupo?.sigla === d.grupoMateria.grupoSigla
-          );
-          
-          return (ins && gm) ? ({ idInscripcion: ins, idGrupoMat: gm } as Partial<Detalle>) : null;
-        },
-        'Detalles'
-      );
+      // Detalles (dependen de Inscripciones y GrupoMaterias)
       const detalles = await this.seedEntity(
         this.dataSource.getRepository(Detalle), 
-        detallesMapped as any, 
+        seedData.detalles, 
         'id',
         'Detalles'
       );
 
-      // Notas
-      const notasMapped = this.mapWithValidation(
-        seedData.notas,
-        (n) => {
-          const estudiante = (estudiantes as any[]).find((e: any) => e.id === n.idEstudiante.id);
-          const gm = (grupoMaterias as any[]).find((x: any) =>
-            x.idMateria?.codigo === n.grupoMateria.materiaCodigo && 
-            x.idGrupo?.sigla === n.grupoMateria.grupoSigla
-          );
-          
-          return (estudiante && gm) 
-            ? ({ nota: n.nota, idMatGrup: gm, idEstudiante: estudiante } as Partial<Nota>)
-            : null;
-        },
-        'Notas'
-      );
+      // Notas (dependen de Estudiantes y GrupoMaterias)
       const notas = await this.seedEntity(
         this.dataSource.getRepository(Nota), 
-        notasMapped as any, 
-        'idEstudiante',
+        seedData.notas, 
+        'id',
         'Notas'
       );
 
-      // Prerequisitos
-      let prerequisitos: any[] = [];
-      if (seedData.prerequisitos?.length) {
-        const prerequisitosMapped = this.mapWithValidation(
-          seedData.prerequisitos,
-          (p: any) => {
-            const materia = (materias as any[]).find((m: any) => m.codigo === p.materiaCodigo);
-            const prerequisito = (materias as any[]).find((m: any) => m.codigo === p.prerequisitoCodigo);
-            
-            return (materia && prerequisito) 
-              ? ({ idMateria: materia, idPrerequisito: prerequisito } as Partial<Prerequisito>)
-              : null;
-          },
-          'Prerequisitos'
-        );
+      // ========================================
+      // FASE 6: PREREQUISITOS
+      // ========================================
+      console.log('\n📋 Fase 6: Prerequisitos');
 
-        const repo = this.dataSource.getRepository(Prerequisito);
-        const inserted: any[] = [];
+      // Prerequisitos (dependen de Materias)
+      const prerequisitos = await this.seedEntityComposite(
+        this.dataSource.getRepository(Prerequisito),
+        seedData.prerequisitos,
+        ['idMateria', 'idPrerequisito'],
+        'Prerequisitos'
+      );
 
-        for (const item of prerequisitosMapped) {
-          const exists = await repo.findOne({
-            where: {
-              idMateria: { id: (item.idMateria as any).id },
-              idPrerequisito: { id: (item.idPrerequisito as any).id },
-            },
-            relations: ['idMateria', 'idPrerequisito'],
-          });
-
-          if (!exists) {
-            const created = repo.create(item);
-            const saved = await repo.save(created);
-            inserted.push(saved);
-          } else {
-            inserted.push(exists);
-          }
-        }
-
-      }
-
+      // ========================================
+      // RESUMEN FINAL
+      // ========================================
       console.log('\n✅ Proceso de seeding completado exitosamente');
       
-      // Resumen final
       console.log('\n📊 Resumen:');
       console.log(`   Users:           ${users.length}`);
       console.log(`   Carreras:        ${carreras.length}`);

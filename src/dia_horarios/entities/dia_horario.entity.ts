@@ -8,16 +8,10 @@ export class DiaHorario {
     @Column({ primary: true, generated: true})
     id: number;
 
-    @ManyToOne(() => Dia, (dia) => dia.id,{
-        eager: true,
-        nullable: false
-    })
+    @ManyToOne(() => Dia, (dia) => dia.id,{eager: true, nullable: true})
     idDia: Dia;
 
-    @ManyToOne(() => Horario, (horario) => horario.id,{
-        eager: true,
-        nullable: false
-    })
+    @ManyToOne(() => Horario, (horario) => horario.id,{ eager: true,nullable: true})
     idHorario: Horario;
 
     @CreateDateColumn()

@@ -11,7 +11,9 @@ import { SyncEstudiantesController } from './sync-estudiantes.controller';
 import { MateriasModule } from 'src/materias/materias.module';
 import { NotasModule } from 'src/notas/notas.module';
 import { PrerequisitosModule } from 'src/prerequisitos/prerequisitos.module';
-
+import { GrupoMateriasModule } from 'src/grupo_materias/grupo_materias.module';
+import { BoletaHorariosModule } from 'src/boleta_horarios/boleta_horarios.module';
+import { DiaHorariosModule } from 'src/dia_horarios/dia_horarios.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Estudiante]),
@@ -21,7 +23,10 @@ import { PrerequisitosModule } from 'src/prerequisitos/prerequisitos.module';
     PrerequisitosModule,
     forwardRef(() => AuthModule),
     forwardRef(() => PlanEstudiosModule),
-    forwardRef(() => TareasModule)
+    forwardRef(() => TareasModule),
+    GrupoMateriasModule,
+    BoletaHorariosModule,
+    DiaHorariosModule,
   ],
   controllers: [EstudiantesController, SyncEstudiantesController],
   providers: [EstudiantesService, SyncEstudiantesService],

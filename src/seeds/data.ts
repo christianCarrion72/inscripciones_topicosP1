@@ -12,72 +12,72 @@ export const seedData = {
   ],
 
   carreras: [
-    { nombre: 'Ingeniería de Sistemas', codigo: 'SIS' },
-    { nombre: 'Ingeniería Industrial', codigo: 'IND' },
-    { nombre: 'Ingeniería Civil', codigo: 'CIV' },
-    { nombre: 'Administración de Empresas', codigo: 'ADM' },
+    { id: 1, nombre: 'Ingeniería de Sistemas', codigo: 'SIS' },
+    { id: 2, nombre: 'Ingeniería Industrial', codigo: 'IND' },
+    { id: 3, nombre: 'Ingeniería Civil', codigo: 'CIV' },
+    { id: 4, nombre: 'Administración de Empresas', codigo: 'ADM' },
   ],
 
   planesEstudio: [
-    { nombre: 'Plan 2025', carreraCodigo: 'SIS' },
-    { nombre: 'Plan 2018', carreraCodigo: 'IND' },
-    { nombre: 'Plan 2022', carreraCodigo: 'CIV' },
-    { nombre: 'Plan 2019', carreraCodigo: 'ADM' },
+    { id: 1, nombre: 'Plan 2025', idCarrera: 1 },
+    { id: 2, nombre: 'Plan 2018', idCarrera: 2 },
+    { id: 3, nombre: 'Plan 2022', idCarrera: 3 },
+    { id: 4, nombre: 'Plan 2019', idCarrera: 4 },
   ],
 
   niveles: [
-    { nombre: 'Primer Nivel', planNombre: 'Plan 2025' },
-    { nombre: 'Segundo Nivel', planNombre: 'Plan 2025' },
-    { nombre: 'Tercer Nivel', planNombre: 'Plan 2025' },
-    { nombre: 'Cuarto Nivel', planNombre: 'Plan 2025' },
+    { id: 1, nombre: 'Primer Nivel', idPlan: 1 },
+    { id: 2, nombre: 'Segundo Nivel', idPlan: 1 },
+    { id: 3, nombre: 'Tercer Nivel', idPlan: 1 },
+    { id: 4, nombre: 'Cuarto Nivel', idPlan: 1 },
   ],
 
   modulos: [
-    { codigo: 1 },
-    { codigo: 2 },
-    { codigo: 3 },
+    { id: 1, codigo: 1 },
+    { id: 2, codigo: 2 },
+    { id: 3, codigo: 3 },
   ],
 
   aulas: [
-    { numero: 101, moduloCodigo: 1 },
-    { numero: 102, moduloCodigo: 1 },
-    { numero: 201, moduloCodigo: 2 },
-    { numero: 301, moduloCodigo: 3 },
+    { id: 1, numero: 101, idModulo: 1 },
+    { id: 2, numero: 102, idModulo: 1 },
+    { id: 3, numero: 201, idModulo: 2 },
+    { id: 4, numero: 301, idModulo: 3 },
   ],
 
   dias: [
-    { nombre: 'Lunes' },
-    { nombre: 'Martes' },
-    { nombre: 'Miércoles' },
-    { nombre: 'Jueves' },
-    { nombre: 'Viernes' },
-    { nombre: 'Sábado' },
+    { id: 1, nombre: 'Lunes' },
+    { id: 2, nombre: 'Martes' },
+    { id: 3, nombre: 'Miércoles' },
+    { id: 4, nombre: 'Jueves' },
+    { id: 5, nombre: 'Viernes' },
+    { id: 6, nombre: 'Sábado' },
   ],
 
   horarios: [
-    { horaInicio: '07:00', horaFin: '08:30', aulaNumero: 101 },
-    { horaInicio: '08:30', horaFin: '10:00', aulaNumero: 101 },
-    { horaInicio: '10:15', horaFin: '11:45', aulaNumero: 102 },
-    { horaInicio: '11:45', horaFin: '13:15', aulaNumero: 201 },
-    { horaInicio: '14:30', horaFin: '16:00', aulaNumero: 301 },
+    { id: 1, horaInicio: '07:00', horaFin: '08:30', idAula: 1 },
+    { id: 2, horaInicio: '08:30', horaFin: '10:00', idAula: 1 },
+    { id: 3, horaInicio: '10:15', horaFin: '11:45', idAula: 2 },
+    { id: 4, horaInicio: '11:45', horaFin: '13:15', idAula: 3 },
+    { id: 5, horaInicio: '14:30', horaFin: '16:00', idAula: 4 },
   ],
 
   materias: [
     // Nivel 1
-    { nombre: 'Introducción a la Programación', codigo: 'SIS-101', nivelNombre: 'Primer Nivel', planNombre: 'Plan 2025' },
-    { nombre: 'Lógica y Matemática Discreta', codigo: 'SIS-102', nivelNombre: 'Primer Nivel', planNombre: 'Plan 2025' },
+    { id: 1, nombre: 'Introducción a la Programación', codigo: 'SIS-101', idNivel: 1, idPlan: 1 },
+    { id: 2, nombre: 'Lógica y Matemática Discreta', codigo: 'SIS-102', idNivel: 1, idPlan: 1 },
 
     // Nivel 2
-    { nombre: 'Programación Orientada a Objetos', codigo: 'SIS-201', nivelNombre: 'Segundo Nivel', planNombre: 'Plan 2025' },
-    { nombre: 'Estructuras de Datos', codigo: 'SIS-202', nivelNombre: 'Segundo Nivel', planNombre: 'Plan 2025' },
+    { id: 3, nombre: 'Programación Orientada a Objetos', codigo: 'SIS-201', idNivel: 2, idPlan: 1 },
+    { id: 4, nombre: 'Estructuras de Datos', codigo: 'SIS-202', idNivel: 2, idPlan: 1 },
 
     // Nivel 3
-    { nombre: 'Bases de Datos I', codigo: 'SIS-301', nivelNombre: 'Tercer Nivel', planNombre: 'Plan 2025' },
-    { nombre: 'Ingeniería de Software I', codigo: 'SIS-302', nivelNombre: 'Tercer Nivel', planNombre: 'Plan 2025' },
+    { id: 5, nombre: 'Bases de Datos I', codigo: 'SIS-301', idNivel: 3, idPlan: 1 },
+    { id: 6, nombre: 'Ingeniería de Software I', codigo: 'SIS-302', idNivel: 3, idPlan: 1 },
 
     // Nivel 4
-    { nombre: 'Sistemas Operativos', codigo: 'SIS-401', nivelNombre: 'Cuarto Nivel', planNombre: 'Plan 2025' },
-    { nombre: 'Redes de Computadoras', codigo: 'SIS-402', nivelNombre: 'Cuarto Nivel', planNombre: 'Plan 2025' },
+    { id: 7, nombre: 'Sistemas Operativos', codigo: 'SIS-401', idNivel: 4, idPlan: 1 },
+    { id: 8, nombre: 'Redes de Computadoras', codigo: 'SIS-402', idNivel: 4, idPlan: 1 },
   ],
 
   docentes: [
@@ -89,7 +89,7 @@ export const seedData = {
       telefono: 71000001,
       direccion: 'Av. Paraguá #123',
       especialidad: 'Ingeniería de Software',
-      user: { id: 5 },
+      userId: 5,
     },
     {
       id: 2,
@@ -99,7 +99,7 @@ export const seedData = {
       telefono: 71000002,
       direccion: 'Av. Banzer #456',
       especialidad: 'Inteligencia Artificial',
-      user: { id: 6 },
+      userId: 6,
     },
     {
       id: 3,
@@ -109,7 +109,7 @@ export const seedData = {
       telefono: 71000003,
       direccion: 'Av. Pirai #789',
       especialidad: 'Redes y Telecomunicaciones',
-      user: { id: 7 },
+      userId: 7,
     },
   ],
 
@@ -122,8 +122,8 @@ export const seedData = {
       telefono: 70000001,
       direccion: 'Av. Busch #123',
       tituloBachiller: 123,
-      planNombre: 'Plan 2025',
-      user: { id: 2 },
+      idPlan: 1,
+      userId: 2,
     },
     {
       id: 2,
@@ -133,8 +133,8 @@ export const seedData = {
       telefono: 70000002,
       direccion: 'Av. Cañoto #456',
       tituloBachiller: 124,
-      planNombre: 'Plan 2025',
-      user: { id: 3 },
+      idPlan: 1,
+      userId: 3,
     },
     {
       id: 3,
@@ -144,89 +144,119 @@ export const seedData = {
       telefono: 70000003,
       direccion: 'Av. Irala #789',
       tituloBachiller: 125,
-      planNombre: 'Plan 2025',
-      user: { id: 4 },
+      idPlan: 1,
+      userId: 4,
     },
   ],
 
   gestiones: [
-    { numero: 2024 },
-    { numero: 2025 },
+    { id: 1, numero: 2024 },
+    { id: 2, numero: 2025 },
   ],
 
   periodos: [
-    { numero: 1, gestionNumero: 2025 },
-    { numero: 2, gestionNumero: 2025 },
+    { id: 1, numero: 1, idGestion: 2 },
+    { id: 2, numero: 2, idGestion: 2 },
   ],
 
   grupos: [
-    { sigla: 'A' },
-    { sigla: 'B' },
+    { id: 1, sigla: 'A' },
+    { id: 2, sigla: 'B' },
   ],
 
-  // 👇 Cada materia tiene 2 grupos (A y B) con docentes alternados
   grupoMaterias: [
     // Nivel 1
-    { cupos: 20, materiaCodigo: 'SIS-101', idDocente: { id: 1 }, grupoSigla: 'A' },
-    { cupos: 20, materiaCodigo: 'SIS-101', idDocente: { id: 2 }, grupoSigla: 'B' },
+    { id: 1, cupos: 20, idMateria: 1, idDocente: 1, idGrupo: 1 },
+    { id: 2, cupos: 20, idMateria: 1, idDocente: 2, idGrupo: 2 },
 
-    { cupos: 30, materiaCodigo: 'SIS-102', idDocente: { id: 2 }, grupoSigla: 'A' },
-    { cupos: 30, materiaCodigo: 'SIS-102', idDocente: { id: 3 }, grupoSigla: 'B' },
+    { id: 3, cupos: 30, idMateria: 2, idDocente: 2, idGrupo: 1 },
+    { id: 4, cupos: 30, idMateria: 2, idDocente: 3, idGrupo: 2 },
 
     // Nivel 2
-    { cupos: 35, materiaCodigo: 'SIS-201', idDocente: { id: 3 }, grupoSigla: 'A' },
-    { cupos: 35, materiaCodigo: 'SIS-201', idDocente: { id: 1 }, grupoSigla: 'B' },
+    { id: 5, cupos: 35, idMateria: 3, idDocente: 3, idGrupo: 1 },
+    { id: 6, cupos: 35, idMateria: 3, idDocente: 1, idGrupo: 2 },
 
-    { cupos: 40, materiaCodigo: 'SIS-202', idDocente: { id: 1 }, grupoSigla: 'A' },
-    { cupos: 40, materiaCodigo: 'SIS-202', idDocente: { id: 2 }, grupoSigla: 'B' },
+    { id: 7, cupos: 40, idMateria: 4, idDocente: 1, idGrupo: 1 },
+    { id: 8, cupos: 40, idMateria: 4, idDocente: 2, idGrupo: 2 },
 
     // Nivel 3
-    { cupos: 45, materiaCodigo: 'SIS-301', idDocente: { id: 2 }, grupoSigla: 'A' },
-    { cupos: 45, materiaCodigo: 'SIS-301', idDocente: { id: 3 }, grupoSigla: 'B' },
+    { id: 9, cupos: 45, idMateria: 5, idDocente: 2, idGrupo: 1 },
+    { id: 10, cupos: 45, idMateria: 5, idDocente: 3, idGrupo: 2 },
 
-    { cupos: 50, materiaCodigo: 'SIS-302', idDocente: { id: 3 }, grupoSigla: 'A' },
-    { cupos: 50, materiaCodigo: 'SIS-302', idDocente: { id: 1 }, grupoSigla: 'B' },
+    { id: 11, cupos: 50, idMateria: 6, idDocente: 3, idGrupo: 1 },
+    { id: 12, cupos: 50, idMateria: 6, idDocente: 1, idGrupo: 2 },
 
     // Nivel 4
-    { cupos: 55, materiaCodigo: 'SIS-401', idDocente: { id: 1 }, grupoSigla: 'A' },
-    { cupos: 55, materiaCodigo: 'SIS-401', idDocente: { id: 2 }, grupoSigla: 'B' },
+    { id: 13, cupos: 55, idMateria: 7, idDocente: 1, idGrupo: 1 },
+    { id: 14, cupos: 55, idMateria: 7, idDocente: 2, idGrupo: 2 },
 
-    { cupos: 60, materiaCodigo: 'SIS-402', idDocente: { id: 2 }, grupoSigla: 'A' },
-    { cupos: 60, materiaCodigo: 'SIS-402', idDocente: { id: 3 }, grupoSigla: 'B' },
+    { id: 15, cupos: 60, idMateria: 8, idDocente: 2, idGrupo: 1 },
+    { id: 16, cupos: 60, idMateria: 8, idDocente: 3, idGrupo: 2 },
   ],
 
   diaHorarios: [
-    { diaNombre: 'Lunes', horarioHoraInicio: '07:00' },
-    { diaNombre: 'Martes', horarioHoraInicio: '08:30' },
+    { id: 1, idDia: 1, idHorario: 1 },
+    { id: 2, idDia: 2, idHorario: 2 },
+    { id: 3, idDia: 3, idHorario: 3 },
+    { id: 4, idDia: 4, idHorario: 4 },
+    { id: 5, idDia: 5, idHorario: 5 },
+    { id: 6, idDia: 6, idHorario: 1 },
   ],
 
   boletaHorarios: [
-    { horarioHoraInicio: '07:00', grupoMateria: { materiaCodigo: 'SIS-101', grupoSigla: 'A' } },
-    { horarioHoraInicio: '08:30', grupoMateria: { materiaCodigo: 'SIS-101', grupoSigla: 'B' } },
-    { horarioHoraInicio: '10:15', grupoMateria: { materiaCodigo: 'SIS-102', grupoSigla: 'A' } },
-    { horarioHoraInicio: '11:45', grupoMateria: { materiaCodigo: 'SIS-102', grupoSigla: 'B' } },
+    // Nivel 1
+    { id: 1, idHorario: 1, idGrupoMateria: 1 },  // SIS-101 Grupo A
+    { id: 2, idHorario: 2, idGrupoMateria: 2 },  // SIS-101 Grupo B
+  
+    { id: 3, idHorario: 3, idGrupoMateria: 3 },  // SIS-102 Grupo A
+    { id: 4, idHorario: 4, idGrupoMateria: 4 },  // SIS-102 Grupo B
+  
+    // Nivel 2
+    { id: 5, idHorario: 5, idGrupoMateria: 5 },  // SIS-201 Grupo A
+    { id: 6, idHorario: 1, idGrupoMateria: 6 },  // SIS-201 Grupo B
+  
+    { id: 7, idHorario: 2, idGrupoMateria: 7 },  // SIS-202 Grupo A
+    { id: 8, idHorario: 3, idGrupoMateria: 8 },  // SIS-202 Grupo B
+  
+    // Nivel 3
+    { id: 9, idHorario: 4, idGrupoMateria: 9 },   // SIS-301 Grupo A
+    { id: 10, idHorario: 5, idGrupoMateria: 10 }, // SIS-301 Grupo B
+  
+    { id: 11, idHorario: 1, idGrupoMateria: 11 }, // SIS-302 Grupo A
+    { id: 12, idHorario: 2, idGrupoMateria: 12 }, // SIS-302 Grupo B
+  
+    // Nivel 4
+    { id: 13, idHorario: 3, idGrupoMateria: 13 }, // SIS-401 Grupo A
+    { id: 14, idHorario: 4, idGrupoMateria: 14 }, // SIS-401 Grupo B
+  
+    { id: 15, idHorario: 5, idGrupoMateria: 15 }, // SIS-402 Grupo A
+    { id: 16, idHorario: 1, idGrupoMateria: 16 }, // SIS-402 Grupo B
   ],
 
   inscripciones: [
-    { idEstudiante: { id: 1 } },
+    { id: 1, idEstudiante: 1, fechaInscripcion: '2025-01-15' },
+    { id: 2, idEstudiante: 2, fechaInscripcion: '2025-01-15' },
+    { id: 3, idEstudiante: 3, fechaInscripcion: '2025-01-15' },
   ],
 
   detalles: [
-    { inscripcionRegistro: 219062851, grupoMateria: { materiaCodigo: 'SIS-101', grupoSigla: 'A' } },
-    { inscripcionRegistro: 219062852, grupoMateria: { materiaCodigo: 'SIS-102', grupoSigla: 'B' } },
+    { id: 1, idInscripcion: 1, idGrupoMat: 1 },  // Estudiante 1 en SIS-101 Grupo A
+    { id: 2, idInscripcion: 2, idGrupoMat: 4 },  // Estudiante 2 en SIS-102 Grupo B
+    { id: 3, idInscripcion: 3, idGrupoMat: 3 },  // Estudiante 3 en SIS-102 Grupo A
   ],
 
   notas: [
-    { idEstudiante: { id: 1 }, grupoMateria: { materiaCodigo: 'SIS-101', grupoSigla: 'A' }, nota: 85 },
-    { idEstudiante: { id: 2 }, grupoMateria: { materiaCodigo: 'SIS-102', grupoSigla: 'B' }, nota: 90 },
+    { id: 1, idEstudiante: 1, idMatGrup: 1, nota: 85 },
+    { id: 2, idEstudiante: 2, idMatGrup: 4, nota: 90 },
+    { id: 3, idEstudiante: 3, idMatGrup: 3, nota: 78 },
   ],
 
   prerequisitos: [
-    { materiaCodigo: 'SIS-201', prerequisitoCodigo: 'SIS-101' },
-    { materiaCodigo: 'SIS-202', prerequisitoCodigo: 'SIS-102' },
-    { materiaCodigo: 'SIS-301', prerequisitoCodigo: 'SIS-201' },
-    { materiaCodigo: 'SIS-302', prerequisitoCodigo: 'SIS-202' },
-    { materiaCodigo: 'SIS-401', prerequisitoCodigo: 'SIS-301' },
-    { materiaCodigo: 'SIS-402', prerequisitoCodigo: 'SIS-302' },
+    { id: 1, idMateria: 3, idPrerequisito: 1 },  // SIS-201 requiere SIS-101
+    { id: 2, idMateria: 4, idPrerequisito: 2 },  // SIS-202 requiere SIS-102
+    { id: 3, idMateria: 5, idPrerequisito: 3 },  // SIS-301 requiere SIS-201
+    { id: 4, idMateria: 6, idPrerequisito: 4 },  // SIS-302 requiere SIS-202
+    { id: 5, idMateria: 7, idPrerequisito: 5 },  // SIS-401 requiere SIS-301
+    { id: 6, idMateria: 8, idPrerequisito: 6 },  // SIS-402 requiere SIS-302
   ],
 };

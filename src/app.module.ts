@@ -26,12 +26,31 @@ import { AuthModule } from './auth/auth.module';
 import { SeedsModule } from './seeds/seeds.module';
 import { BullModule } from '@nestjs/bullmq';
 import { StatsController } from './req-contador/stats.controller';
+import { CacheModule } from '@nestjs/cache-manager';
+import { redisStore } from 'cache-manager-redis-yet';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       envFilePath: '.env',
       isGlobal: true,
+    }),
+    // Configuración GLOBAL de caché con Redis (usando redis-yet)
+    CacheModule.registerAsync({
+      isGlobal: true,
+      useFactory: async () => {
+        const store = await redisStore({
+          socket: {
+            host: process.env.REDIS_HOST || 'localhost',
+            port: parseInt(process.env.REDIS_PORT || '6379', 10),
+          },
+          ttl: 3600 * 1000, // En milisegundos con redis-yet
+        });
+
+        return {
+          store: () => store,
+        };
+      },
     }),
     TypeOrmModule.forRoot({
       type: "postgres",
