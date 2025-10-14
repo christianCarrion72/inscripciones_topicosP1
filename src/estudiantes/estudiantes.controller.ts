@@ -51,11 +51,15 @@ export class EstudiantesController {
     summary: 'Obtener materias disponibles para inscripción del estudiante (OPTIMIZADO)',
     description: 'Devuelve las materias disponibles desde caché. Respuesta instantánea sin cola.'
   })
-  async getMateriasDisponibles(@ActiveUser() user: ActiveUserInterface) {
+  @ApiHeader({
+    name: 'x-callback-url',
+    description: 'CallBack-URL opcional para recibir respuestas',
+    required: false,
+  })
+  getMateriasDisponibles(@ActiveUser() user: ActiveUserInterface, @Headers('x-callback-url') callbackUrl?: string) {
     this.logger.debug(`Obteniendo materias disponibles desde caché para estudiante: ${user.id}`);
-    return await this.estudiantesService.getMateriasDisponibles(user.id);
+    return this.tareas.enqueue('estudiante', 'getMateriasDisponibles', { id: user.id }, callbackUrl);
   }
-
   /**
    * Endpoint para regenerar manualmente el caché de un estudiante
    */
