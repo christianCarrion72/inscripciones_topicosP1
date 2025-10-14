@@ -46,7 +46,7 @@ import { PeriodosService } from 'src/periodos/periodos.service';
 import { PlanEstudiosService } from 'src/plan_estudios/plan_estudios.service';
 import { PrerequisitosService } from 'src/prerequisitos/prerequisitos.service';
 import { TareasService } from './tareas.service';
-import { JobProcessor } from './job-processor';
+import { TareasWorker } from './tareas.worker';
 import { QueueManagerService } from './queue-manager.service';
 import { QueueManagerController } from './queue-manager.controller';
 import { TareasStatusController } from './tarea.controller';
@@ -83,7 +83,7 @@ import { TareasEventsManager } from './tareas.events';
     TareasProducer,
     TareasEventsManager,
     TareasService,
-    JobProcessor,
+    TareasWorker,
     QueueManagerService,
     {
       provide: 'ENTITY_SERVICES',

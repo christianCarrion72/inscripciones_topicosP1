@@ -4,8 +4,8 @@ import { Job } from 'bullmq';
 import { TaskData } from './tareas.types';
 
 @Injectable()
-export class JobProcessor {
-  private readonly logger = new Logger(JobProcessor.name);
+export class TareasWorker {
+  private readonly logger = new Logger(TareasWorker.name);
 
   constructor(
     @Inject('ENTITY_SERVICES')

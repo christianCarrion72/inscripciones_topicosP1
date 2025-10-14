@@ -2,7 +2,7 @@
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { Queue, Worker, QueueEvents, Job } from 'bullmq';
 import { randomUUID } from 'crypto';
-import { JobProcessor } from './job-processor';
+import { TareasWorker } from './tareas.worker';
 import { TaskData } from './tareas.types';
 import { TareasEventsManager } from './tareas.events';
 
@@ -35,7 +35,7 @@ export class QueueManagerService implements OnModuleDestroy {
   private balancedQueueNames: string[] = [];
   private lastIndex = -1;
 
-  constructor(private readonly jobProcessor: JobProcessor,private readonly eventsManager: TareasEventsManager,) { 
+  constructor(private readonly jobProcessor: TareasWorker,private readonly eventsManager: TareasEventsManager,) { 
     this.createQueue('default', true); 
     this.createQueue('inscripciones', true, false);
   }
