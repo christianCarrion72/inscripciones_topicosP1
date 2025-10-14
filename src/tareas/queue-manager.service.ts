@@ -31,34 +31,42 @@ export class QueueManagerService implements OnModuleDestroy {
   private queues = new Map<string, Queue>();
   private workers = new Map<string, ManagedWorker[]>();
 
-  // For simple round-robin dispatcher
   private queueNames: string[] = [];
+  private balancedQueueNames: string[] = [];
   private lastIndex = -1;
 
   constructor(private readonly jobProcessor: JobProcessor,private readonly eventsManager: TareasEventsManager,) { 
     this.createQueue('default', true); 
-    this.createQueue('inscripciones', true);
+    this.createQueue('inscripciones', true, false);
   }
 
-  async createQueue(name: string, createDefaultWorker = true) {
+  async createQueue(
+    name: string,
+    createDefaultWorker = true,
+    includeInBalance = true
+  ) {
     if (this.queues.has(name)) throw new Error(`Queue ${name} ya existe`);
+  
     const queue = new Queue(name, { connection: defaultRedisConn });
     this.queues.set(name, queue);
     this.workers.set(name, []);
     this.queueNames.push(name);
-
+  
+    if (includeInBalance) {
+      this.balancedQueueNames.push(name);
+    }
+  
     await this.eventsManager.registerQueueEvents(name, queue);
     this.onQueuesChanged?.();
-
+  
     this.logger.log(`Queue creada: ${name}`);
-
+  
     if (createDefaultWorker) {
-      await this.addWorker(name,10);
+      await this.addWorker(name, 10);
     }
-
+  
     return { message: `Queue ${name} creada` };
   }
-
   async removeQueue(name: string, { waitForDrain = true, timeoutMs = 30_000 } = {}) {
     const queue = this.queues.get(name);
     if (!queue) throw new Error(`Queue ${name} no existe`);
@@ -102,6 +110,7 @@ export class QueueManagerService implements OnModuleDestroy {
     this.queues.delete(name);
     this.workers.delete(name);
     this.queueNames = this.queueNames.filter((q) => q !== name);
+    this.balancedQueueNames = this.balancedQueueNames.filter((q) => q !== name);
 
     this.onQueuesChanged?.();
     this.logger.log(`Queue eliminada: ${name}`);
@@ -170,10 +179,12 @@ export class QueueManagerService implements OnModuleDestroy {
 
   /** Simple round-robin: get next queue name */
   getNextQueueName(): string {
-    if (this.queueNames.length === 0) throw new Error('No hay colas registradas');
-    this.lastIndex = (this.lastIndex + 1) % this.queueNames.length;
-    return this.queueNames[this.lastIndex];
-  }
+    if (this.balancedQueueNames.length === 0)
+      throw new Error('No hay colas registradas para el balanceo');
+  
+    this.lastIndex = (this.lastIndex + 1) % this.balancedQueueNames.length;
+    return this.balancedQueueNames[this.lastIndex];
+  }  
 
   /** Enqueue balanced (round-robin) using entity.type as job name */
   async enqueueBalanced(data: TaskData, opts: any = {}) {

@@ -18,11 +18,6 @@ export class DiaHorariosController {
   ) {}
 
   @Post()
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false,
-  })
   async create(@Body() createDiaHorarioDto: CreateDiaHorarioDto) {
     const jobId = generateJobId('dia_horario', 'create', createDiaHorarioDto);
     return await this.tareas.enqueue(
@@ -44,11 +39,6 @@ export class DiaHorariosController {
   }
 
   @Patch(':id')
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false,
-  })
   async update(@Param('id') id: number, @Body() updateDiaHorarioDto: UpdateDiaHorarioDto) {
     const jobId = generateJobId('dia_horario', 'update', { id, ...updateDiaHorarioDto });
     return await this.tareas.enqueue(
@@ -60,11 +50,6 @@ export class DiaHorariosController {
   }
 
   @Delete(':id')
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false,
-  })
   async remove(@Param('id') id: number) {
     const jobId = generateJobId('dia_horario', 'remove', { id });
     return await this.tareas.enqueue(

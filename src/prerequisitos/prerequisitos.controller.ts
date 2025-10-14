@@ -18,11 +18,6 @@ export class PrerequisitosController {
   ) {}
 
   @Post()
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false,
-  })
   async create(@Body() createPrerequisitoDto: CreatePrerequisitoDto) {
     const jobId = generateJobId('prerequisito', 'create', createPrerequisitoDto);
     return await this.tareas.enqueue(
@@ -44,11 +39,6 @@ export class PrerequisitosController {
   }
 
   @Patch(':id')
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false,
-  })
   async update(@Param('id') id: number, @Body() updatePrerequisitoDto: UpdatePrerequisitoDto) {
     const jobId = generateJobId('prerequisito', 'update', { id, ...updatePrerequisitoDto });
     return await this.tareas.enqueue(
@@ -60,11 +50,6 @@ export class PrerequisitosController {
   }
 
   @Delete(':id')
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false,
-  })
   async remove(@Param('id') id: number) {
     const jobId = generateJobId('prerequisito', 'remove', { id });
     return await this.tareas.enqueue(

@@ -54,7 +54,7 @@ export class TareasEventsManager {
 
     // Evento: completed
     queueEvents.on('completed', async ({ jobId, returnvalue }) => {
-      this.logger.log(`[${queueName}] Job ${jobId} completado exitosamente`);
+      this.logger.debug(`[${queueName}] Job ${jobId} completado exitosamente`);
       
       try {
         const job = await queue.getJob(jobId);

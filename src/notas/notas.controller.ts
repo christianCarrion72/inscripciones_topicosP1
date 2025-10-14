@@ -18,11 +18,6 @@ export class NotasController {
   ) {}
 
   @Post()
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false,
-  })
   async create(@Body() createNotaDto: CreateNotaDto) {
     const jobId = generateJobId('nota', 'create', createNotaDto);
     return await this.tareas.enqueue(
@@ -44,11 +39,6 @@ export class NotasController {
   }
 
   @Patch(':id')
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false,
-  })
   async update(@Param('id') id: number, @Body() updateNotaDto: UpdateNotaDto) {
     const jobId = generateJobId('nota', 'update', { id, ...updateNotaDto });
     return await this.tareas.enqueue(
@@ -60,11 +50,6 @@ export class NotasController {
   }
 
   @Delete(':id')
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false,
-  })
   async remove(@Param('id') id: number) {
     const jobId = generateJobId('nota', 'remove', { id });
     return await this.tareas.enqueue(

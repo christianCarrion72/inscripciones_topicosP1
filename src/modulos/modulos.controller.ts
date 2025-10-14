@@ -18,11 +18,6 @@ export class ModulosController {
   ) {}
 
   @Post()
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false,
-  })
   async create(@Body() createModuloDto: CreateModuloDto) {
     const jobId = generateJobId('modulo', 'create', createModuloDto);
     return await this.tareas.enqueue(
@@ -44,11 +39,6 @@ export class ModulosController {
   }
 
   @Patch(':id')
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false,
-  })
   async update(@Param('id') id: number, @Body() updateModuloDto: UpdateModuloDto) {
     const jobId = generateJobId('modulo', 'update', { id, ...updateModuloDto });
     return await this.tareas.enqueue(
@@ -60,11 +50,6 @@ export class ModulosController {
   }
 
   @Delete(':id')
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false,
-  })
   async remove(@Param('id') id: number) {
     const jobId = generateJobId('modulo', 'remove', { id });
     return await this.tareas.enqueue(

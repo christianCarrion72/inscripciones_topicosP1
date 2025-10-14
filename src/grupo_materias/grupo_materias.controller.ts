@@ -49,11 +49,6 @@ export class GrupoMateriasController {
   }
 
   @Patch(':id')
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false,
-  })
   async update(@Param('id') id: number, @Body() updateGrupoMateriaDto: UpdateGrupoMateriaDto) {
     const jobId = generateJobId('grupo_materia', 'update', { id, ...updateGrupoMateriaDto });
     return await this.tareas.enqueue(
@@ -65,11 +60,6 @@ export class GrupoMateriasController {
   }
 
   @Delete(':id')
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false,
-  })
   async remove(@Param('id') id: number) {
     const jobId = generateJobId('grupo_materia', 'remove', { id });
     return await this.tareas.enqueue(

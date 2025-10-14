@@ -18,11 +18,6 @@ export class PlanEstudiosController {
   ) {}
 
   @Post()
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false,
-  })
   async create(@Body() createPlanEstudioDto: CreatePlanEstudioDto) {
     const jobId = generateJobId('plan_estudio', 'create', createPlanEstudioDto);
     return await this.tareas.enqueue(
@@ -44,11 +39,6 @@ export class PlanEstudiosController {
   }
 
   @Patch(':id')
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false,
-  })
   async update(@Param('id') id: number, @Body() updatePlanEstudioDto: UpdatePlanEstudioDto) {
     const jobId = generateJobId('plan_estudio', 'update', { id, ...updatePlanEstudioDto });
     return await this.tareas.enqueue(
@@ -60,11 +50,6 @@ export class PlanEstudiosController {
   }
 
   @Delete(':id')
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false,
-  })
   async remove(@Param('id') id: number) {
     const jobId = generateJobId('plan_estudio', 'remove', { id });
     return await this.tareas.enqueue(

@@ -18,11 +18,6 @@ export class PeriodosController {
   ) {}
 
   @Post()
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false,
-  })
   async create(@Body() createPeriodoDto: CreatePeriodoDto) {
     const jobId = generateJobId('periodo', 'create', createPeriodoDto);
     return await this.tareas.enqueue(
@@ -44,11 +39,6 @@ export class PeriodosController {
   }
 
   @Patch(':id')
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false,
-  })
   async update(@Param('id') id: number, @Body() updatePeriodoDto: UpdatePeriodoDto) {
     const jobId = generateJobId('periodo', 'update', { id, ...updatePeriodoDto });
     return await this.tareas.enqueue(
@@ -60,11 +50,6 @@ export class PeriodosController {
   }
 
   @Delete(':id')
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false,
-  })
   async remove(@Param('id') id: number) {
     const jobId = generateJobId('periodo', 'remove', { id });
     return await this.tareas.enqueue(

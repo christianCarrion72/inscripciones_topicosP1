@@ -18,11 +18,6 @@ export class DetallesController {
   ) {}
 
   @Post()
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false,
-  })
   async create(@Body() createDetalleDto: CreateDetalleDto) {
     const jobId = generateJobId('detalle', 'create', createDetalleDto);
     return await this.tareas.enqueue(
@@ -44,11 +39,6 @@ export class DetallesController {
   }
 
   @Patch(':id')
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false,
-  })
   async update(@Param('id') id: number, @Body() updateDetalleDto: UpdateDetalleDto) {
     const jobId = generateJobId('detalle', 'update', { id, ...updateDetalleDto });
     return await this.tareas.enqueue(
@@ -60,11 +50,6 @@ export class DetallesController {
   }
 
   @Delete(':id')
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false,
-  })
   async remove(@Param('id') id: number) {
     const jobId = generateJobId('detalle', 'remove', { id });
     return await this.tareas.enqueue(

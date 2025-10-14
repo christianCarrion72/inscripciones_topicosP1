@@ -18,11 +18,6 @@ export class GruposController {
   ) {}
 
   @Post()
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false,
-  })
   async create(@Body() createGrupoDto: CreateGrupoDto) {
     const jobId = generateJobId('grupo', 'create', createGrupoDto);
     return await this.tareas.enqueue(
@@ -44,11 +39,6 @@ export class GruposController {
   }
 
   @Patch(':id')
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false,
-  })
   async update(@Param('id') id: number, @Body() updateGrupoDto: UpdateGrupoDto) {
     const jobId = generateJobId('grupo', 'update', { id, ...updateGrupoDto });
     return await this.tareas.enqueue(
@@ -60,11 +50,6 @@ export class GruposController {
   }
 
   @Delete(':id')
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false,
-  })
   async remove(@Param('id') id: number) {
     const jobId = generateJobId('grupo', 'remove', { id });
     return await this.tareas.enqueue(

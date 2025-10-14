@@ -18,11 +18,6 @@ export class NivelsController {
   ) {}
 
   @Post()
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false,
-  })
   async create(@Body() createNivelDto: CreateNivelDto) {
     const jobId = generateJobId('nivel', 'create', createNivelDto);
     return await this.tareas.enqueue(
@@ -44,11 +39,6 @@ export class NivelsController {
   }
 
   @Patch(':id')
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false,
-  })
   async update(@Param('id') id: number, @Body() updateNivelDto: UpdateNivelDto) {
     const jobId = generateJobId('nivel', 'update', { id, ...updateNivelDto });
     return await this.tareas.enqueue(
@@ -60,11 +50,6 @@ export class NivelsController {
   }
 
   @Delete(':id')
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false,
-  })
   async remove(@Param('id') id: number) {
     const jobId = generateJobId('nivel', 'remove', { id });
     return await this.tareas.enqueue(

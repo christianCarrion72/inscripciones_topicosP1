@@ -18,11 +18,6 @@ export class MateriasController {
   ) {}
 
   @Post()
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false,
-  })
   async create(@Body() createMateriaDto: CreateMateriaDto) {
     const jobId = generateJobId('materia', 'create', createMateriaDto);
     return await this.tareas.enqueue(
@@ -44,11 +39,6 @@ export class MateriasController {
   }
 
   @Patch(':id')
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false,
-  })
   async update(@Param('id') id: number, @Body() updateMateriaDto: UpdateMateriaDto) {
     const jobId = generateJobId('materia', 'update', { id, ...updateMateriaDto });
     return await this.tareas.enqueue(
@@ -60,11 +50,6 @@ export class MateriasController {
   }
 
   @Delete(':id')
-  @ApiHeader({
-    name: 'x-idempotency-key',
-    description: 'Idempotency key opcional para evitar duplicados',
-    required: false,
-  })
   async remove(@Param('id') id: number) {
     const jobId = generateJobId('materia', 'remove', { id });
     return await this.tareas.enqueue(
