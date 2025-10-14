@@ -50,7 +50,6 @@ async function bootstrap() {
   
   const queueManager = app.get(QueueManagerService);
   
-  // Inicializamos con las colas existentes (puede estar vacío al principio)
   let adapters = queueManager.getAllQueues().map(queue => new BullMQAdapter(queue));
   
   const { replaceQueues } = createBullBoard({
@@ -60,7 +59,6 @@ async function bootstrap() {
   
   app.use('/admin/queues', serverAdapter.getRouter());
   
-  // 🔄 Hook: cada vez que quieras refrescar el dashboard
   queueManager['onQueuesChanged'] = () => {
     const adapters = queueManager.getAllQueues().map(queue => new BullMQAdapter(queue));
     replaceQueues(adapters);
