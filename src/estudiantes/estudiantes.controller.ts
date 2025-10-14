@@ -63,7 +63,6 @@ export class EstudiantesController {
   /**
    * Endpoint para regenerar manualmente el caché de un estudiante
    */
-  @Roles('admin')
   @Post(':id/regenerar-cache')
   @ApiOperation({ 
     summary: 'Regenerar caché de materias disponibles',
@@ -77,7 +76,6 @@ export class EstudiantesController {
   /**
    * Endpoint para regenerar el caché de todos los estudiantes
    */
-  @Roles('estudiante')
   @Post('regenerar-cache-todos')
   @ApiOperation({ 
     summary: 'Regenerar caché de todos los estudiantes',
