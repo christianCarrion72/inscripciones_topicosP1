@@ -89,7 +89,7 @@ export const seedData = {
       telefono: 71000001,
       direccion: 'Av. Paraguá #123',
       especialidad: 'Ingeniería de Software',
-      userId: 5,
+      user: 5,
     },
     {
       id: 2,
@@ -99,7 +99,7 @@ export const seedData = {
       telefono: 71000002,
       direccion: 'Av. Banzer #456',
       especialidad: 'Inteligencia Artificial',
-      userId: 6,
+      user: 6,
     },
     {
       id: 3,
@@ -109,7 +109,7 @@ export const seedData = {
       telefono: 71000003,
       direccion: 'Av. Pirai #789',
       especialidad: 'Redes y Telecomunicaciones',
-      userId: 7,
+      user: 7,
     },
   ],
 
@@ -123,7 +123,7 @@ export const seedData = {
       direccion: 'Av. Busch #123',
       tituloBachiller: 123,
       idPlan: 1,
-      userId: 2,
+      user: 2,
     },
     {
       id: 2,
@@ -134,7 +134,7 @@ export const seedData = {
       direccion: 'Av. Cañoto #456',
       tituloBachiller: 124,
       idPlan: 1,
-      userId: 3,
+      user: 3,
     },
     {
       id: 3,
@@ -145,7 +145,7 @@ export const seedData = {
       direccion: 'Av. Irala #789',
       tituloBachiller: 125,
       idPlan: 1,
-      userId: 4,
+      user: 4,
     },
   ],
 
