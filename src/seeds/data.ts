@@ -60,6 +60,7 @@ export const seedData = {
     { id: 3, horaInicio: '10:15', horaFin: '11:45', idAula: 2 },
     { id: 4, horaInicio: '11:45', horaFin: '13:15', idAula: 3 },
     { id: 5, horaInicio: '14:30', horaFin: '16:00', idAula: 4 },
+    { id: 6, horaInicio: '08:30', horaFin: '10:00', idAula: 1 }, // NUEVO
   ],
 
   materias: [
@@ -201,12 +202,13 @@ export const seedData = {
     { id: 4, idDia: 4, idHorario: 4 },
     { id: 5, idDia: 5, idHorario: 5 },
     { id: 6, idDia: 6, idHorario: 1 },
+    { id: 7, idDia: 2, idHorario: 6 }, // Martes
+    { id: 8, idDia: 4, idHorario: 6 }, // Jueves
   ],
-
   boletaHorarios: [
     // Nivel 1
     { id: 1, idHorario: 1, idGrupoMateria: 1 },  // SIS-101 Grupo A
-    { id: 2, idHorario: 2, idGrupoMateria: 2 },  // SIS-101 Grupo B
+    { id: 2, idHorario: 6, idGrupoMateria: 2 }, // ← actualizado (Martes y Jueves)  // SIS-101 Grupo B
   
     { id: 3, idHorario: 3, idGrupoMateria: 3 },  // SIS-102 Grupo A
     { id: 4, idHorario: 4, idGrupoMateria: 4 },  // SIS-102 Grupo B
