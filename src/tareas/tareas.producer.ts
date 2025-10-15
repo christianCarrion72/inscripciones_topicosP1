@@ -12,11 +12,8 @@ export class TareasProducer {
   async enqueue(entity: string, type: OperationType, data?: any, callback?: string, jobId?: string) {
     const id = jobId ?? randomUUID();
     const task: TaskData = { entity, type, data, callbackUrl: callback };
-    // Enqueue balanced (round-robin) by default
-    if( entity === 'inscripcion')
-      await this.queueManager.enqueueToQueue('inscripciones','inscripcion',task, { jobId: id });
-    else
-      await this.queueManager.enqueueBalanced(task, { jobId: id });
+    // Enqueue balanced (round-robin)
+    await this.queueManager.enqueueBalanced(task, { jobId: id });
     return {
       mensaje: 'Procesando Tarea',
       jobId: id,

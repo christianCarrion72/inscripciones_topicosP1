@@ -151,7 +151,7 @@ export class EstudiantesService {
     const result = await this.generateMateriasDisponibles(id);
     
     // Guardar en caché por 1 hora
-    await this.cacheManager.set(cacheKey, result, 3600);
+    await this.cacheManager.set(cacheKey, result);
     
     return result;
   }

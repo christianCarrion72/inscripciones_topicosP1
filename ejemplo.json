@@ -1,0 +1,171 @@
+"materias"
+"Primer Nivel": [
+    {
+      "id": 2,
+      "nombre": "Lógica y Matemática Discreta",
+      "codigo": "SIS-102",
+      "gruposMaterias": [
+        {
+          "id": 3,
+          "cupos": 30,
+          "docente": {
+            "id": 2,
+            "nombre": "Dra. Ana Sánchez"
+          },
+          "grupo": {
+            "id": 1,
+            "sigla": "A"
+          },
+          "horarios": [
+            {
+              "id": 3,
+              "horaInicio": "10:15:00",
+              "horaFin": "11:45:00",
+              "aula": {
+                "id": 2,
+                "numero": 102
+              },
+              "modulo": {
+                "id": 1,
+                "codigo": 1
+              },
+              "dias": [
+                {
+                  "id": 3,
+                  "nombre": "Miércoles"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "cupos": 0,
+          "docente": {
+            "id": 3,
+            "nombre": "Dr. Luis Torres"
+          },
+          "grupo": {
+            "id": 2,
+            "sigla": "B"
+          },
+          "horarios": [
+            {
+              "id": 4,
+              "horaInicio": "11:45:00",
+              "horaFin": "13:15:00",
+              "aula": {
+                "id": 3,
+                "numero": 201
+              },
+              "modulo": {
+                "id": 2,
+                "codigo": 2
+              },
+              "dias": [
+                {
+                  "id": 4,
+                  "nombre": "Jueves"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "Segundo Nivel": [
+    {
+      "id": 3,
+      "nombre": "Programación Orientada a Objetos",
+      "codigo": "SIS-201",
+      "gruposMaterias": [
+        {
+          "id": 5,
+          "cupos": 35,
+          "docente": {
+            "id": 3,
+            "nombre": "Dr. Luis Torres"
+          },
+          "grupo": {
+            "id": 1,
+            "sigla": "A"
+          },
+          "horarios": [
+            {
+              "id": 5,
+              "horaInicio": "14:30:00",
+              "horaFin": "16:00:00",
+              "aula": {
+                "id": 4,
+                "numero": 301
+              },
+              "modulo": {
+                "id": 3,
+                "codigo": 3
+              },
+              "dias": [
+                {
+                  "id": 5,
+                  "nombre": "Viernes"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 6,
+          "cupos": 35,
+          "docente": {
+            "id": 1,
+            "nombre": "Dr. Roberto Méndez"
+          },
+          "grupo": {
+            "id": 2,
+            "sigla": "B"
+          },
+          "horarios": [
+            {
+              "id": 1,
+              "horaInicio": "07:00:00",
+              "horaFin": "08:30:00",
+              "aula": {
+                "id": 1,
+                "numero": 101
+              },
+              "modulo": {
+                "id": 1,
+                "codigo": 1
+              },
+              "dias": [
+                {
+                  "id": 1,
+                  "nombre": "Lunes"
+                },
+                {
+                  "id": 6,
+                  "nombre": "Sábado"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+"estudiante": {
+    "id": 1,
+    "nombre": "Juan Pérez",
+    "registro": 219062851,
+    "planEstudio": "Plan 2025"
+  },
+  "materiasAprobadas": 1,
+  "materiasDisponibles": 2,
+  "materiasPorNivel": {
+    "Primer Nivel": {
+        "materia": 1,
+        "materia": 2,
+    },
+  },
+  
+  ]

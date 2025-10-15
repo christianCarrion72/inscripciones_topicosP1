@@ -23,9 +23,9 @@ export class QueueManagerController {
     return this.manager.removeQueue(name, { waitForDrain: true });
   }
 
-  @Post(':name/:concurrency/workers')
-  async addWorker(@Param('name') name: string,@Param('concurrency') concurrency: number) {
-    return this.manager.addWorker(name, concurrency);
+  @Post(':name/:concurrency/:number/workers')
+  async addWorker(@Param('name') name: string,@Param('concurrency') concurrency: number,@Param('number') number: number) {
+    return this.manager.addWorker(name, concurrency,number);
   }
 
   @Delete(':name/workers/:id')
