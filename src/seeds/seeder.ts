@@ -49,7 +49,6 @@ export class DatabaseSeeder {
     try {
       for (const item of data) {
         try {
-          // Intentar insertar directamente
           await repository
             .createQueryBuilder()
             .insert()
@@ -60,7 +59,6 @@ export class DatabaseSeeder {
           
           created++;
         } catch (error: any) {
-          // Si falla, verificar si ya existe
           const whereCondition = { [uniqueField]: (item as any)[uniqueField] } as any;
           const existingEntity = await repository.findOne({ where: whereCondition } as any);
           
@@ -73,7 +71,6 @@ export class DatabaseSeeder {
         }
       }
 
-      // Recuperar todas las entidades insertadas
       const allEntities = await repository.find();
       entities.push(...allEntities);
 
@@ -88,7 +85,6 @@ export class DatabaseSeeder {
 
   /**
    * Seed especial para entidades con claves compuestas
-   * No verifica existencia, solo inserta todos los registros
    */
   private async seedEntityComposite<T = any>(
     repository: Repository<any>,
@@ -123,7 +119,6 @@ export class DatabaseSeeder {
         }
       }
 
-      // Recuperar todas las entidades
       const allEntities = await repository.find();
       entities.push(...allEntities);
 
@@ -155,9 +150,6 @@ export class DatabaseSeeder {
     console.log('🚀 Iniciando proceso de seeding...');
     
     try {
-      // ========================================
-      // LIMPIEZA INICIAL (Opcional pero recomendado)
-      // ========================================
       console.log('\n🧹 Limpiando tablas en orden inverso...');
       
       const tablesToClean = [
