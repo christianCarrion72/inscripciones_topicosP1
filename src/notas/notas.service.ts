@@ -34,13 +34,13 @@ export class NotasService {
       notaData.idEstudiante = estudiante;
     }
 
-    if (createNotaDto.idMatGrup) {
-      const grupoMateria = await this.grupoMateriaRepository.findOneBy({ id: createNotaDto.idMatGrup });
-      if (!grupoMateria) {
-        throw new BadRequestException('El grupo materia no existe');
-      }
-      notaData.idMatGrup = grupoMateria;
-    }
+    // if (createNotaDto.idMatGrup) {
+    //   const grupoMateria = await this.grupoMateriaRepository.findOneBy({ id: createNotaDto.idMatGrup });
+    //   if (!grupoMateria) {
+    //     throw new BadRequestException('El grupo materia no existe');
+    //   }
+    //   notaData.idMatGrup = grupoMateria;
+    // }
 
     return await this.notaRepository.save(notaData);
   }
@@ -67,19 +67,18 @@ export class NotasService {
       }
     }
 
-    let grupoMateria;
-    if (updateNotaDto.idMatGrup) {
-      grupoMateria = await this.grupoMateriaRepository.findOneBy({ id: updateNotaDto.idMatGrup });
-      if (!grupoMateria) {
-        throw new BadRequestException('El grupo materia no encontrado');
-      }
-    }
+    // let grupoMateria;
+    // if (updateNotaDto.idMatGrup) {
+    //   grupoMateria = await this.grupoMateriaRepository.findOneBy({ id: updateNotaDto.idMatGrup });
+    //   if (!grupoMateria) {
+    //     throw new BadRequestException('El grupo materia no encontrado');
+    //   }
+    // }
 
     return await this.notaRepository.save({
       ...nota,
       ...updateNotaDto,
       idEstudiante: estudiante,
-      idMatGrup: grupoMateria
     });
   }
 

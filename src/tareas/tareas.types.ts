@@ -1,5 +1,5 @@
 // src/tareas/task.types.ts
-export type OperationType = 'create' | 'update' | 'findOne' | 'findAll' | 'remove' | 'requestSeat' | 'getMateriasDisponibles';
+export type OperationType = 'create' | 'update' | 'findOne' | 'findAll' | 'remove' | 'requestSeat' | 'getMateriasDisponibles' | 'getHistorial' | 'custom';
 export type TaskStatus = 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled';
 
 export interface TaskData<T = any> {

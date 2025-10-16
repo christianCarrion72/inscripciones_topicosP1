@@ -15,6 +15,9 @@ import { Prerequisito } from 'src/prerequisitos/entities/prerequisito.entity';
 import { GrupoMateria } from 'src/grupo_materias/entities/grupo_materia.entity';
 import { BoletaHorario } from 'src/boleta_horarios/entities/boleta_horario.entity';
 import { DiaHorario } from 'src/dia_horarios/entities/dia_horario.entity';
+import { Gestion } from 'src/gestions/entities/gestion.entity';
+import { Periodo } from 'src/periodos/entities/periodo.entity';
+import { Inscripcion } from 'src/inscripcions/entities/inscripcion.entity';
 
 @Injectable()
 export class EstudiantesService {
@@ -46,6 +49,15 @@ export class EstudiantesService {
 
     @InjectRepository(DiaHorario)
     private readonly diaHorarioRepository: Repository<DiaHorario>,
+
+    @InjectRepository(Gestion)
+    private readonly gestionRepository: Repository<Gestion>,
+
+    @InjectRepository(Periodo)
+    private readonly periodoRepository: Repository<Periodo>,
+
+    @InjectRepository(Inscripcion)
+    private readonly inscripcionRepository: Repository<Inscripcion>,
 
     @Inject(CACHE_MANAGER)
     private cacheManager: Cache,
@@ -174,6 +186,56 @@ export class EstudiantesService {
       throw new BadRequestException('El estudiante no tiene un plan de estudios asignado');
     }
 
+    // Obtener periodo-gestión actual
+    const fechaActual = new Date();
+    const anioActual = fechaActual.getFullYear();
+    const mesActual = fechaActual.getMonth() + 1;
+    
+    let numeroPeriodo: number;
+    if(mesActual >= 3 && mesActual <= 7) {
+      numeroPeriodo = 1;
+    } else if(mesActual >= 8 && mesActual <= 11) {
+      numeroPeriodo = 2;
+    } else {
+      numeroPeriodo = 3;
+    }
+
+    // Buscar gestión y periodo actual
+    const gestionActual = await this.gestionRepository.findOne({
+      where: { numero: anioActual }
+    });
+
+    let periodoActual: Periodo | null = null;
+    let materiasInscritasEnPeriodoActual: number[] = [];
+
+    if (gestionActual) {
+      periodoActual = await this.periodoRepository.findOne({
+        where: {
+          numero: numeroPeriodo,
+          idGestion: { id: gestionActual.id }
+        }
+      });
+
+      // Si existe el periodo actual, obtener materias ya inscritas
+      if (periodoActual) {
+        const inscripcionesActuales = await this.inscripcionRepository.find({
+          where: {
+            idEstudiante: { id: id },
+            idPeriodo: { id: periodoActual.id }
+          },
+          relations: ['detalles', 'detalles.idGrupoMat', 'detalles.idGrupoMat.idMateria']
+        });
+
+        // Extraer IDs de materias ya inscritas en el periodo actual
+        materiasInscritasEnPeriodoActual = inscripcionesActuales
+          .flatMap(inscripcion => 
+            inscripcion.detalles
+              .map(detalle => detalle.idGrupoMat?.idMateria?.id)
+              .filter(Boolean)
+          );
+      }
+    }
+
     // Obtener todas las materias del plan de estudios del estudiante
     const todasLasMaterias = await this.materiaRepository.find({
       where: { idPlan: { id: estudiante.idPlan.id } },
@@ -185,13 +247,13 @@ export class EstudiantesService {
       where: { 
         idEstudiante: { id: id }
       },
-      relations: ['idMatGrup', 'idMatGrup.idMateria']
+      relations: ['idDetalle.idGrupoMat', 'idDetalle.idGrupoMat.idMateria']
     });
 
     // Filtrar solo las notas aprobadas (>= 51) y extraer los IDs de las materias
     const materiasAprobadas = notasAprobadas
-      .filter(nota => nota.nota >= 51)
-      .map(nota => nota.idMatGrup?.idMateria?.id)
+      .filter(nota => (nota.nota ?? 0) >= 51)
+      .map(nota => nota.idDetalle.idGrupoMat?.idMateria?.id)
       .filter(Boolean);
 
     // Obtener todos los prerrequisitos
@@ -203,6 +265,11 @@ export class EstudiantesService {
     const materiasDisponibles = todasLasMaterias.filter(materia => {
       // Excluir materias ya aprobadas
       if (materiasAprobadas.includes(materia.id)) {
+        return false;
+      }
+
+      // Excluir materias ya inscritas en el periodo-gestión actual
+      if (materiasInscritasEnPeriodoActual.includes(materia.id)) {
         return false;
       }
 
@@ -346,7 +413,13 @@ export class EstudiantesService {
         registro: estudiante.registro,
         planEstudio: estudiante.idPlan.nombre
       },
+      periodoActual: periodoActual ? {
+        numero: numeroPeriodo,
+        gestion: anioActual,
+        descripcion: `${numeroPeriodo}-${anioActual}`
+      } : null,
       materiasAprobadas: materiasAprobadas.length,
+      materiasInscritasEnPeriodoActual: materiasInscritasEnPeriodoActual.length,
       materiasDisponibles: materiasDisponibles.length,
       materiasPorNivel: materiasAgrupadasPorNivel,
       // Retornar también lista plana de grupos para facilitar selección en frontend

@@ -36,6 +36,12 @@ export class InscripcionsController {
     return await this.tareas.enqueue('inscripcion', 'findAll');
   }
 
+  @Get('historial')
+  @ApiOperation({ summary: 'Obtener historial de inscripciones del estudiante autenticado' })
+  async getHistorial(@ActiveUser() user: ActiveUserInterface) {
+    return await this.tareas.enqueue('inscripcion', 'getHistorial', { userId: user.id });
+  }
+
   @Get(':id')
   async findOne(@Param('id') id: number) {
     return await this.tareas.enqueue('inscripcion', 'findOne', { id });

@@ -1,24 +1,36 @@
 import { GrupoMateria } from "src/grupo_materias/entities/grupo_materia.entity";
 import { Inscripcion } from "src/inscripcions/entities/inscripcion.entity";
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToOne, UpdateDateColumn } from "typeorm";
+import { Nota } from "src/notas/entities/nota.entity";
+import { 
+    Column, 
+    CreateDateColumn, 
+    DeleteDateColumn, 
+    Entity, 
+    ManyToOne, 
+    OneToOne,
+    UpdateDateColumn 
+} from "typeorm";
 
 @Entity()
 export class Detalle {
 
-    @Column({ primary: true, generated: true})
+    @Column({ primary: true, generated: true })
     id: number;
 
     @ManyToOne(() => Inscripcion, (inscripcion) => inscripcion.id, {
         eager: true,
-        nullable: true
+        nullable: true,
     })
     idInscripcion: Inscripcion;
 
     @ManyToOne(() => GrupoMateria, (grupo_materia) => grupo_materia.id, {
         eager: true,
-        nullable: true
+        nullable: true,
     })
     idGrupoMat: GrupoMateria;
+
+    @OneToOne(() => Nota, (nota) => nota.idDetalle)
+    nota: Nota;
 
     @CreateDateColumn()
     createdAt: Date;

@@ -25,14 +25,11 @@ export class GrupoMateria {
     @ManyToOne(() => Grupo, (grupo) => grupo.id, { eager: true, nullable: true })
     idGrupo: Grupo;
 
-    // @OneToMany(() => Periodo, (periodo) => periodo.idGrupoMateria)
-    // periodos: Periodo[];
-
     @OneToMany(() => BoletaHorario, (boleta_horario) =>boleta_horario.idGrupoMateria)
     boletaHorarios: BoletaHorario[];
     
-    @OneToMany(() => Nota, (nota) => nota.idMatGrup )
-    notas: Nota[];
+    // @OneToMany(() => Nota, (nota) => nota.idMatGrup )
+    // notas: Nota[];
 
     @OneToMany(() => Detalle, (detalle) => detalle.idGrupoMat)
     detalles: Detalle[];

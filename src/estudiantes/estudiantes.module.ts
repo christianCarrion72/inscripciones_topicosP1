@@ -14,6 +14,9 @@ import { PrerequisitosModule } from 'src/prerequisitos/prerequisitos.module';
 import { GrupoMateriasModule } from 'src/grupo_materias/grupo_materias.module';
 import { BoletaHorariosModule } from 'src/boleta_horarios/boleta_horarios.module';
 import { DiaHorariosModule } from 'src/dia_horarios/dia_horarios.module';
+import { GestionsModule } from 'src/gestions/gestions.module';
+import { PeriodosModule } from 'src/periodos/periodos.module';
+import { InscripcionsModule } from 'src/inscripcions/inscripcions.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Estudiante]),
@@ -27,6 +30,9 @@ import { DiaHorariosModule } from 'src/dia_horarios/dia_horarios.module';
     GrupoMateriasModule,
     BoletaHorariosModule,
     DiaHorariosModule,
+    GestionsModule,
+    PeriodosModule,
+    InscripcionsModule,
   ],
   controllers: [EstudiantesController, SyncEstudiantesController],
   providers: [EstudiantesService, SyncEstudiantesService],

@@ -54,6 +54,8 @@ export class TareasWorker {
         return [data];
       case 'getMateriasDisponibles':
         return [data.id];
+      case 'getHistorial':
+        return [data.userId];
       default:
         return [];
     }

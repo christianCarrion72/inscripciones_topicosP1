@@ -9,6 +9,8 @@ import { GrupoMateria } from 'src/grupo_materias/entities/grupo_materia.entity';
 import { Detalle } from 'src/detalles/entities/detalle.entity';
 import { Periodo } from 'src/periodos/entities/periodo.entity';
 import { Gestion } from 'src/gestions/entities/gestion.entity';
+import { EstudiantesService } from 'src/estudiantes/estudiantes.service';
+import { Nota } from 'src/notas/entities/nota.entity';
 
 @Injectable()
 export class InscripcionsService {
@@ -26,6 +28,8 @@ export class InscripcionsService {
 
     @InjectRepository(Gestion)
     private readonly gestionRepository: Repository<Gestion>,
+
+    private readonly estudiantesService: EstudiantesService,
 
     private readonly dataSource: DataSource,
   ){}
@@ -83,6 +87,51 @@ export class InscripcionsService {
     return await this.inscripcionRepository.softDelete(id);
   }
 
+  async getHistorial(idEstudiante: number) {
+    const estudiante = await this.estudianteRepository.findOneBy({ id: idEstudiante });
+    
+    if (!estudiante) {
+      throw new BadRequestException('El estudiante no existe');
+    }
+
+    const inscripciones = await this.inscripcionRepository.find({
+      where: { idEstudiante: { id: idEstudiante } },
+      relations: ['idPeriodo', 'idPeriodo.idGestion', 'detalles', 'detalles.idGrupoMat', 'detalles.idGrupoMat.idMateria', 'detalles.idGrupoMat.idGrupo', 'detalles.idGrupoMat.idDocente', 'detalles.nota'],
+      order: { fechaInscripcion: 'DESC' }
+    });
+
+    return {
+      estudiante: {
+        id: estudiante.id,
+        nombre: estudiante.nombre,
+        ci: estudiante.ci,
+        registro: estudiante.registro
+      },
+      inscripciones: inscripciones.map(inscripcion => ({
+        id: inscripcion.id,
+        fechaInscripcion: inscripcion.fechaInscripcion,
+        periodo: `${inscripcion.idPeriodo.numero}-${inscripcion.idPeriodo.idGestion.numero}`,
+        materias: inscripcion.detalles.map(detalle => ({
+          id: detalle.id,
+          nota: detalle.nota.nota,
+          materia: {
+            id: detalle.idGrupoMat.idMateria.id,
+            nombre: detalle.idGrupoMat.idMateria.nombre,
+            codigo: detalle.idGrupoMat.idMateria.codigo
+          },
+          grupo: {
+            id: detalle.idGrupoMat.idGrupo.id,
+            sigla: detalle.idGrupoMat.idGrupo.sigla
+          }, 
+          docente: {
+            id: detalle.idGrupoMat.idDocente.id,
+            nombre: detalle.idGrupoMat.idDocente.nombre,
+          }
+        }))
+      }))
+    };
+  }
+
   async requestSeat(createInscripcionDto: CreateInscripcionDto){
     const { idEstudiante, idsGrupoMateria } = createInscripcionDto;
     if(!idEstudiante) throw new BadRequestException('Estudiante no enviado');
@@ -95,7 +144,6 @@ export class InscripcionsService {
     const anioActual = fechaActual.getFullYear();
     const mesActual = fechaActual.getMonth() + 1; // getMonth() devuelve 0-11
     
-    // Determinar número de periodo según el mes
     let numeroPeriodo: number;
     if(mesActual >= 3 && mesActual <= 7) {
       numeroPeriodo = 1; // Marzo-Julio: Periodo 1
@@ -104,15 +152,12 @@ export class InscripcionsService {
     } else {
       numeroPeriodo = 3; // Diciembre-Febrero: Periodo 3
     }
-    
-    // Buscar la gestión por año
     const gestion = await this.gestionRepository.findOne({
       where: { numero: anioActual }
     });
     
     if(!gestion) throw new BadRequestException(`La gestión ${anioActual} no existe`);
     
-    // Buscar el periodo correspondiente
     const periodo = await this.periodoRepository.findOne({
       where: {
         numero: numeroPeriodo,
@@ -124,6 +169,7 @@ export class InscripcionsService {
       const grupoRepo = manager.getRepository(GrupoMateria);
       const inscripcionRepo = manager.getRepository(Inscripcion);
       const detalleRepo = manager.getRepository(Detalle);
+      const notaRepo = manager.getRepository(Nota);
 
       const gruposReservados: number[] = [];
 
@@ -160,6 +206,15 @@ export class InscripcionsService {
           }),
         );
         await detalleRepo.save(detalles);
+        for(const detalle of detalles){
+          const nota = notaRepo.create({
+            nota: null,
+            idEstudiante: estudiante,
+            idDetalle: detalle,
+          })
+          await notaRepo.save(nota);
+        }
+        await this.estudiantesService.invalidateCacheForEstudiante(idEstudiante);
         return{
           status: 'CONFIRMED',
           inscripcion,

@@ -157,10 +157,12 @@ export const seedData = {
   ],
 
   periodos: [
-    { id: 1, numero: 1, idGestion: 2 }, //gestion 2025
-    { id: 2, numero: 2, idGestion: 2 }, //gestion 2025
-    { id: 3, numero: 3, idGestion: 2 }, //gestion 2025
-    { id: 4, numero: 4, idGestion: 2 }, //gestion 2025
+    { id: 1, numero: 1, idGestion: 1 }, //gestion 2024
+    { id: 2, numero: 2, idGestion: 1 }, //gestion 2024
+    { id: 3, numero: 3, idGestion: 1 }, //gestion 2024
+    { id: 4, numero: 1, idGestion: 2 }, //gestion 2025
+    { id: 5, numero: 2, idGestion: 2 }, //gestion 2025
+    { id: 6, numero: 3, idGestion: 2 }, //gestion 2025
   ],
 
   grupos: [
@@ -210,11 +212,11 @@ export const seedData = {
   ],
   boletaHorarios: [
     // Nivel 1
-    { id: 1, idHorario: 1, idGrupoMateria: 1 },  // SIS-101 Grupo A
-    { id: 2, idHorario: 6, idGrupoMateria: 2 }, // ← actualizado (Martes y Jueves)  // SIS-101 Grupo B
+    { id: 1, idHorario: 4, idGrupoMateria: 1 },  // SIS-101 Grupo A
+    { id: 2, idHorario: 5, idGrupoMateria: 2 },  // SIS-101 Grupo B
   
-    { id: 3, idHorario: 3, idGrupoMateria: 3 },  // SIS-102 Grupo A
-    { id: 4, idHorario: 4, idGrupoMateria: 4 },  // SIS-102 Grupo B
+    { id: 3, idHorario: 1, idGrupoMateria: 3 },  // SIS-102 Grupo A
+    { id: 4, idHorario: 2, idGrupoMateria: 4 },  // SIS-102 Grupo B
   
     // Nivel 2
     { id: 5, idHorario: 5, idGrupoMateria: 5 },  // SIS-201 Grupo A
@@ -224,14 +226,14 @@ export const seedData = {
     { id: 8, idHorario: 3, idGrupoMateria: 8 },  // SIS-202 Grupo B
   
     // Nivel 3
-    { id: 9, idHorario: 4, idGrupoMateria: 9 },   // SIS-301 Grupo A
-    { id: 10, idHorario: 5, idGrupoMateria: 10 }, // SIS-301 Grupo B
+    { id: 9, idHorario: 1, idGrupoMateria: 9 },   // SIS-301 Grupo A 1
+    { id: 10, idHorario: 6, idGrupoMateria: 10 }, // SIS-301 Grupo B 6
   
-    { id: 11, idHorario: 1, idGrupoMateria: 11 }, // SIS-302 Grupo A
-    { id: 12, idHorario: 2, idGrupoMateria: 12 }, // SIS-302 Grupo B
+    { id: 11, idHorario: 3, idGrupoMateria: 11 }, // SIS-302 Grupo A 3
+    { id: 12, idHorario: 2, idGrupoMateria: 12 }, // SIS-302 Grupo B 4
   
     // Nivel 4
-    { id: 13, idHorario: 3, idGrupoMateria: 13 }, // SIS-401 Grupo A
+    { id: 13, idHorario: 3, idGrupoMateria: 13 }, // SIS-401 Grupo A 
     { id: 14, idHorario: 4, idGrupoMateria: 14 }, // SIS-401 Grupo B
   
     { id: 15, idHorario: 5, idGrupoMateria: 15 }, // SIS-402 Grupo A
@@ -239,21 +241,59 @@ export const seedData = {
   ],
 
   inscripciones: [
-    // { id: 1, idEstudiante: 1, fechaInscripcion: '2025-01-15' },
-    // { id: 2, idEstudiante: 2, fechaInscripcion: '2025-01-15' },
-    // { id: 3, idEstudiante: 3, fechaInscripcion: '2025-01-15' },
+    // --- Gestión 2024, periodo 2 ---
+    { id: 1, idEstudiante: 1, idPeriodo: 2, fechaInscripcion: '2024-07-10' },
+    { id: 2, idEstudiante: 2, idPeriodo: 2, fechaInscripcion: '2024-07-10' },
+    { id: 3, idEstudiante: 3, idPeriodo: 2, fechaInscripcion: '2024-07-10' },
+
+    // --- Gestión 2025, periodo 1 ---
+    { id: 4, idEstudiante: 1, idPeriodo: 4, fechaInscripcion: '2025-02-05' },
+    { id: 5, idEstudiante: 2, idPeriodo: 4, fechaInscripcion: '2025-02-05' },
+    { id: 6, idEstudiante: 3, idPeriodo: 4, fechaInscripcion: '2025-02-05' },
   ],
 
   detalles: [
-    // { id: 1, idInscripcion: 1, idGrupoMat: 1 },  // Estudiante 1 en SIS-101 Grupo A
-    // { id: 2, idInscripcion: 2, idGrupoMat: 4 },  // Estudiante 2 en SIS-102 Grupo B
-    // { id: 3, idInscripcion: 3, idGrupoMat: 3 },  // Estudiante 3 en SIS-102 Grupo A
+    // ---- Nivel 1 (Periodo 2-2024) ----
+    { id: 1, idInscripcion: 1, idGrupoMat: 1 },
+    { id: 2, idInscripcion: 1, idGrupoMat: 3 },
+
+    { id: 3, idInscripcion: 2, idGrupoMat: 1 },
+    { id: 4, idInscripcion: 2, idGrupoMat: 3 },
+
+    { id: 5, idInscripcion: 3, idGrupoMat: 1 },
+    { id: 6, idInscripcion: 3, idGrupoMat: 3 },
+
+    // ---- Nivel 2 (Periodo 1-2025) ----
+    { id: 7, idInscripcion: 4, idGrupoMat: 5 },
+    { id: 8, idInscripcion: 4, idGrupoMat: 7 },
+
+    { id: 9, idInscripcion: 5, idGrupoMat: 5 },
+    { id: 10, idInscripcion: 5, idGrupoMat: 7 },
+
+    { id: 11, idInscripcion: 6, idGrupoMat: 5 },
+    { id: 12, idInscripcion: 6, idGrupoMat: 7 },
   ],
 
   notas: [
-    { id: 1, idEstudiante: 1, idMatGrup: 1, nota: 85 },
-    { id: 2, idEstudiante: 2, idMatGrup: 4, nota: 90 },
-    { id: 3, idEstudiante: 3, idMatGrup: 3, nota: 78 },
+    // ---- Nivel 1 (2024) ----
+    { id: 1, idEstudiante: 1, idDetalle: 1, nota: 85 },
+    { id: 2, idEstudiante: 1, idDetalle: 2, nota: 78 },
+
+    { id: 3, idEstudiante: 2, idDetalle: 3, nota: 88 },
+    { id: 4, idEstudiante: 2, idDetalle: 4, nota: 91 },
+
+    { id: 5, idEstudiante: 3, idDetalle: 5, nota: 75 },
+    { id: 6, idEstudiante: 3, idDetalle: 6, nota: 82 },
+
+    // ---- Nivel 2 (2025) ----
+    { id: 7, idEstudiante: 1, idDetalle: 7, nota: 84 },
+    { id: 8, idEstudiante: 1, idDetalle: 8, nota: 80 },
+
+    { id: 9, idEstudiante: 2, idDetalle: 9, nota: 90 },
+    { id: 10, idEstudiante: 2, idDetalle: 10, nota: 87 },
+
+    { id: 11, idEstudiante: 3, idDetalle: 11, nota: 79 },
+    { id: 12, idEstudiante: 3, idDetalle: 12, nota: 83 },
   ],
 
   prerequisitos: [

@@ -10,11 +10,6 @@ export class CreateNotaDto {
     @IsOptional()
     @IsInt()
     @IsPositive()
-    idMatGrup?: number;
-
-    @IsOptional()
-    @IsInt()
-    @IsPositive()
     idEstudiante?: number;
 
 }
