@@ -19,7 +19,6 @@ export class TareasStatusController {
   @ApiResponse({ status: 200, description: 'Estado del job encontrado' })
   @ApiResponse({ status: 404, description: 'Job no encontrado en ninguna cola' })
   async getStatus(@Param('jobId') jobId: string) {
-    // Buscar el job en todas las colas dinámicas
     const queues = this.queueManager.getAllQueues();
     
     for (const queue of queues) {
@@ -52,12 +51,10 @@ export class TareasStatusController {
           };
         }
       } catch (error) {
-        // Continuar buscando en la siguiente cola si hay error
         continue;
       }
     }
 
-    // Si no se encontró en ninguna cola
     throw new NotFoundException({
       jobId,
       status: 'not_found',

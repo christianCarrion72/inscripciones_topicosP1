@@ -25,9 +25,6 @@ export class TareasEventsManager {
 
   constructor(private readonly tareasService: TareasService) {}
 
-  /**
-   * Registra eventos para una nueva cola dinámica
-   */
   async registerQueueEvents(queueName: string, queue: any): Promise<void> {
     if (this.eventListeners.has(queueName)) {
       this.logger.warn(`Ya existen eventos registrados para la cola ${queueName}`);
@@ -99,9 +96,6 @@ export class TareasEventsManager {
     this.logger.log(`📡 Eventos registrados para la cola: ${queueName}`);
   }
 
-  /**
-   * Desregistra eventos de una cola que será eliminada
-   */
   async unregisterQueueEvents(queueName: string): Promise<void> {
     const listener = this.eventListeners.get(queueName);
     if (!listener) {
@@ -135,9 +129,6 @@ export class TareasEventsManager {
     this.logger.log('🔌 Todos los event listeners cerrados');
   }
 
-  /**
-   * Lista todas las colas con eventos registrados
-   */
   getRegisteredQueues(): string[] {
     return Array.from(this.eventListeners.keys());
   }

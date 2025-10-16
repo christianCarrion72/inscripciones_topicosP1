@@ -12,7 +12,6 @@ export class TareasProducer {
   async enqueue(entity: string, type: OperationType, data?: any, callback?: string, jobId?: string) {
     const id = jobId ?? randomUUID();
     const task: TaskData = { entity, type, data, callbackUrl: callback };
-    // Enqueue balanced (round-robin)
     if(entity === 'inscripcion' && type === "requestSeat"){
       await this.queueManager.enqueueToQueue('inscripcion', `${entity}.${type}`, task, { jobId: id });
     }else{
@@ -22,18 +21,6 @@ export class TareasProducer {
     return {
       mensaje: 'Procesando Tarea',
       jobId: id,
-      notificationEndpoint: `/tareas/status/${id}`,
-    };
-  }
-
-  async enqueueToQueue(queueName: string, entity: string, type: OperationType, data?: any, opts: any = {}) {
-    const id = opts.jobId ?? randomUUID();
-    const task: TaskData = { entity, type, data };
-    const jobName = `${entity}.${type}`;
-    const job = await this.queueManager.enqueueToQueue(queueName, jobName, task, { jobId: id, ...opts });
-    return {
-      mensaje: 'Procesando Tarea',
-      jobId: job.id,
       notificationEndpoint: `/tareas/status/${id}`,
     };
   }

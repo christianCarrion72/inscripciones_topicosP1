@@ -140,7 +140,6 @@ export class QueueManagerService implements OnModuleDestroy {
     }
   }
 
-  /** Remove a worker by id (safe close) */
   async removeWorker(queueName: string, workerId: string) {
     const arr = this.workers.get(queueName);
     if (!arr) throw new Error(`Queue ${queueName} no existe`);
@@ -158,7 +157,6 @@ export class QueueManagerService implements OnModuleDestroy {
     return { workerId };
   }
 
-  /** Enqueue job to specific queue */
   async enqueueToQueue(queueName: string, name: string, data: TaskData, opts: any = {}) {
     const queue = this.queues.get(queueName);
     if (!queue) throw new Error(`Queue ${queueName} no existe`);
@@ -166,7 +164,6 @@ export class QueueManagerService implements OnModuleDestroy {
     return job;
   }
 
-  /** Simple round-robin: get next queue name */
   getNextQueueName(): string {
     if (this.balancedQueueNames.length === 0)
       throw new Error('No hay colas registradas para el balanceo');
@@ -175,7 +172,6 @@ export class QueueManagerService implements OnModuleDestroy {
     return this.balancedQueueNames[this.lastIndex];
   }  
 
-  /** Enqueue balanced (round-robin) using entity.type as job name */
   async enqueueBalanced(data: TaskData, opts: any = {}) {
     const queueName = this.getNextQueueName();
     const jobName = `${data.entity}.${data.type}`;
@@ -194,7 +190,6 @@ export class QueueManagerService implements OnModuleDestroy {
   }
 
   async onModuleDestroy() {
-    // Cerrar todo al shutdown
     await this.eventsManager.closeAll();
     for (const name of Array.from(this.queues.keys())) {
       try {

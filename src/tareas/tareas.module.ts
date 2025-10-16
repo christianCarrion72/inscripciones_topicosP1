@@ -1,10 +1,6 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { BullModule } from '@nestjs/bullmq';
-import { QUEUE } from './tareas.constants';
 import { TareasProducer } from './tareas.producer';
-// import { TareasWorker } from './tareas.worker';
-//import { TareasStatusController } from './tareas-status.controller';
 import { CarrerasModule } from '../carreras/carreras.module';
 import { DiasModule } from '../dias/dias.module';
 import { AulasModule } from '../aulas/aulas.module';
@@ -79,7 +75,6 @@ import { TareasEventsManager } from './tareas.events';
     forwardRef(() => PrerequisitosModule),
     ],
   providers: [
-    // TareasWorker,
     TareasProducer,
     TareasEventsManager,
     TareasService,

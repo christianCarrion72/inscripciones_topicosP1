@@ -14,8 +14,6 @@ export class TareasWorker {
 
   async process(job: Job<TaskData>): Promise<any> {
     const { entity, type, data } = job.data;
-    const jobIdStr = String(job.id ?? '');
-    //this.logger.debug(`🚀 Procesando ${entity}.${type} id=${jobIdStr}`);
 
     const service = this.entityServices[entity];
     if (!service) {
@@ -31,7 +29,6 @@ export class TareasWorker {
 
     await job.updateProgress(25);
 
-    // Ejecuta la operación con los argumentos normalizados
     const result = await service[type](...this.buildArgs(type, data));
 
     await job.updateProgress(100);

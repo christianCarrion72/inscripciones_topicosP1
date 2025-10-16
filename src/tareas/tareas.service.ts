@@ -21,7 +21,6 @@ export class TareasService {
       return;
     }
 
-    // ✅ Agregar el jobId a la URL del callback
     const fullCallbackUrl = `${callbackUrl}/${job.id}`;
 
     try {
@@ -36,9 +35,8 @@ export class TareasService {
           : { error: payload.error }),
       };
 
-      this.logger.debug(`📤 Enviando callback para job ${job.id} → ${fullCallbackUrl}`);
+      this.logger.debug(`Enviando callback para job ${job.id} → ${fullCallbackUrl}`);
 
-      // ✅ Usa fetch nativo (disponible en Node 18+)
       const response = await fetch(fullCallbackUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -50,16 +48,15 @@ export class TareasService {
         throw new Error(`HTTP ${response.status}: ${errorText}`);
       }
 
-      this.logger.log(`✅ Callback enviado exitosamente para job ${job.id}`);
+      this.logger.log(`Callback enviado exitosamente para job ${job.id}`);
     } catch (error: any) {
       this.logger.error(
-        `❌ Error enviando callback para job ${job.id} → ${fullCallbackUrl}: ${error.message}`,
+        `Error enviando callback para job ${job.id} → ${fullCallbackUrl}: ${error.message}`,
         {
           jobData: job.data,
           returnValue: payload.result,
         },
       );
-      // No lanzar el error para que no falle el job
     }
   }
 }
