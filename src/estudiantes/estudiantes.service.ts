@@ -147,30 +147,21 @@ export class EstudiantesService {
     return estudiantes.find(e => e.registro === registro);
   }
 
-  /**
-   * Obtiene materias disponibles desde caché o las genera si no existe
-   */
   async getMateriasDisponibles(id: number) {
     const cacheKey = `materias_disponibles_${id}`;
     
-    // Intentar obtener del caché
     const cached = await this.cacheManager.get(cacheKey);
     if (cached) {
       return cached;
     }
 
-    // Si no existe en caché, generar
     const result = await this.generateMateriasDisponibles(id);
     
-    // Guardar en caché por 1 hora
     await this.cacheManager.set(cacheKey, result);
     
     return result;
   }
 
-  /**
-   * Genera las materias disponibles con sus grupos (estructura completa para el frontend)
-   */
   private async generateMateriasDisponibles(id: number) {
     // Verificar que el estudiante existe
     const estudiante = await this.estudianteRepository.findOne({
@@ -422,7 +413,6 @@ export class EstudiantesService {
       materiasInscritasEnPeriodoActual: materiasInscritasEnPeriodoActual.length,
       materiasDisponibles: materiasDisponibles.length,
       materiasPorNivel: materiasAgrupadasPorNivel,
-      // Retornar también lista plana de grupos para facilitar selección en frontend
       gruposMaterias: gruposMaterias.map(gm => ({
         id: gm.id,
         cupos: gm.cupos,
@@ -444,9 +434,6 @@ export class EstudiantesService {
     };
   }
 
-  /**
-   * Genera caché para un estudiante específico
-   */
   async generateCacheForEstudiante(estudianteId: number) {
     try {
       await this.getMateriasDisponibles(estudianteId);
@@ -455,17 +442,11 @@ export class EstudiantesService {
     }
   }
 
-  /**
-   * Invalida el caché de un estudiante
-   */
   async invalidateCacheForEstudiante(estudianteId: number) {
     const cacheKey = `materias_disponibles_${estudianteId}`;
     await this.cacheManager.del(cacheKey);
   }
 
-  /**
-   * Invalida el caché de todos los estudiantes de un plan de estudios
-   */
   async invalidateCacheByPlan(planId: number) {
     const estudiantes = await this.estudianteRepository.find({
       where: { idPlan: { id: planId } }
@@ -476,9 +457,6 @@ export class EstudiantesService {
     }
   }
 
-  /**
-   * Invalida el caché de estudiantes que tienen una materia específica disponible
-   */
   async invalidateCacheByMateria(materiaId: number) {
     // Obtener la materia para saber su plan de estudios
     const materia = await this.materiaRepository.findOne({
@@ -490,13 +468,10 @@ export class EstudiantesService {
       return;
     }
 
-    // Invalidar caché de todos los estudiantes del mismo plan
     await this.invalidateCacheByPlan(materia.idPlan.id);
   }
 
-  /**
-   * Regenera el caché de todos los estudiantes
-   */
+
   async regenerateAllCache() {
     const estudiantes = await this.estudianteRepository.find();
     
