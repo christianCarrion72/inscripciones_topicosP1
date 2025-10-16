@@ -9,17 +9,20 @@ import { ExpressAdapter } from '@bull-board/express';
 import { Queue } from 'bullmq';
 import { RequestCounterMiddleware } from './req-contador/request-counter.middleware';
 import { QueueManagerService } from './tareas/queue-manager.service';
+import { AppExceptionFilter } from './common/exceptions/exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.setGlobalPrefix("api");
 
+  app.useGlobalFilters(new AppExceptionFilter());
+
   // Habilitar CORS
   app.enableCors({
-    origin: '*',  // Permitir solicitudes desde tu frontend en Angular
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',  // Métodos permitidos
-    credentials: true,  // Permitir envío de credenciales como cookies
+    origin: '*',  
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',  
+    credentials: true, 
   });
   
   app.useGlobalPipes(

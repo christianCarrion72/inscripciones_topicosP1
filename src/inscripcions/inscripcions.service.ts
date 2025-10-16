@@ -11,6 +11,7 @@ import { Periodo } from 'src/periodos/entities/periodo.entity';
 import { Gestion } from 'src/gestions/entities/gestion.entity';
 import { EstudiantesService } from 'src/estudiantes/estudiantes.service';
 import { Nota } from 'src/notas/entities/nota.entity';
+import { EstudianteIdRequiredException, EstudianteNotFoundException, GestionNotFoundException, GruposRequiredException, InscripcionNotFoundException, PeriodoNotFoundException } from 'src/common/exceptions/lista.exception';
 
 @Injectable()
 export class InscripcionsService {
@@ -44,7 +45,7 @@ export class InscripcionsService {
         id: createInscripcionDto.idEstudiante
       });
       if(!estudiante){
-        throw new BadRequestException('El estudiante no existe');
+        throw new EstudianteNotFoundException(createInscripcionDto.idEstudiante);
       }
 
       inscripcionData.idEstudiante = estudiante;
@@ -64,7 +65,7 @@ export class InscripcionsService {
   async update(id: number, updateInscripcionDto: UpdateInscripcionDto) {
     const inscripcion = await this.inscripcionRepository.findOneBy({id});
     if (!inscripcion) {
-      throw new BadRequestException('La inscripcion no existe');
+      throw new InscripcionNotFoundException(id);
     }
 
     let estudiante;
@@ -74,7 +75,7 @@ export class InscripcionsService {
       })
 
       if (!estudiante) {
-        throw new BadRequestException('El estudiante no encontrado');
+        throw new EstudianteNotFoundException(updateInscripcionDto.idEstudiante);
       }
     }
     return await this.inscripcionRepository.save({
@@ -91,7 +92,7 @@ export class InscripcionsService {
     const estudiante = await this.estudianteRepository.findOneBy({ id: idEstudiante });
     
     if (!estudiante) {
-      throw new BadRequestException('El estudiante no existe');
+      throw new EstudianteNotFoundException(idEstudiante);
     }
 
     const inscripciones = await this.inscripcionRepository.find({
@@ -134,11 +135,11 @@ export class InscripcionsService {
 
   async requestSeat(createInscripcionDto: CreateInscripcionDto){
     const { idEstudiante, idsGrupoMateria } = createInscripcionDto;
-    if(!idEstudiante) throw new BadRequestException('Estudiante no enviado');
+    if(!idEstudiante) throw new EstudianteIdRequiredException();
     if(!idsGrupoMateria || idsGrupoMateria.length === 0)
-      throw new BadRequestException('Grupos no enviados');
+      throw new GruposRequiredException();
     const estudiante = await this.estudianteRepository.findOneBy({id: idEstudiante});
-    if(!estudiante) throw new BadRequestException('El estudiante no existe');
+    if(!estudiante) throw new EstudianteNotFoundException(idEstudiante);
     // Obtener año y mes actual
     const fechaActual = new Date();
     const anioActual = fechaActual.getFullYear();
@@ -156,7 +157,7 @@ export class InscripcionsService {
       where: { numero: anioActual }
     });
     
-    if(!gestion) throw new BadRequestException(`La gestión ${anioActual} no existe`);
+    if(!gestion) throw new GestionNotFoundException(anioActual);
     
     const periodo = await this.periodoRepository.findOne({
       where: {
@@ -164,7 +165,7 @@ export class InscripcionsService {
         idGestion: { id: gestion.id }
       }
     });
-    if(!periodo) throw new BadRequestException('El periodo no existe');
+    if(!periodo) throw new PeriodoNotFoundException(anioActual, numeroPeriodo);
     return await this.dataSource.transaction(async (manager) => {
       const grupoRepo = manager.getRepository(GrupoMateria);
       const inscripcionRepo = manager.getRepository(Inscripcion);

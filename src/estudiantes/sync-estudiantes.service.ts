@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Estudiante } from './entities/estudiante.entity';
 import { Repository } from 'typeorm';
 import { PlanEstudio } from 'src/plan_estudios/entities/plan_estudio.entity';
+import { EstudianteNotFoundException } from 'src/common/exceptions/lista.exception';
 
 @Injectable()
 export class SyncEstudiantesService {
@@ -49,7 +50,11 @@ export class SyncEstudiantesService {
   }
 
   async findOne(id: number) {
-    return await this.estudianteRepository.findOneBy({id});
+    const estudiante = await this.estudianteRepository.findOneBy({id});
+    if (!estudiante) {
+      throw new EstudianteNotFoundException(id);
+    }
+    return estudiante;
   }
 
   async update(id: number, updateEstudianteDto: UpdateEstudianteDto) {

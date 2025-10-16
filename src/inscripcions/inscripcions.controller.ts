@@ -70,6 +70,11 @@ export class InscripcionsController {
   }
  
   @Post('request-seat')
+  @ApiHeader({
+    name: 'x-callback-url',
+    description: 'CallBack-URL opcional para recibir respuestas',
+    required: false,
+  })
   async requestSeat(@Body() createInscripcionDto: CreateInscripcionDto,@ActiveUser() user: ActiveUserInterface, @Headers('x-callback-url') callbackUrl?: string) {
     createInscripcionDto.idEstudiante = user.id;
     const jobId = generateJobId('inscripcion', 'requestSeat', createInscripcionDto);
