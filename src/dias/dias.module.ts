@@ -14,7 +14,7 @@ import { SyncDiasController } from './sync-dias.controller';
     forwardRef(() => AuthModule),
     forwardRef(() => TareasModule),
   ],
-  controllers: [DiasController, SyncDiasController],
+  controllers: [],
   providers: [DiasService, SyncDiasService],
   exports: [TypeOrmModule, DiasService, SyncDiasService]
 })

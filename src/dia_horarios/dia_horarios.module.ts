@@ -18,7 +18,7 @@ import { TareasModule } from 'src/tareas/tareas.module';
     forwardRef(() => AuthModule),
     forwardRef(() => TareasModule)
   ],
-  controllers: [DiaHorariosController],
+  controllers: [],
   providers: [DiaHorariosService],
   exports: [TypeOrmModule, DiaHorariosService]
 })

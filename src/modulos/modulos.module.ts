@@ -12,7 +12,7 @@ import { TareasModule } from 'src/tareas/tareas.module';
     forwardRef(() => AuthModule),
     forwardRef(() => TareasModule)
   ],
-  controllers: [ModulosController],
+  controllers: [],
   providers: [ModulosService],
   exports: [TypeOrmModule, ModulosService]
 })

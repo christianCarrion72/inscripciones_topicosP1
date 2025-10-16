@@ -16,7 +16,7 @@ import { SyncAulasController } from './sync-aulas.controller';
     ModulosModule,
     forwardRef(() => TareasModule),
   ],
-  controllers: [AulasController, SyncAulasController],
+  controllers: [],
   providers: [AulasService, SyncAulasService],
   exports: [TypeOrmModule, AulasService, SyncAulasService]
 })

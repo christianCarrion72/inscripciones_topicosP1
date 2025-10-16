@@ -16,7 +16,7 @@ import { PlanEstudiosModule } from 'src/plan_estudios/plan_estudios.module';
     forwardRef(() => AuthModule),
     forwardRef(() => TareasModule)
   ],
-  controllers: [MateriasController],
+  controllers: [],
   providers: [MateriasService],
   exports: [TypeOrmModule, MateriasService]
 })

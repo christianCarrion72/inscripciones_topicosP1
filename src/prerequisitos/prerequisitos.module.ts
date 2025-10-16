@@ -14,7 +14,7 @@ import { TareasModule } from 'src/tareas/tareas.module';
     forwardRef(() => AuthModule),
     forwardRef(() => TareasModule)
   ],
-  controllers: [PrerequisitosController],
+  controllers: [],
   providers: [PrerequisitosService],
   exports: [TypeOrmModule, PrerequisitosService]
 })

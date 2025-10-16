@@ -187,7 +187,7 @@ export class InscripcionsService {
             const grupo = await grupoRepo.findOneBy({id: grupoId});
             return {
               status: 'REJECTED',
-              reason: `Sin cupos el grupo: ${grupo?.idGrupo.sigla}`
+              reason: `Sin cupos el grupo: ${grupo?.idMateria.nombre}-${grupo?.idGrupo.sigla}`
             };
           }
 

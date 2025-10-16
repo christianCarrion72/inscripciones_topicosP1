@@ -44,7 +44,7 @@ import { redisStore } from 'cache-manager-redis-yet';
             host: process.env.REDIS_HOST || 'localhost',
             port: parseInt(process.env.REDIS_PORT || '6379', 10),
           },
-          ttl: 3600 * 1000, // En milisegundos con redis-yet
+          ttl: 3600, // En milisegundos con redis-yet * 1000
         });
 
         return {

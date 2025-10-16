@@ -14,7 +14,7 @@ import { TareasModule } from 'src/tareas/tareas.module';
     forwardRef(() => AuthModule),
     forwardRef(() => TareasModule),
     ],
-  controllers: [CarrerasController, SyncCarrerasController],
+  controllers: [],
   providers: [CarrerasService, SyncCarrerasService],
   exports: [TypeOrmModule, CarrerasService, SyncCarrerasService]
 })
