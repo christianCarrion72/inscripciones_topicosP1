@@ -153,11 +153,14 @@ export const seedData = {
   gestiones: [
     { id: 1, numero: 2024 },
     { id: 2, numero: 2025 },
+    { id: 3, numero: 2026 },
   ],
 
   periodos: [
-    { id: 1, numero: 1, idGestion: 2 },
-    { id: 2, numero: 2, idGestion: 2 },
+    { id: 1, numero: 1, idGestion: 2 }, //gestion 2025
+    { id: 2, numero: 2, idGestion: 2 }, //gestion 2025
+    { id: 3, numero: 3, idGestion: 2 }, //gestion 2025
+    { id: 4, numero: 4, idGestion: 2 }, //gestion 2025
   ],
 
   grupos: [
@@ -236,15 +239,15 @@ export const seedData = {
   ],
 
   inscripciones: [
-    { id: 1, idEstudiante: 1, fechaInscripcion: '2025-01-15' },
-    { id: 2, idEstudiante: 2, fechaInscripcion: '2025-01-15' },
-    { id: 3, idEstudiante: 3, fechaInscripcion: '2025-01-15' },
+    // { id: 1, idEstudiante: 1, fechaInscripcion: '2025-01-15' },
+    // { id: 2, idEstudiante: 2, fechaInscripcion: '2025-01-15' },
+    // { id: 3, idEstudiante: 3, fechaInscripcion: '2025-01-15' },
   ],
 
   detalles: [
-    { id: 1, idInscripcion: 1, idGrupoMat: 1 },  // Estudiante 1 en SIS-101 Grupo A
-    { id: 2, idInscripcion: 2, idGrupoMat: 4 },  // Estudiante 2 en SIS-102 Grupo B
-    { id: 3, idInscripcion: 3, idGrupoMat: 3 },  // Estudiante 3 en SIS-102 Grupo A
+    // { id: 1, idInscripcion: 1, idGrupoMat: 1 },  // Estudiante 1 en SIS-101 Grupo A
+    // { id: 2, idInscripcion: 2, idGrupoMat: 4 },  // Estudiante 2 en SIS-102 Grupo B
+    // { id: 3, idInscripcion: 3, idGrupoMat: 3 },  // Estudiante 3 en SIS-102 Grupo A
   ],
 
   notas: [

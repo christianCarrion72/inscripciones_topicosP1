@@ -7,6 +7,8 @@ import { EstudiantesModule } from 'src/estudiantes/estudiantes.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { TareasModule } from 'src/tareas/tareas.module';
 import { GrupoMateriasModule } from 'src/grupo_materias/grupo_materias.module';
+import { PeriodosModule } from 'src/periodos/periodos.module';
+import { GestionsModule } from 'src/gestions/gestions.module';
 
 @Module({
   imports: [
@@ -14,7 +16,9 @@ import { GrupoMateriasModule } from 'src/grupo_materias/grupo_materias.module';
     forwardRef(() => EstudiantesModule),
     forwardRef(() => GrupoMateriasModule), 
     forwardRef(() => AuthModule),
-    forwardRef(() => TareasModule)
+    forwardRef(() => TareasModule),
+    PeriodosModule,
+    forwardRef(() => GestionsModule),
   ],
   controllers: [InscripcionsController],
   providers: [InscripcionsService],

@@ -8,10 +8,5 @@ export class CreatePeriodoDto {
     @IsInt()
     @IsPositive()
     @IsOptional()
-    idGrupoMateria?: number;
-
-    @IsInt()
-    @IsPositive()
-    @IsOptional()
     idGestion?: number;
 }

@@ -15,9 +15,6 @@ export class PeriodosService {
 
     @InjectRepository(Gestion)
     private readonly gestionRepository: Repository<Gestion>,
-
-    @InjectRepository(GrupoMateria)
-    private readonly grupoMateriaRepository: Repository<GrupoMateria>
   ){}
 
   async create(createPeriodoDto: CreatePeriodoDto) {
@@ -34,17 +31,6 @@ export class PeriodosService {
       }
 
       periodoData.idGestion = gestion;
-    }
-
-    if (createPeriodoDto.idGrupoMateria) {
-      const grupoMateria = await this.grupoMateriaRepository.findOneBy({
-        id: createPeriodoDto.idGrupoMateria
-      });
-      if (!grupoMateria) {
-        throw new BadRequestException('El grupo materia no existe');
-      }
-
-      periodoData.idGrupoMateria = grupoMateria;
     }
 
     return await this.periodoRepository.save(periodoData);
@@ -75,22 +61,10 @@ export class PeriodosService {
       }
     }
 
-    let grupoMateria;
-    if (updatePeriodoDto.idGrupoMateria) {
-      grupoMateria = this.grupoMateriaRepository.findOneBy({
-        id: updatePeriodoDto.idGrupoMateria
-      });
-
-      if (!grupoMateria) {
-        throw new BadRequestException('Grupo materia no encontrada');
-      }
-    }
-
     return await this.periodoRepository.save({
       ...periodo,
       ...updatePeriodoDto,
       idGestion: gestion,
-      idGrupoMateria: grupoMateria
     });
   }
 

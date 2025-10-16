@@ -7,6 +7,8 @@ import { DataSource, In, MoreThan, Repository } from 'typeorm';
 import { Estudiante } from 'src/estudiantes/entities/estudiante.entity';
 import { GrupoMateria } from 'src/grupo_materias/entities/grupo_materia.entity';
 import { Detalle } from 'src/detalles/entities/detalle.entity';
+import { Periodo } from 'src/periodos/entities/periodo.entity';
+import { Gestion } from 'src/gestions/entities/gestion.entity';
 
 @Injectable()
 export class InscripcionsService {
@@ -19,8 +21,11 @@ export class InscripcionsService {
     @InjectRepository(Estudiante)
     private readonly estudianteRepository: Repository<Estudiante>,
 
-    @InjectRepository(GrupoMateria)
-    private readonly grupoMateriaRepository: Repository<GrupoMateria>,
+    @InjectRepository(Periodo)
+    private readonly periodoRepository: Repository<Periodo>,
+
+    @InjectRepository(Gestion)
+    private readonly gestionRepository: Repository<Gestion>,
 
     private readonly dataSource: DataSource,
   ){}
@@ -85,6 +90,36 @@ export class InscripcionsService {
       throw new BadRequestException('Grupos no enviados');
     const estudiante = await this.estudianteRepository.findOneBy({id: idEstudiante});
     if(!estudiante) throw new BadRequestException('El estudiante no existe');
+    // Obtener año y mes actual
+    const fechaActual = new Date();
+    const anioActual = fechaActual.getFullYear();
+    const mesActual = fechaActual.getMonth() + 1; // getMonth() devuelve 0-11
+    
+    // Determinar número de periodo según el mes
+    let numeroPeriodo: number;
+    if(mesActual >= 3 && mesActual <= 7) {
+      numeroPeriodo = 1; // Marzo-Julio: Periodo 1
+    } else if(mesActual >= 8 && mesActual <= 11) {
+      numeroPeriodo = 2; // Agosto-Noviembre: Periodo 2
+    } else {
+      numeroPeriodo = 3; // Diciembre-Febrero: Periodo 3
+    }
+    
+    // Buscar la gestión por año
+    const gestion = await this.gestionRepository.findOne({
+      where: { numero: anioActual }
+    });
+    
+    if(!gestion) throw new BadRequestException(`La gestión ${anioActual} no existe`);
+    
+    // Buscar el periodo correspondiente
+    const periodo = await this.periodoRepository.findOne({
+      where: {
+        numero: numeroPeriodo,
+        idGestion: { id: gestion.id }
+      }
+    });
+    if(!periodo) throw new BadRequestException('El periodo no existe');
     return await this.dataSource.transaction(async (manager) => {
       const grupoRepo = manager.getRepository(GrupoMateria);
       const inscripcionRepo = manager.getRepository(Inscripcion);
@@ -113,6 +148,7 @@ export class InscripcionsService {
           gruposReservados.push(grupoId);
         }
         const inscripcion = inscripcionRepo.create({
+          idPeriodo: periodo,
           idEstudiante: estudiante,
           fechaInscripcion: new Date(),
         });

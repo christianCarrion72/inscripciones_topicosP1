@@ -16,7 +16,6 @@ import { InscripcionsModule } from 'src/inscripcions/inscripcions.module';
     TypeOrmModule.forFeature([GrupoMateria]), 
     forwardRef(() => AuthModule),
     MateriasModule, 
-    GestionsModule, 
     DocentesModule,
     GruposModule,
     forwardRef(() => InscripcionsModule),

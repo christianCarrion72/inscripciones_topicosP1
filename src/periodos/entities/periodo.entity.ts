@@ -1,6 +1,7 @@
 import { Gestion } from "src/gestions/entities/gestion.entity";
 import { GrupoMateria } from "src/grupo_materias/entities/grupo_materia.entity";
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToOne, UpdateDateColumn } from "typeorm";
+import { Inscripcion } from "src/inscripcions/entities/inscripcion.entity";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToOne, OneToMany, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Periodo {
@@ -11,11 +12,14 @@ export class Periodo {
     @Column()
     numero: number;
 
-    @ManyToOne(() => GrupoMateria, (grupo_materia) => grupo_materia.id, { eager: true, nullable: true })
-    idGrupoMateria: GrupoMateria;
+    // @ManyToOne(() => GrupoMateria, (grupo_materia) => grupo_materia.id, { eager: true, nullable: true })
+    // idGrupoMateria: GrupoMateria;
 
     @ManyToOne(() => Gestion, (gestion) => gestion.id, { eager: true, nullable: true } )
     idGestion: Gestion;
+
+    @OneToMany(() => Inscripcion, (inscripcion) => inscripcion.idPeriodo)
+    inscripciones: Inscripcion[];
 
     @CreateDateColumn()
     createdAt: Date;

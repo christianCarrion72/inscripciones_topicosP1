@@ -11,10 +11,5 @@ export class UpdatePeriodoDto {
     @IsInt()
     @IsPositive()
     @IsOptional()
-    idGrupoMateria?: number;
-
-    @IsInt()
-    @IsPositive()
-    @IsOptional()
     idGestion?: number;
 }
