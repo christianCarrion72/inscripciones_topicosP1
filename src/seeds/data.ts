@@ -2,13 +2,16 @@ import * as bcryptjs from 'bcryptjs';
 
 export const seedData = {
   users: [
-    { id: 1, email: 'admin@example.com', contraseña: bcryptjs.hashSync('123456789', 10), rol: 'admin' },
-    { id: 2, email: 'estudiante1@example.com', contraseña: bcryptjs.hashSync('123456789', 10), rol: 'estudiante' },
-    { id: 3, email: 'estudiante2@example.com', contraseña: bcryptjs.hashSync('123456789', 10), rol: 'estudiante' },
-    { id: 4, email: 'estudiante3@example.com', contraseña: bcryptjs.hashSync('123456789', 10), rol: 'estudiante' },
-    { id: 5, email: 'docente1@example.com', contraseña: bcryptjs.hashSync('123456789', 10), rol: 'docente' },
-    { id: 6, email: 'docente2@example.com', contraseña: bcryptjs.hashSync('123456789', 10), rol: 'docente' },
-    { id: 7, email: 'docente3@example.com', contraseña: bcryptjs.hashSync('123456789', 10), rol: 'docente' },
+    ...Array.from({ length: 50 }, (_, i) => ({
+      id: i + 1,
+      email: `estudiante${i + 1}@example.com`,
+      contraseña: bcryptjs.hashSync('123456789', 10),
+      rol: 'estudiante'
+    })),
+    { id: 51, email: 'admin@example.com', contraseña: bcryptjs.hashSync('123456789', 10), rol: 'admin' },
+    { id: 52, email: 'docente1@example.com', contraseña: bcryptjs.hashSync('123456789', 10), rol: 'docente' },
+    { id: 53, email: 'docente2@example.com', contraseña: bcryptjs.hashSync('123456789', 10), rol: 'docente' },
+    { id: 54, email: 'docente3@example.com', contraseña: bcryptjs.hashSync('123456789', 10), rol: 'docente' },
   ],
 
   carreras: [
@@ -90,7 +93,7 @@ export const seedData = {
       telefono: 71000001,
       direccion: 'Av. Paraguá #123',
       especialidad: 'Ingeniería de Software',
-      user: 5,
+      user: 52,
     },
     {
       id: 2,
@@ -100,7 +103,7 @@ export const seedData = {
       telefono: 71000002,
       direccion: 'Av. Banzer #456',
       especialidad: 'Inteligencia Artificial',
-      user: 6,
+      user: 53,
     },
     {
       id: 3,
@@ -110,44 +113,22 @@ export const seedData = {
       telefono: 71000003,
       direccion: 'Av. Pirai #789',
       especialidad: 'Redes y Telecomunicaciones',
-      user: 7,
+      user: 54,
     },
   ],
 
   estudiantes: [
-    {
-      id: 1,
-      nombre: 'Juan Pérez',
-      ci: 12345678,
-      registro: 219062851,
-      telefono: 70000001,
-      direccion: 'Av. Busch #123',
-      tituloBachiller: 123,
+    ...Array.from({ length: 50 }, (_, i) => ({
+      id: i + 1,
+      nombre: `Estudiante ${i + 1}`,
+      ci: 12345678 + i,
+      registro: 219062851 + i,
+      telefono: 70000001 + i,
+      direccion: `Av. Principal #${100 + i}`,
+      tituloBachiller: 123 + i,
       idPlan: 1,
-      user: 2,
-    },
-    {
-      id: 2,
-      nombre: 'María García',
-      ci: 23456789,
-      registro: 219062852,
-      telefono: 70000002,
-      direccion: 'Av. Cañoto #456',
-      tituloBachiller: 124,
-      idPlan: 1,
-      user: 3,
-    },
-    {
-      id: 3,
-      nombre: 'Carlos López',
-      ci: 34567890,
-      registro: 219062853,
-      telefono: 70000003,
-      direccion: 'Av. Irala #789',
-      tituloBachiller: 125,
-      idPlan: 1,
-      user: 4,
-    },
+      user: i + 1,
+    })),
   ],
 
   gestiones: [
@@ -175,29 +156,29 @@ export const seedData = {
     { id: 1, cupos: 20, idMateria: 1, idDocente: 1, idGrupo: 1 },
     { id: 2, cupos: 20, idMateria: 1, idDocente: 2, idGrupo: 2 },
 
-    { id: 3, cupos: 30, idMateria: 2, idDocente: 2, idGrupo: 1 },
-    { id: 4, cupos: 30, idMateria: 2, idDocente: 3, idGrupo: 2 },
+    { id: 3, cupos: 25, idMateria: 2, idDocente: 2, idGrupo: 1 },
+    { id: 4, cupos: 25, idMateria: 2, idDocente: 3, idGrupo: 2 },
 
     // Nivel 2
-    { id: 5, cupos: 35, idMateria: 3, idDocente: 3, idGrupo: 1 },
-    { id: 6, cupos: 35, idMateria: 3, idDocente: 1, idGrupo: 2 },
+    { id: 5, cupos: 30, idMateria: 3, idDocente: 3, idGrupo: 1 },
+    { id: 6, cupos: 30, idMateria: 3, idDocente: 1, idGrupo: 2 },
 
-    { id: 7, cupos: 40, idMateria: 4, idDocente: 1, idGrupo: 1 },
-    { id: 8, cupos: 40, idMateria: 4, idDocente: 2, idGrupo: 2 },
+    { id: 7, cupos: 35, idMateria: 4, idDocente: 1, idGrupo: 1 },
+    { id: 8, cupos: 35, idMateria: 4, idDocente: 2, idGrupo: 2 },
 
     // Nivel 3
-    { id: 9, cupos: 45, idMateria: 5, idDocente: 2, idGrupo: 1 },
-    { id: 10, cupos: 45, idMateria: 5, idDocente: 3, idGrupo: 2 },
+    { id: 9, cupos: 40, idMateria: 5, idDocente: 2, idGrupo: 1 },
+    { id: 10, cupos: 40, idMateria: 5, idDocente: 3, idGrupo: 2 },
 
-    { id: 11, cupos: 50, idMateria: 6, idDocente: 3, idGrupo: 1 },
-    { id: 12, cupos: 50, idMateria: 6, idDocente: 1, idGrupo: 2 },
+    { id: 11, cupos: 45, idMateria: 6, idDocente: 3, idGrupo: 1 },
+    { id: 12, cupos: 45, idMateria: 6, idDocente: 1, idGrupo: 2 },
 
     // Nivel 4
-    { id: 13, cupos: 55, idMateria: 7, idDocente: 1, idGrupo: 1 },
-    { id: 14, cupos: 55, idMateria: 7, idDocente: 2, idGrupo: 2 },
+    { id: 13, cupos: 50, idMateria: 7, idDocente: 1, idGrupo: 1 },
+    { id: 14, cupos: 50, idMateria: 7, idDocente: 2, idGrupo: 2 },
 
-    { id: 15, cupos: 60, idMateria: 8, idDocente: 2, idGrupo: 1 },
-    { id: 16, cupos: 60, idMateria: 8, idDocente: 3, idGrupo: 2 },
+    { id: 15, cupos: 55, idMateria: 8, idDocente: 2, idGrupo: 1 },
+    { id: 16, cupos: 55, idMateria: 8, idDocente: 3, idGrupo: 2 },
   ],
 
   diaHorarios: [
@@ -210,90 +191,117 @@ export const seedData = {
     { id: 7, idDia: 2, idHorario: 6 }, 
     { id: 8, idDia: 4, idHorario: 6 }, 
   ],
+
   boletaHorarios: [
     // Nivel 1
-    { id: 1, idHorario: 4, idGrupoMateria: 1 },  // SIS-101 Grupo A
-    { id: 2, idHorario: 5, idGrupoMateria: 2 },  // SIS-101 Grupo B
+    { id: 1, idHorario: 4, idGrupoMateria: 1 },
+    { id: 2, idHorario: 5, idGrupoMateria: 2 },
   
-    { id: 3, idHorario: 1, idGrupoMateria: 3 },  // SIS-102 Grupo A
-    { id: 4, idHorario: 2, idGrupoMateria: 4 },  // SIS-102 Grupo B
+    { id: 3, idHorario: 1, idGrupoMateria: 3 },
+    { id: 4, idHorario: 2, idGrupoMateria: 4 },
   
     // Nivel 2
-    { id: 5, idHorario: 5, idGrupoMateria: 5 },  // SIS-201 Grupo A
-    { id: 6, idHorario: 1, idGrupoMateria: 6 },  // SIS-201 Grupo B
+    { id: 5, idHorario: 5, idGrupoMateria: 5 },
+    { id: 6, idHorario: 1, idGrupoMateria: 6 },
   
-    { id: 7, idHorario: 2, idGrupoMateria: 7 },  // SIS-202 Grupo A
-    { id: 8, idHorario: 3, idGrupoMateria: 8 },  // SIS-202 Grupo B
+    { id: 7, idHorario: 2, idGrupoMateria: 7 },
+    { id: 8, idHorario: 3, idGrupoMateria: 8 },
   
     // Nivel 3
-    { id: 9, idHorario: 1, idGrupoMateria: 9 },   // SIS-301 Grupo A 
-    { id: 10, idHorario: 6, idGrupoMateria: 10 }, // SIS-301 Grupo B 
+    { id: 9, idHorario: 1, idGrupoMateria: 9 },
+    { id: 10, idHorario: 6, idGrupoMateria: 10 },
   
-    { id: 11, idHorario: 3, idGrupoMateria: 11 }, // SIS-302 Grupo A 
-    { id: 12, idHorario: 2, idGrupoMateria: 12 }, // SIS-302 Grupo B 
+    { id: 11, idHorario: 3, idGrupoMateria: 11 },
+    { id: 12, idHorario: 2, idGrupoMateria: 12 },
   
     // Nivel 4
-    { id: 13, idHorario: 3, idGrupoMateria: 13 }, // SIS-401 Grupo A 
-    { id: 14, idHorario: 4, idGrupoMateria: 14 }, // SIS-401 Grupo B
+    { id: 13, idHorario: 3, idGrupoMateria: 13 },
+    { id: 14, idHorario: 4, idGrupoMateria: 14 },
   
-    { id: 15, idHorario: 5, idGrupoMateria: 15 }, // SIS-402 Grupo A
-    { id: 16, idHorario: 1, idGrupoMateria: 16 }, // SIS-402 Grupo B
+    { id: 15, idHorario: 5, idGrupoMateria: 15 },
+    { id: 16, idHorario: 1, idGrupoMateria: 16 },
   ],
 
   inscripciones: [
-    // --- Gestión 2024, periodo 2 ---
-    { id: 1, idEstudiante: 1, idPeriodo: 2, fechaInscripcion: '2024-07-10' },
-    { id: 2, idEstudiante: 2, idPeriodo: 2, fechaInscripcion: '2024-07-10' },
-    { id: 3, idEstudiante: 3, idPeriodo: 2, fechaInscripcion: '2024-07-10' },
+    // Inscripciones Nivel 1 (Gestión 2024, periodo 2) - 50 estudiantes
+    ...Array.from({ length: 50 }, (_, i) => ({
+      id: i + 1,
+      idEstudiante: i + 1,
+      idPeriodo: 2,
+      fechaInscripcion: '2024-07-10'
+    })),
 
-    // --- Gestión 2025, periodo 1 ---
-    { id: 4, idEstudiante: 1, idPeriodo: 4, fechaInscripcion: '2025-02-05' },
-    { id: 5, idEstudiante: 2, idPeriodo: 4, fechaInscripcion: '2025-02-05' },
-    { id: 6, idEstudiante: 3, idPeriodo: 4, fechaInscripcion: '2025-02-05' },
+    // Inscripciones Nivel 2 (Gestión 2025, periodo 1) - 50 estudiantes
+    ...Array.from({ length: 50 }, (_, i) => ({
+      id: 51 + i,
+      idEstudiante: i + 1,
+      idPeriodo: 4,
+      fechaInscripcion: '2025-02-05'
+    })),
   ],
 
   detalles: [
-    // ---- Nivel 1 (Periodo 2-2024) ----
-    { id: 1, idInscripcion: 1, idGrupoMat: 1 },
-    { id: 2, idInscripcion: 1, idGrupoMat: 3 },
+    // Nivel 1 (Periodo 2-2024) - 50 estudiantes, 2 materias cada uno
+    ...Array.from({ length: 50 }, (_, i) => [
+      {
+        id: i * 2 + 1,
+        idInscripcion: i + 1,
+        idGrupoMat: (i % 2) + 1 // Alterna entre grupo A (1) y B (2) para SIS-101
+      },
+      {
+        id: i * 2 + 2,
+        idInscripcion: i + 1,
+        idGrupoMat: (i % 2) + 3 // Alterna entre grupo A (3) y B (4) para SIS-102
+      }
+    ]).flat(),
 
-    { id: 3, idInscripcion: 2, idGrupoMat: 1 },
-    { id: 4, idInscripcion: 2, idGrupoMat: 3 },
-
-    { id: 5, idInscripcion: 3, idGrupoMat: 1 },
-    { id: 6, idInscripcion: 3, idGrupoMat: 3 },
-
-    // ---- Nivel 2 (Periodo 1-2025) ----
-    { id: 7, idInscripcion: 4, idGrupoMat: 5 },
-    { id: 8, idInscripcion: 4, idGrupoMat: 7 },
-
-    { id: 9, idInscripcion: 5, idGrupoMat: 5 },
-    { id: 10, idInscripcion: 5, idGrupoMat: 7 },
-
-    { id: 11, idInscripcion: 6, idGrupoMat: 5 },
-    { id: 12, idInscripcion: 6, idGrupoMat: 7 },
+    // Nivel 2 (Periodo 1-2025) - 50 estudiantes, 2 materias cada uno
+    ...Array.from({ length: 50 }, (_, i) => [
+      {
+        id: 100 + i * 2 + 1,
+        idInscripcion: 51 + i,
+        idGrupoMat: (i % 2) + 5 // Alterna entre grupo A (5) y B (6) para SIS-201
+      },
+      {
+        id: 100 + i * 2 + 2,
+        idInscripcion: 51 + i,
+        idGrupoMat: (i % 2) + 7 // Alterna entre grupo A (7) y B (8) para SIS-202
+      }
+    ]).flat(),
   ],
 
   notas: [
-    // ---- Nivel 1 (2024) ----
-    { id: 1, idEstudiante: 1, idDetalle: 1, nota: 85 },
-    { id: 2, idEstudiante: 1, idDetalle: 2, nota: 78 },
+    // Nivel 1 (2024) - 50 estudiantes, 2 materias cada uno, todas aprobadas (51-100)
+    ...Array.from({ length: 50 }, (_, i) => [
+      {
+        id: i * 2 + 1,
+        idEstudiante: i + 1,
+        idDetalle: i * 2 + 1,
+        nota: 51 + Math.floor(Math.random() * 50) // Nota entre 51 y 100
+      },
+      {
+        id: i * 2 + 2,
+        idEstudiante: i + 1,
+        idDetalle: i * 2 + 2,
+        nota: 51 + Math.floor(Math.random() * 50) // Nota entre 51 y 100
+      }
+    ]).flat(),
 
-    { id: 3, idEstudiante: 2, idDetalle: 3, nota: 88 },
-    { id: 4, idEstudiante: 2, idDetalle: 4, nota: 91 },
-
-    { id: 5, idEstudiante: 3, idDetalle: 5, nota: 75 },
-    { id: 6, idEstudiante: 3, idDetalle: 6, nota: 82 },
-
-    // ---- Nivel 2 (2025) ----
-    { id: 7, idEstudiante: 1, idDetalle: 7, nota: 84 },
-    { id: 8, idEstudiante: 1, idDetalle: 8, nota: 80 },
-
-    { id: 9, idEstudiante: 2, idDetalle: 9, nota: 90 },
-    { id: 10, idEstudiante: 2, idDetalle: 10, nota: 87 },
-
-    { id: 11, idEstudiante: 3, idDetalle: 11, nota: 79 },
-    { id: 12, idEstudiante: 3, idDetalle: 12, nota: 83 },
+    // Nivel 2 (2025) - 50 estudiantes, 2 materias cada uno, todas aprobadas (51-100)
+    ...Array.from({ length: 50 }, (_, i) => [
+      {
+        id: 100 + i * 2 + 1,
+        idEstudiante: i + 1,
+        idDetalle: 100 + i * 2 + 1,
+        nota: 51 + Math.floor(Math.random() * 50) // Nota entre 51 y 100
+      },
+      {
+        id: 100 + i * 2 + 2,
+        idEstudiante: i + 1,
+        idDetalle: 100 + i * 2 + 2,
+        nota: 51 + Math.floor(Math.random() * 50) // Nota entre 51 y 100
+      }
+    ]).flat(),
   ],
 
   prerequisitos: [

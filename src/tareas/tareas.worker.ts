@@ -1,4 +1,4 @@
-// src/tareas/job-processor.ts
+// src/tareas/tarea.worker.ts
 import { Injectable, Logger, Inject } from '@nestjs/common';
 import { Job } from 'bullmq';
 import { TaskData } from './tareas.types';

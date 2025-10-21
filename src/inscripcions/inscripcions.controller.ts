@@ -10,8 +10,8 @@ import { ActiveUserInterface } from 'src/common/interfaces/active-user.interface
 import { ActiveUser } from 'src/common/decorators/active-user.decorator';
 
 @ApiTags('inscripcions')
-@ApiBearerAuth()
-@UseGuards(AuthGuard)
+// @ApiBearerAuth()
+// @UseGuards(AuthGuard)
 @Controller('inscripcions')
 export class InscripcionsController {
   private readonly logger = new Logger(InscripcionsController.name);
@@ -68,15 +68,14 @@ export class InscripcionsController {
       jobId,
     );
   }
- 
+
   @Post('request-seat')
   @ApiHeader({
     name: 'x-callback-url',
     description: 'CallBack-URL opcional para recibir respuestas',
     required: false,
   })
-  async requestSeat(@Body() createInscripcionDto: CreateInscripcionDto,@ActiveUser() user: ActiveUserInterface, @Headers('x-callback-url') callbackUrl?: string) {
-    createInscripcionDto.idEstudiante = user.id;
+  async requestSeat(@Body() createInscripcionDto: CreateInscripcionDto, @Headers('x-callback-url') callbackUrl?: string) {
     const jobId = generateJobId('inscripcion', 'requestSeat', createInscripcionDto);
     return await this.tareas.enqueue(
       'inscripcion',
@@ -86,4 +85,22 @@ export class InscripcionsController {
       jobId,
     );
   }
+ 
+  // @Post('request-seat')
+  // @ApiHeader({
+  //   name: 'x-callback-url',
+  //   description: 'CallBack-URL opcional para recibir respuestas',
+  //   required: false,
+  // })
+  // async requestSeat(@Body() createInscripcionDto: CreateInscripcionDto,@ActiveUser() user: ActiveUserInterface, @Headers('x-callback-url') callbackUrl?: string) {
+  //   createInscripcionDto.idEstudiante = user.id;
+  //   const jobId = generateJobId('inscripcion', 'requestSeat', createInscripcionDto);
+  //   return await this.tareas.enqueue(
+  //     'inscripcion',
+  //     'requestSeat',
+  //     createInscripcionDto,
+  //     callbackUrl,
+  //     jobId,
+  //   );
+  // }
 }
