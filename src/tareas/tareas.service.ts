@@ -30,10 +30,10 @@ export class TareasService {
         progress: status === 'completed' ? 100 : await job.progress,
         timestamp: Date.now(),
         data: job.data,
-        ...(status === 'completed'
-          ? { result: payload.result }
-          : { error: payload.error }),
-      };
+        ...(status === 'completed' ? { result: payload.result } : { error: payload.error }),
+      }
+
+      console.log(callbackPayload);
 
       this.logger.debug(`Enviando callback para job ${job.id} → ${fullCallbackUrl}`);
 
