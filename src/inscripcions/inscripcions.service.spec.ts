@@ -1,67 +1,111 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { InscripcionsService } from './inscripcions.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { Inscripcion } from './entities/inscripcion.entity';
 import { Estudiante } from 'src/estudiantes/entities/estudiante.entity';
 import { Periodo } from 'src/periodos/entities/periodo.entity';
 import { Gestion } from 'src/gestions/entities/gestion.entity';
-import { GrupoMateria } from 'src/grupo_materias/entities/grupo_materia.entity';
 import { EstudiantesService } from 'src/estudiantes/estudiantes.service';
+import { GrupoMateria } from 'src/grupo_materias/entities/grupo_materia.entity';
 import { Detalle } from 'src/detalles/entities/detalle.entity';
 import { Nota } from 'src/notas/entities/nota.entity';
+import {
+  EstudianteIdRequiredException,
+  EstudianteNotFoundException,
+  GestionNotFoundException,
+  GruposRequiredException,
+  PeriodoNotFoundException,
+} from 'src/common/exceptions/lista.exception';
 
-describe('InscripcionsService', () => {
+describe('InscripcionsService - requestSeat', () => {
   let service: InscripcionsService;
-  let mockDataSource: any;
-  let mockGrupoRepo: any;
-  let mockDetalleRepo: any;
-  let mockNotaRepo: any;
-  let mockInscripcionRepo: any;
+  let estudianteRepository: Repository<Estudiante>;
+  let periodoRepository: Repository<Periodo>;
+  let gestionRepository: Repository<Gestion>;
+  let estudiantesService: EstudiantesService;
+  let dataSource: DataSource;
+
+  const mockEstudiante = {
+    id: 1,
+    nombre: 'Juan Pérez',
+    ci: '12345678',
+    registro: 'REG001',
+  };
+
+  const mockGestion = {
+    id: 1,
+    numero: 2025,
+  };
+
+  const mockPeriodo = {
+    id: 1,
+    numero: 2,
+    idGestion: mockGestion,
+  };
+
+  const mockInscripcion = {
+    id: 1,
+    idPeriodo: mockPeriodo,
+    idEstudiante: mockEstudiante,
+    fechaInscripcion: new Date(),
+  };
+
+  const mockDetalle = {
+    id: 1,
+    idInscripcion: mockInscripcion,
+    idGrupoMat: { id: 1 },
+  };
 
   beforeEach(async () => {
-    // Mock del repositorio de GrupoMateria
-    mockGrupoRepo = {
+    const mockEstudianteRepository = {
+      findOneBy: jest.fn(),
+    };
+
+    const mockPeriodoRepository = {
+      findOne: jest.fn(),
+    };
+
+    const mockGestionRepository = {
+      findOne: jest.fn(),
+    };
+
+    const mockEstudiantesService = {
+      invalidateCacheForEstudiante: jest.fn(),
+    };
+
+    const mockGrupoRepo = {
       decrement: jest.fn(),
       increment: jest.fn(),
       findOneBy: jest.fn(),
     };
 
-    // Mock del repositorio de Detalle
-    mockDetalleRepo = {
-      create: jest.fn((data) => ({ id: 1, ...data })),
-      save: jest.fn((data) => Promise.resolve(data)),
+    const mockInscripcionRepo = {
+      create: jest.fn(),
+      save: jest.fn(),
     };
 
-    // Mock del repositorio de Nota
-    mockNotaRepo = {
-      create: jest.fn((data) => ({ id: 1, ...data })),
-      save: jest.fn((data) => Promise.resolve(data)),
+    const mockDetalleRepo = {
+      create: jest.fn(),
+      save: jest.fn(),
     };
 
-    // Mock del repositorio de Inscripcion
-    mockInscripcionRepo = {
-      create: jest.fn((data) => ({ id: 1, ...data })),
-      save: jest.fn((data) => Promise.resolve({ id: 1, ...data })),
+    const mockNotaRepo = {
+      create: jest.fn(),
+      save: jest.fn(),
     };
 
-    // Mock del DataSource y transaction
-    mockDataSource = {
-      transaction: jest.fn((callback) => {
-        const mockManager = {
-          getRepository: jest.fn((entity) => {
-            if (entity === GrupoMateria) return mockGrupoRepo;
-            if (entity === Detalle) return mockDetalleRepo;
-            if (entity === Nota) return mockNotaRepo;
-            if (entity === Inscripcion) return mockInscripcionRepo;
-            return {
-              create: jest.fn((data) => data),
-              save: jest.fn((data) => Promise.resolve(data)),
-            };
-          }),
-        };
-        return callback(mockManager);
+    const mockManager = {
+      getRepository: jest.fn((entity) => {
+        if (entity === GrupoMateria) return mockGrupoRepo;
+        if (entity === Inscripcion) return mockInscripcionRepo;
+        if (entity === Detalle) return mockDetalleRepo;
+        if (entity === Nota) return mockNotaRepo;
       }),
+    };
+
+    const mockDataSource = {
+      transaction: jest.fn((callback) => callback(mockManager)),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -69,147 +113,252 @@ describe('InscripcionsService', () => {
         InscripcionsService,
         {
           provide: getRepositoryToken(Inscripcion),
-          useValue: { 
-            save: jest.fn(), 
-            find: jest.fn(),
-            findOneBy: jest.fn(),
-          },
+          useValue: {},
         },
         {
           provide: getRepositoryToken(Estudiante),
-          useValue: { 
-            findOneBy: jest.fn().mockResolvedValue({ 
-              id: 1, 
-              nombre: 'Test Estudiante',
-              ci: '12345678',
-              registro: 'REG001',
-            }) 
-          },
+          useValue: mockEstudianteRepository,
         },
         {
           provide: getRepositoryToken(Periodo),
-          useValue: { 
-            findOne: jest.fn().mockResolvedValue({ 
-              id: 1, 
-              numero: 1,
-            }) 
-          },
+          useValue: mockPeriodoRepository,
         },
         {
           provide: getRepositoryToken(Gestion),
-          useValue: { 
-            findOne: jest.fn().mockResolvedValue({ 
-              id: 1, 
-              numero: 2025,
-            }) 
-          },
+          useValue: mockGestionRepository,
+        },
+        {
+          provide: EstudiantesService,
+          useValue: mockEstudiantesService,
         },
         {
           provide: DataSource,
           useValue: mockDataSource,
         },
-        {
-          provide: EstudiantesService, 
-          useValue: { 
-            invalidateCacheForEstudiante: jest.fn().mockResolvedValue(undefined),
-          },
-        },
       ],
     }).compile();
 
     service = module.get<InscripcionsService>(InscripcionsService);
+    estudianteRepository = module.get<Repository<Estudiante>>(
+      getRepositoryToken(Estudiante),
+    );
+    periodoRepository = module.get<Repository<Periodo>>(
+      getRepositoryToken(Periodo),
+    );
+    gestionRepository = module.get<Repository<Gestion>>(
+      getRepositoryToken(Gestion),
+    );
+    estudiantesService = module.get<EstudiantesService>(EstudiantesService);
+    dataSource = module.get<DataSource>(DataSource);
   });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
-  });
+  describe('requestSeat', () => {
+    it('debe lanzar EstudianteIdRequiredException si no se proporciona idEstudiante', async () => {
+      const dto = { idsGrupoMateria: [1, 2] };
 
-  describe('requestSeat - Validación de Cupos', () => {
-    it('debe RECHAZAR cuando NO hay cupos disponibles', async () => {
-      // Simula que el decrement NO afectó ninguna fila (affected = 0)
-      mockGrupoRepo.decrement.mockResolvedValue({ affected: 0 });
-      
-      // Mock para el findOneBy que busca info del grupo
-      mockGrupoRepo.findOneBy.mockResolvedValue({
-        id: 1,
-        idMateria: { nombre: 'Matemáticas' },
-        idGrupo: { sigla: 'A' },
-      });
-
-      const result = await service.requestSeat({
-        idEstudiante: 1,
-        idsGrupoMateria: [1],
-      });
-
-      // VALIDA que el resultado sea REJECTED
-      expect(result.status).toBe('REJECTED');
-      expect(result.reason).toContain('Sin cupos');
-      
-      // VALIDA que intentó decrementar
-      expect(mockGrupoRepo.decrement).toHaveBeenCalledWith(
-        expect.objectContaining({ id: 1 }),
-        'cupos',
-        1
+      await expect(service.requestSeat(dto as any)).rejects.toThrow(
+        EstudianteIdRequiredException,
       );
     });
 
-    it('debe CONFIRMAR cuando SÍ hay cupos disponibles', async () => {
-      // Simula que el decrement SÍ afectó una fila (affected = 1)
-      mockGrupoRepo.decrement.mockResolvedValue({ affected: 1 });
+    it('debe lanzar GruposRequiredException si idsGrupoMateria está vacío', async () => {
+      const dto = { idEstudiante: 1, idsGrupoMateria: [] };
 
-      const result = await service.requestSeat({
-        idEstudiante: 1,
-        idsGrupoMateria: [1],
-      });
+      await expect(service.requestSeat(dto)).rejects.toThrow(
+        GruposRequiredException,
+      );
+    });
 
-      // VALIDA que el resultado sea CONFIRMED
+    it('debe lanzar EstudianteNotFoundException si el estudiante no existe', async () => {
+      jest.spyOn(estudianteRepository, 'findOneBy').mockResolvedValue(null);
+
+      const dto = { idEstudiante: 999, idsGrupoMateria: [1] };
+
+      await expect(service.requestSeat(dto)).rejects.toThrow(
+        EstudianteNotFoundException,
+      );
+    });
+
+    it('debe lanzar GestionNotFoundException si la gestión no existe', async () => {
+      jest
+        .spyOn(estudianteRepository, 'findOneBy')
+        .mockResolvedValue(mockEstudiante as any);
+      jest.spyOn(gestionRepository, 'findOne').mockResolvedValue(null);
+
+      const dto = { idEstudiante: 1, idsGrupoMateria: [1] };
+
+      await expect(service.requestSeat(dto)).rejects.toThrow(
+        GestionNotFoundException,
+      );
+    });
+
+    it('debe lanzar PeriodoNotFoundException si el periodo no existe', async () => {
+      jest
+        .spyOn(estudianteRepository, 'findOneBy')
+        .mockResolvedValue(mockEstudiante as any);
+      jest
+        .spyOn(gestionRepository, 'findOne')
+        .mockResolvedValue(mockGestion as any);
+      jest.spyOn(periodoRepository, 'findOne').mockResolvedValue(null);
+
+      const dto = { idEstudiante: 1, idsGrupoMateria: [1] };
+
+      await expect(service.requestSeat(dto)).rejects.toThrow(
+        PeriodoNotFoundException,
+      );
+    });
+
+    it('debe retornar REJECTED si no hay cupos disponibles', async () => {
+      jest
+        .spyOn(estudianteRepository, 'findOneBy')
+        .mockResolvedValue(mockEstudiante as any);
+      jest
+        .spyOn(gestionRepository, 'findOne')
+        .mockResolvedValue(mockGestion as any);
+      jest
+        .spyOn(periodoRepository, 'findOne')
+        .mockResolvedValue(mockPeriodo as any);
+
+      const mockManager = {
+        getRepository: jest.fn((entity) => {
+          if (entity === GrupoMateria) {
+            return {
+              decrement: jest.fn().mockResolvedValue({ affected: 0 }),
+              increment: jest.fn(),
+              findOneBy: jest.fn().mockResolvedValue({
+                idMateria: { nombre: 'Matemáticas' },
+                idGrupo: { sigla: 'A' },
+              }),
+            };
+          }
+          return {};
+        }),
+      };
+
+      jest
+        .spyOn(dataSource, 'transaction')
+        .mockImplementation((callback: any) => callback(mockManager));
+
+      const dto = { idEstudiante: 1, idsGrupoMateria: [1] };
+      const result = await service.requestSeat(dto);
+
+      expect(result.status).toBe('REJECTED');
+      expect(result.reason).toContain('Sin cupos el grupo');
+    });
+
+    it('debe crear inscripción exitosamente cuando todo es válido', async () => {
+      jest
+        .spyOn(estudianteRepository, 'findOneBy')
+        .mockResolvedValue(mockEstudiante as any);
+      jest
+        .spyOn(gestionRepository, 'findOne')
+        .mockResolvedValue(mockGestion as any);
+      jest
+        .spyOn(periodoRepository, 'findOne')
+        .mockResolvedValue(mockPeriodo as any);
+
+      const mockManager = {
+        getRepository: jest.fn((entity) => {
+          if (entity === GrupoMateria) {
+            return {
+              decrement: jest.fn().mockResolvedValue({ affected: 1 }),
+              increment: jest.fn(),
+            };
+          }
+          if (entity === Inscripcion) {
+            return {
+              create: jest.fn().mockReturnValue(mockInscripcion),
+              save: jest.fn().mockResolvedValue(mockInscripcion),
+            };
+          }
+          if (entity === Detalle) {
+            return {
+              create: jest.fn().mockReturnValue(mockDetalle),
+              save: jest.fn().mockResolvedValue([mockDetalle]),
+            };
+          }
+          if (entity === Nota) {
+            return {
+              create: jest.fn().mockReturnValue({}),
+              save: jest.fn().mockResolvedValue({}),
+            };
+          }
+        }),
+      };
+
+      jest
+        .spyOn(dataSource, 'transaction')
+        .mockImplementation((callback: any) => callback(mockManager));
+
+      const dto = { idEstudiante: 1, idsGrupoMateria: [1, 2] };
+      const result = await service.requestSeat(dto);
+
       expect(result.status).toBe('CONFIRMED');
       expect(result.inscripcion).toBeDefined();
-      expect(result.grupos).toContain(1);
-      
-      // VALIDA que decrementó exitosamente
-      expect(mockGrupoRepo.decrement).toHaveBeenCalledTimes(1);
-      
-      // VALIDA que se creó la inscripción
-      expect(mockInscripcionRepo.save).toHaveBeenCalled();
-      
-      // VALIDA que se crearon los detalles
-      expect(mockDetalleRepo.save).toHaveBeenCalled();
-      
-      // VALIDA que se crearon las notas
-      expect(mockNotaRepo.save).toHaveBeenCalled();
+      expect(result.grupos).toEqual([1, 2]);
+      expect(estudiantesService.invalidateCacheForEstudiante).toHaveBeenCalledWith(1);
     });
 
-    it('debe REVERTIR cupos si falla en el segundo grupo', async () => {
-      // Primer grupo: tiene cupos (affected = 1)
-      // Segundo grupo: NO tiene cupos (affected = 0)
-      mockGrupoRepo.decrement
-        .mockResolvedValueOnce({ affected: 1 })  // Grupo 1: OK
-        .mockResolvedValueOnce({ affected: 0 }); // Grupo 2: FALLA
+    it('debe hacer rollback de cupos si falla después de reservar algunos', async () => {
+      jest
+        .spyOn(estudianteRepository, 'findOneBy')
+        .mockResolvedValue(mockEstudiante as any);
+      jest
+        .spyOn(gestionRepository, 'findOne')
+        .mockResolvedValue(mockGestion as any);
+      jest
+        .spyOn(periodoRepository, 'findOne')
+        .mockResolvedValue(mockPeriodo as any);
 
-      mockGrupoRepo.findOneBy.mockResolvedValue({
-        id: 2,
-        idMateria: { nombre: 'Física' },
-        idGrupo: { sigla: 'B' },
-      });
+      const mockIncrement = jest.fn();
+      const mockManager = {
+        getRepository: jest.fn((entity) => {
+          if (entity === GrupoMateria) {
+            return {
+              decrement: jest
+                .fn()
+                .mockResolvedValueOnce({ affected: 1 })
+                .mockResolvedValueOnce({ affected: 0 }),
+              increment: mockIncrement,
+              findOneBy: jest.fn().mockResolvedValue({
+                idMateria: { nombre: 'Física' },
+                idGrupo: { sigla: 'B' },
+              }),
+            };
+          }
+          return {};
+        }),
+      };
 
-      const result = await service.requestSeat({
-        idEstudiante: 1,
-        idsGrupoMateria: [1, 2],
-      });
+      jest
+        .spyOn(dataSource, 'transaction')
+        .mockImplementation((callback: any) => callback(mockManager));
 
-      // VALIDA que rechazó la inscripción
+      const dto = { idEstudiante: 1, idsGrupoMateria: [1, 2] };
+      const result = await service.requestSeat(dto);
+
       expect(result.status).toBe('REJECTED');
-      
-      // VALIDA que REVIRTIÓ el cupo del grupo 1
-      expect(mockGrupoRepo.increment).toHaveBeenCalledWith(
-        expect.objectContaining({ id: expect.anything() }),
-        'cupos',
-        1
-      );
-      
-      // VALIDA que NO se creó la inscripción
-      expect(mockInscripcionRepo.save).not.toHaveBeenCalled();
+      expect(mockIncrement).toHaveBeenCalled();
+    });
+  });
+
+  describe('calcularNumeroPeriodo', () => {
+    it('debe retornar 1 para marzo-julio', () => {
+      const fecha = new Date('2025-05-15');
+      const resultado = service['calcularNumeroPeriodo'](fecha);
+      expect(resultado).toBe(1);
+    });
+
+    it('debe retornar 2 para agosto-noviembre', () => {
+      const fecha = new Date('2025-10-15');
+      const resultado = service['calcularNumeroPeriodo'](fecha);
+      expect(resultado).toBe(2);
+    });
+
+    it('debe retornar 3 para diciembre-febrero', () => {
+      const fecha = new Date('2025-01-15');
+      const resultado = service['calcularNumeroPeriodo'](fecha);
+      expect(resultado).toBe(3);
     });
   });
 });

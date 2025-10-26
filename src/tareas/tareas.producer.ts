@@ -12,8 +12,8 @@ export class TareasProducer {
   async enqueue(entity: string, type: OperationType, data?: any, callback?: string, jobId?: string) {
     const id = jobId ?? randomUUID();
     const task: TaskData = { entity, type, data, callbackUrl: callback };
-    if(entity === 'inscripcion' && type === "requestSeat"){
-      await this.queueManager.enqueueToQueue('inscripcion', `${entity}.${type}`, task, { jobId: id });
+    if(type !== "requestSeat"){
+      await this.queueManager.enqueueToQueue('default', `${entity}.${type}`, task, { jobId: id });
     }else{
       await this.queueManager.enqueueBalanced(task, { jobId: id });
     }
