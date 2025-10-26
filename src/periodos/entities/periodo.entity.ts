@@ -11,10 +11,7 @@ export class Periodo {
 
     @Column()
     numero: number;
-
-    // @ManyToOne(() => GrupoMateria, (grupo_materia) => grupo_materia.id, { eager: true, nullable: true })
-    // idGrupoMateria: GrupoMateria;
-
+    
     @ManyToOne(() => Gestion, (gestion) => gestion.id, { eager: true, nullable: true } )
     idGestion: Gestion;
 

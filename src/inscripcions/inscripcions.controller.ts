@@ -68,14 +68,16 @@ export class InscripcionsController {
       jobId,
     );
   }
-
+ 
   @Post('request-seat')
   @ApiHeader({
     name: 'x-callback-url',
     description: 'CallBack-URL opcional para recibir respuestas',
     required: false,
   })
-  async requestSeat(@Body() createInscripcionDto: CreateInscripcionDto, @Headers('x-callback-url') callbackUrl?: string) {
+
+  async requestSeat(@Body() createInscripcionDto: CreateInscripcionDto,@ActiveUser() user: ActiveUserInterface, @Headers('x-callback-url') callbackUrl?: string) {
+    createInscripcionDto.idEstudiante = user.id;
     const jobId = generateJobId('inscripcion', 'requestSeat', createInscripcionDto);
     return await this.tareas.enqueue(
       'inscripcion',
@@ -85,22 +87,4 @@ export class InscripcionsController {
       jobId,
     );
   }
- 
-  // @Post('request-seat')
-  // @ApiHeader({
-  //   name: 'x-callback-url',
-  //   description: 'CallBack-URL opcional para recibir respuestas',
-  //   required: false,
-  // })
-  // async requestSeat(@Body() createInscripcionDto: CreateInscripcionDto,@ActiveUser() user: ActiveUserInterface, @Headers('x-callback-url') callbackUrl?: string) {
-  //   createInscripcionDto.idEstudiante = user.id;
-  //   const jobId = generateJobId('inscripcion', 'requestSeat', createInscripcionDto);
-  //   return await this.tareas.enqueue(
-  //     'inscripcion',
-  //     'requestSeat',
-  //     createInscripcionDto,
-  //     callbackUrl,
-  //     jobId,
-  //   );
-  // }
 }

@@ -35,8 +35,8 @@ export class QueueManagerService implements OnModuleDestroy {
   private lastIndex = -1;
 
   constructor(private readonly jobProcessor: TareasWorker,private readonly eventsManager: TareasEventsManager,) { 
-    this.createQueue('default', true); 
-    this.createQueue('inscripcion', true,false); 
+    this.createQueue('default', true, false); 
+    this.createQueue('inscripcion', true); 
   }
 
   async createQueue(
