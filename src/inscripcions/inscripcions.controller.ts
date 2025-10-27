@@ -10,8 +10,8 @@ import { ActiveUserInterface } from 'src/common/interfaces/active-user.interface
 import { ActiveUser } from 'src/common/decorators/active-user.decorator';
 
 @ApiTags('inscripcions')
-// @ApiBearerAuth()
-// @UseGuards(AuthGuard)
+@ApiBearerAuth()
+@UseGuards(AuthGuard)
 @Controller('inscripcions')
 export class InscripcionsController {
   private readonly logger = new Logger(InscripcionsController.name);

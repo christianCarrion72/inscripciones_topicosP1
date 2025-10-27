@@ -30,5 +30,5 @@ RUN yarn install --production --frozen-lockfile && \
 # Configurar usuario no root por seguridad
 USER node
 
-EXPOSE 3000
+EXPOSE 3001
 CMD ["node", "dist/main"]
