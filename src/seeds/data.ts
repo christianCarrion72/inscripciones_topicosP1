@@ -774,5 +774,8 @@ export const seedData = {
     { id: 38, idMateria: 42, idPrerequisito: 40 }, // INF-512 requiere INF-422
     { id: 39, idMateria: 43, idPrerequisito: 40 }, // INF-513 requiere INF-422
     { id: 40, idMateria: 44, idPrerequisito: 40 }, // INF-552 requiere INF-422
+    
+    // Semestre 3 → Semestre 4
+    { id: 41, idMateria: 20, idPrerequisito: 15 }, // ADM-200 requiere ADM-100
   ],
 };
