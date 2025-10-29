@@ -28,7 +28,7 @@ export class Estudiante {
     @Column()
     tituloBachiller: number;
 
-    @OneToOne(() => User, (user) => user.estudiante)
+    @OneToOne(() => User, (user) => user.estudiante, {eager: true})
     @JoinColumn()
     user: User;
 

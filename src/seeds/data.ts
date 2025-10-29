@@ -716,6 +716,10 @@ export const seedData = {
     { id: 286, idEstudiante: 51, idDetalle: 286, nota: 80 },  // INF-418
     { id: 287, idEstudiante: 51, idDetalle: 287, nota: 64 },  // ECO-449
     { id: 288, idEstudiante: 51, idDetalle: 288, nota: 70 },  // INF-428
+
+    { id: 289, idEstudiante: 51, idDetalle: 289, nota: null },
+    { id: 290, idEstudiante: 51, idDetalle: 290, nota: null }, 
+    { id: 291, idEstudiante: 51, idDetalle: 291, nota: null },
   ],
 
   prerequisitos: [
