@@ -364,8 +364,8 @@ export class EstudiantesService {
       }
     });
 
-    // Agrupar por nivel para mejor visualización
-    const materiasAgrupadasPorNivel = materiasDisponibles.reduce((acc, materia) => {
+    // Agrupar por nivel para mejor visualización (primero temporal)
+    const materiasAgrupadasPorNivelTemp = materiasDisponibles.reduce((acc, materia) => {
       const nivelNombre = materia.idNivel?.nombre || 'Sin nivel';
       if (!acc[nivelNombre]) {
         acc[nivelNombre] = [];
@@ -396,6 +396,19 @@ export class EstudiantesService {
       });
       return acc;
     }, {});
+
+    // Ordenar los niveles en orden ascendente (Semestre 1, 2, 3, etc.)
+    const materiasAgrupadasPorNivel = Object.keys(materiasAgrupadasPorNivelTemp)
+      .sort((a, b) => {
+        // Extraer el número del semestre
+        const numA = parseInt(a.match(/\d+/)?.[0] || '0');
+        const numB = parseInt(b.match(/\d+/)?.[0] || '0');
+        return numA - numB;
+      })
+      .reduce((acc, key) => {
+        acc[key] = materiasAgrupadasPorNivelTemp[key];
+        return acc;
+      }, {});
 
     return {
       estudiante: {

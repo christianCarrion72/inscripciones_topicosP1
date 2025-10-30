@@ -257,14 +257,14 @@ export const seedData = {
     { id: 10, numero: 2, idGestion: 5 },
     // 2026
     { id: 11, numero: 1, idGestion: 6 },
-    // 2021 - Falta periodo 3
+    // 2021 - 
     { id: 12, numero: 3, idGestion: 1 }, // 3-2021
-    // 2022 - Falta periodo 3
+    // 2022 - 
     { id: 13, numero: 3, idGestion: 2 }, // 3-2022
-    // 2023 - Falta periodo 3 y 4
+    // 2023 - 
     { id: 14, numero: 3, idGestion: 3 }, // 3-2023
     { id: 15, numero: 4, idGestion: 3 }, // 4-2023
-    // 2024 - Falta periodo 3
+    // 2024 - 
     { id: 16, numero: 3, idGestion: 4 }, // 3-2024
   ],
 
@@ -512,11 +512,11 @@ export const seedData = {
     { id: 51, idEstudiante: 51, idPeriodo: 1, fechaInscripcion: '2021-02-01' },  // 1-2021
     { id: 52, idEstudiante: 51, idPeriodo: 2, fechaInscripcion: '2021-08-01' },  // 2-2021
     { id: 53, idEstudiante: 51, idPeriodo: 12, fechaInscripcion: '2021-12-01' }, // 3-2021
-    { id: 54, idEstudiante: 51, idPeriodo: 5, fechaInscripcion: '2022-02-01' },  // 1-2022
-    { id: 55, idEstudiante: 51, idPeriodo: 6, fechaInscripcion: '2022-08-01' },  // 2-2022
+    { id: 54, idEstudiante: 51, idPeriodo: 3, fechaInscripcion: '2022-02-01' },  // 1-2022
+    { id: 55, idEstudiante: 51, idPeriodo: 4, fechaInscripcion: '2022-08-01' },  // 2-2022
     { id: 56, idEstudiante: 51, idPeriodo: 13, fechaInscripcion: '2022-12-01' }, // 3-2022
-    { id: 57, idEstudiante: 51, idPeriodo: 9, fechaInscripcion: '2023-02-01' },  // 1-2023
-    { id: 58, idEstudiante: 51, idPeriodo: 10, fechaInscripcion: '2023-08-01' }, // 2-2023
+    { id: 57, idEstudiante: 51, idPeriodo: 5, fechaInscripcion: '2023-02-01' },  // 1-2023
+    { id: 58, idEstudiante: 51, idPeriodo: 6, fechaInscripcion: '2023-08-01' }, // 2-2023
     { id: 59, idEstudiante: 51, idPeriodo: 7, fechaInscripcion: '2024-02-01' },  // 1-2024
     { id: 60, idEstudiante: 51, idPeriodo: 8, fechaInscripcion: '2024-08-01' },  // 2-2024
     { id: 61, idEstudiante: 51, idPeriodo: 16, fechaInscripcion: '2024-12-01' }, // 3-2024
@@ -559,7 +559,7 @@ export const seedData = {
     { id: 253, idInscripcion: 51, idGrupoMat: 9 },  // LIN-100 Inglés Técnico I
     { id: 254, idInscripcion: 51, idGrupoMat: 5 },  // INF-110 Introducción a la Informática
 
-    // Periodo 2-2021 (inscripcion 102)
+    // Periodo 2-2021 (inscripcion 52)
     { id: 255, idInscripcion: 52, idGrupoMat: 13 }, // MAT-103 Álgebra Lineal
     { id: 256, idInscripcion: 52, idGrupoMat: 3 },  // INF-119 Estructuras Discretas
     { id: 257, idInscripcion: 52, idGrupoMat: 17 }, // FIS-102 Física II
